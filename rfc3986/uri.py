@@ -20,6 +20,13 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
 
         If the authority is not valid, it will raise a ``InvalidAuthority``
         Exception.
+
+        :returns:
+            ``{'userinfo': 'username:password', 'host': 'www.example.com',
+            'port': '80'}``
+        :rtype: dict
+        :raises InvalidAuthority: If the authority is not ``None`` and can not
+            be parsed.
         """
         if not self.authority:
             return {'userinfo': None, 'host': None, 'port': None}
@@ -37,6 +44,7 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
 
     @property
     def host(self):
+        """If present, a string representing the host."""
         try:
             authority = self.authority_info()
         except InvalidAuthority:
@@ -45,6 +53,7 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
 
     @property
     def port(self):
+        """If present, the port (as a string) extracted from the authority."""
         try:
             authority = self.authority_info()
         except InvalidAuthority:
@@ -53,6 +62,7 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
 
     @property
     def userinfo(self):
+        """If present, the userinfo extracted from the authority."""
         try:
             authority = self.authority_info()
         except InvalidAuthority:
