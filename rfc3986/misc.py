@@ -58,8 +58,13 @@ variations = [
 
 ipv6 = '(({0})|({1})|({2})|({3})|({4})|({5})|({6})|({7}))'.format(*variations)
 
+ipv_future = 'v[0-9A-Fa-f]{1}.[%s]{1}' % (
+    ''.join(UNRESERVED_CHARS.union(SUB_DELIMITERS).union(':')))
+
+ip_literal = '\[({0}|{1})\]'.format(ipv6, ipv_future)
+
 # Pattern for matching the host piece of the authority
-HOST_PATTERN = '({0}|{1}|\[{2}\])'.format(reg_name, ipv4, ipv6)
+HOST_PATTERN = '({0}|{1}|{2})'.format(reg_name, ipv4, ip_literal)
 
 SUBAUTHORITY_MATCHER = re.compile((
     '^(?:(?P<userinfo>[{0}%:]+)@)?'  # userinfo
