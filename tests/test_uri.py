@@ -5,7 +5,7 @@ from rfc3986.exceptions import InvalidAuthority
 from rfc3986.uri import URIReference
 
 
-parameters = [
+valid_hosts = [
     '[21DA:00D3:0000:2F3B:02AA:00FF:FE28:9C5A]', '[::1]',
     '[21DA:D3:0:2F3B:2AA:FF:FE28:9C5A]', '[FE80::2AA:FF:FE9A:4CA2]',
     '[FF02::2]', '[FF02:3::5]', '[FF02:0:0:0:0:0:0:2]',
@@ -13,38 +13,39 @@ parameters = [
     ]
 
 
-@pytest.fixture(params=parameters)
+
+@pytest.fixture(params=valid_hosts)
 def basic_uri(request):
     return 'http://%s' % request.param
 
 
-@pytest.fixture(params=parameters)
+@pytest.fixture(params=valid_hosts)
 def basic_uri_with_port(request):
     return 'ftp://%s:21' % request.param
 
 
-@pytest.fixture(params=parameters)
+@pytest.fixture(params=valid_hosts)
 def uri_with_port_and_userinfo(request):
     return 'ssh://user:pass@%s:22' % request.param
 
 
-@pytest.fixture(params=parameters)
+@pytest.fixture(params=valid_hosts)
 def basic_uri_with_path(request):
     return 'http://%s/path/to/resource' % request.param
 
 
-@pytest.fixture(params=parameters)
+@pytest.fixture(params=valid_hosts)
 def uri_with_path_and_query(request):
     return 'http://%s/path/to/resource?key=value' % request.param
 
 
-@pytest.fixture(params=parameters)
+@pytest.fixture(params=valid_hosts)
 def uri_with_everything(request):
     return 'https://user:pass@%s:443/path/to/resource?key=value#fragment' % (
         request.param)
 
 
-@pytest.fixture(params=parameters)
+@pytest.fixture(params=valid_hosts)
 def relative_uri(request):
     return '//%s' % request.param
 
