@@ -1,15 +1,20 @@
 # -*- coding: utf-8 -*-
 import re
 
-# For details about delimiters, see:
+important_characters = {
+    'generic_delimiters': ":/?#[]@",
+    'sub_delimiters': "!$&'()*+,;=",
+    'unreserved_chars': ('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+                         '012345789._~-')
+    }
+# For details about delimiters and reserved characters, see:
 # http://tools.ietf.org/html/rfc3986#section-2.2
-GENERIC_DELIMITERS = set((":", "/", "?", "#", "[", "]", "@"))
-SUB_DELIMITERS = set(("!", "$", "&", "'", "(", ")", "*", "+", ",", ";", "="))
+GENERIC_DELIMITERS = set(important_characters['generic_delimiters'])
+SUB_DELIMITERS = set(important_characters['sub_delimiters'])
 RESERVED_CHARS = GENERIC_DELIMITERS.union(SUB_DELIMITERS)
-UNRESERVED_CHARS = set(
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
-    '0123456789-._~'
-    )
+# For details about unreserved characters, see:
+# http://tools.ietf.org/html/rfc3986#section-2.3
+UNRESERVED_CHARS = set(important_characters['unreserved_chars'])
 
 # Extracted from http://tools.ietf.org/html/rfc3986#appendix-B
 pattern_dict = {
@@ -58,8 +63,10 @@ variations = [
 
 ipv6 = '(({0})|({1})|({2})|({3})|({4})|({5})|({6})|({7}))'.format(*variations)
 
-ipv_future = 'v[0-9A-Fa-f]{1}.[%s]{1}' % (
-    ''.join(UNRESERVED_CHARS.union(SUB_DELIMITERS).union(':')))
+ipv_future = 'v[0-9A-Fa-f]+.[%s]+' % (
+    'A-Za-z0-9._~\-' +  # We need to escape the '-' in this case
+    "!$&'()\*+,;=" +  # We need to escape the '*' in this case
+    ':')
 
 ip_literal = '\[({0}|{1})\]'.format(ipv6, ipv_future)
 
@@ -67,10 +74,10 @@ ip_literal = '\[({0}|{1})\]'.format(ipv6, ipv_future)
 HOST_PATTERN = '({0}|{1}|{2})'.format(reg_name, ipv4, ip_literal)
 
 SUBAUTHORITY_MATCHER = re.compile((
-    '^(?:(?P<userinfo>[{0}%:]+)@)?'  # userinfo
-    '(?P<host>{1}?)'  # host
+    '^(?:(?P<userinfo>[A-Za-z0-9_.~\-%:]+)@)?'  # userinfo
+    '(?P<host>{0}?)'  # host
     ':?(?P<port>\d+)?$'  # port
-    ).format(''.join(UNRESERVED_CHARS), HOST_PATTERN))
+    ).format(HOST_PATTERN))
 
 # These are enumerated for the named tuple used as a superclass of
 # URIReference
