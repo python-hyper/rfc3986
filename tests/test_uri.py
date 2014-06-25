@@ -12,7 +12,11 @@ valid_hosts = [
     '[FF02:30:0:0:0:0:0:5]', '127.0.0.1', 'www.example.com', 'localhost'
     ]
 
-invalid_hosts = ['[FADF:01]', 'localhost:80:80:80']
+invalid_hosts = [
+    '[FF02::3::5]',  # IPv6 can only have one ::
+    '[FADF:01]',  # Not properly compacted (missing a :)
+    'localhost:80:80:80'  # Too many ports
+    ]
 
 
 @pytest.fixture(params=valid_hosts)
@@ -59,6 +63,11 @@ def absolute_path_uri():
 @pytest.fixture(params=invalid_hosts)
 def invalid_uri(request):
     return 'https://%s' % request.param
+
+
+@pytest.fixture
+def scheme_and_path_uri():
+    return 'mailto:user@example.com'
 
 
 class TestURIReferenceParsesURIs:
@@ -160,7 +169,7 @@ class TestURIReferenceParsesURIs:
         assert uri.scheme is None
         assert uri.authority == relative_uri[2:]
 
-    def test_handles_absolute_path_uris(self, absolute_path_uri):
+    def test_handles_absolute_path_uri(self, absolute_path_uri):
         """Test that URIReference can handle a path-only URI."""
         uri = URIReference.from_string(absolute_path_uri)
         assert uri.path == absolute_path_uri
@@ -169,3 +178,14 @@ class TestURIReferenceParsesURIs:
             'host': None,
             'port': None,
             }
+
+    def test_handles_scheme_and_path_uri(self, scheme_and_path_uri):
+        """Test that URIReference can handle a `scheme:path` URI."""
+        uri = URIReference.from_string(scheme_and_path_uri)
+        assert uri.path == 'user@example.com'
+        assert uri.scheme == 'mailto'
+        assert uri.query is None
+        assert uri.host is None
+        assert uri.port is None
+        assert uri.userinfo is None
+        assert uri.authority is None

@@ -22,11 +22,19 @@ expressions for parsing and validating URIs and their components.
 
 import re
 
+# These are enumerated for the named tuple used as a superclass of
+# URIReference
+URI_COMPONENTS = ['scheme', 'authority', 'path', 'query', 'fragment']
+
 important_characters = {
     'generic_delimiters': ":/?#[]@",
     'sub_delimiters': "!$&'()*+,;=",
+    # We need to escape the '*' in this case
+    're_sub_delimiters': "!$&'()\*+,;=",
     'unreserved_chars': ('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
-                         '012345789._~-')
+                         '012345789._~-'),
+    # We need to escape the '-' in this case:
+    're_unreserved': 'A-Za-z0-9._~\-',
     }
 # For details about delimiters and reserved characters, see:
 # http://tools.ietf.org/html/rfc3986#section-2.2
@@ -38,7 +46,7 @@ RESERVED_CHARS = GENERIC_DELIMITERS.union(SUB_DELIMITERS)
 UNRESERVED_CHARS = set(important_characters['unreserved_chars'])
 
 # Extracted from http://tools.ietf.org/html/rfc3986#appendix-B
-pattern_dict = {
+component_pattern_dict = {
     'scheme': '[^:/?#]+',
     'authority': '[^/?#]*',
     'path': '[^?#]*',
@@ -53,9 +61,14 @@ pattern_dict = {
 # the reference so we can also simply use SRE_Match#groups.
 expression = ('(?:(?P<scheme>{scheme}):)?(?://(?P<authority>{authority}))?'
               '(?P<path>{path})(?:\?(?P<query>{query}))?'
-              '(?:#(?P<fragment>{fragment}))?').format(**pattern_dict)
+              '(?:#(?P<fragment>{fragment}))?'
+              ).format(**component_pattern_dict)
 
 URI_MATCHER = re.compile(expression)
+
+# #########################
+# Authority Matcher Section
+# #########################
 
 # Host patterns, see: http://tools.ietf.org/html/rfc3986#section-3.2.2
 # The pattern for a regular name, e.g.,  www.google.com, api.github.com
@@ -96,8 +109,8 @@ variations = [
 ipv6 = '(({0})|({1})|({2})|({3})|({4})|({5})|({6})|({7}))'.format(*variations)
 
 ipv_future = 'v[0-9A-Fa-f]+.[%s]+' % (
-    'A-Za-z0-9._~\-' +  # We need to escape the '-' in this case
-    "!$&'()\*+,;=" +  # We need to escape the '*' in this case
+    important_characters['re_unreserved'] +
+    important_characters['re_sub_delimiters'] +
     ':')
 
 ip_literal = '\[({0}|{1})\]'.format(ipv6, ipv_future)
@@ -111,6 +124,70 @@ SUBAUTHORITY_MATCHER = re.compile((
     ':?(?P<port>\d+)?$'  # port
     ).format(HOST_PATTERN))
 
-# These are enumerated for the named tuple used as a superclass of
-# URIReference
-URI_COMPONENTS = ['scheme', 'authority', 'path', 'query', 'fragment']
+
+# ####################
+# Path Matcher Section
+# ####################
+
+# See http://tools.ietf.org/html/rfc3986#section-3.3 for more information
+# about the path patterns defined below.
+
+# Percent encoded character values
+pct_encoded = '%[A-Fa-f0-9]{2}'
+pchar = ('([' + important_characters['re_unreserved']
+         + important_characters['re_sub_delimiters']
+         + ':@]|%s)' % pct_encoded)
+segments = {
+    'segment': pchar + '*',
+    # Non-zero length segment
+    'segment-nz': pchar + '+',
+    # Non-zero length segment without ":"
+    'segment-nz-nc': pchar.replace(':', '') + '+'
+    }
+
+# Path types taken from Section 3.3 (linked above)
+path_empty = '^$'
+path_rootless = '%(segment-nz)s(/%(segment)s)*' % segments
+path_noscheme = '%(segment-nz-nc)s(/%(segment)s)*' % segments
+path_absolute = '/(%s)?' % path_rootless
+path_abempty = '(/%(segment)s)*' % segments
+
+# Matcher used to validate path components
+PATH_MATCHER = re.compile('(%s|%s|%s|%s|%s)' % (
+    path_abempty, path_absolute, path_noscheme, path_rootless, path_empty
+    ))
+
+
+# ##################################
+# Query and Fragment Matcher Section
+# ##################################
+
+QUERY_MATCHER = re.compile(
+    '([/?:@' + important_characters['re_unreserved']
+    + important_characters['re_sub_delimiters']
+    + '|%s)*' % pct_encoded)
+
+FRAGMENT_MATCHER = QUERY_MATCHER
+
+# Relative reference matcher
+
+# See http://tools.ietf.org/html/rfc3986#section-4.2 for details
+relative_part = '(//%s%s|%s|%s|%s)' % (
+    component_pattern_dict['authority'], path_abempty, path_absolute,
+    path_noscheme, path_empty
+    )
+
+RELATIVE_REF_MATCHER = re.compile('%s(\?%s)?(#%s)?' % (
+    relative_part, QUERY_MATCHER.pattern, FRAGMENT_MATCHER.pattern
+    ))
+
+# See http://tools.ietf.org/html/rfc3986#section-3 for definition
+hier_part = '(//%s%s|%s|%s|%s)' % (
+    component_pattern_dict['authority'], path_abempty, path_absolute,
+    path_rootless, path_empty
+    )
+
+# See http://tools.ietf.org/html/rfc3986#section-4.3
+ABSOLUTE_URI_MATCHER = re.compile('%s:%s(\?%s)' % (
+    component_pattern_dict['scheme'], hier_part, QUERY_MATCHER.pattern
+    ))
