@@ -12,6 +12,7 @@ valid_hosts = [
     '[FF02:30:0:0:0:0:0:5]', '127.0.0.1', 'www.example.com', 'localhost'
     ]
 
+invalid_hosts = ['[FADF:01]', 'localhost:80:80:80']
 
 
 @pytest.fixture(params=valid_hosts)
@@ -55,9 +56,9 @@ def absolute_path_uri():
     return '/path/to/file'
 
 
-@pytest.fixture
-def invalid_ipv6():
-    return 'https://[FADF:01]'
+@pytest.fixture(params=invalid_hosts)
+def invalid_uri(request):
+    return 'https://%s' % request.param
 
 
 class TestURIReferenceParsesURIs:
@@ -140,11 +141,18 @@ class TestURIReferenceParsesURIs:
         assert uri.userinfo == 'user:pass'
         assert uri.port == '443'
 
-    def test_authority_info_raises_InvalidAuthority(self, invalid_ipv6):
+    def test_authority_info_raises_InvalidAuthority(self, invalid_uri):
         """Test that an invalid IPv6 is caught by authority_info()."""
-        uri = URIReference.from_string(invalid_ipv6)
+        uri = URIReference.from_string(invalid_uri)
         with pytest.raises(InvalidAuthority):
             uri.authority_info()
+
+    def test_attributes_catch_InvalidAuthority(self, invalid_uri):
+        """Test that an invalid IPv6 is caught by authority_info()."""
+        uri = URIReference.from_string(invalid_uri)
+        assert uri.host is None
+        assert uri.userinfo is None
+        assert uri.port is None
 
     def test_handles_relative_uri(self, relative_uri):
         """Test that URIReference can handle a relative URI."""
@@ -156,3 +164,8 @@ class TestURIReferenceParsesURIs:
         """Test that URIReference can handle a path-only URI."""
         uri = URIReference.from_string(absolute_path_uri)
         assert uri.path == absolute_path_uri
+        assert uri.authority_info() == {
+            'userinfo': None,
+            'host': None,
+            'port': None,
+            }
