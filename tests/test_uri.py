@@ -6,8 +6,10 @@ from rfc3986.uri import URIReference
 
 
 parameters = [
-    '[21DA:00D3:0000:2F3B:02AA:00FF:FE28:9C5A]', '[::1]', '127.0.0.1',
-    'www.example.com', 'localhost'
+    '[21DA:00D3:0000:2F3B:02AA:00FF:FE28:9C5A]', '[::1]',
+    '[21DA:D3:0:2F3B:2AA:FF:FE28:9C5A]', '[FE80::2AA:FF:FE9A:4CA2]',
+    '[FF02::2]', '[FF02:3::5]', '[FF02:0:0:0:0:0:0:2]',
+    '[FF02:30:0:0:0:0:0:5]', '127.0.0.1', 'www.example.com', 'localhost'
     ]
 
 
