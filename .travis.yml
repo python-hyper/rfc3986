@@ -11,7 +11,14 @@ python:
 before_script:
   - pip install -r dev-requirements.txt
 
-script: py.test --cov rfc3986
+script:
+  - >
+      if [[ $TRAVIS_PYTHON_VERSION == pypy ]]; then
+        py.test test/
+      else
+        py.test -n 4 --cov rfc3986 tests/
+        coverage report -m --fail-under 100
+      fi
 
 notifications:
   on_success: change
