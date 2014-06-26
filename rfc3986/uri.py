@@ -20,6 +20,22 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
             query or None,
             fragment or None)
 
+    def __eq__(self, other):
+        other_ref = other
+        if isinstance(other, tuple):
+            other_ref = URIReference(*other)
+        elif isinstance(other, str):
+            other_ref = URIReference.from_string(other)
+        elif not isinstance(other, URIReference):
+            raise TypeError(
+                'Unable to compare URIReference() to {0}()'.format(
+                    type(other).__name__))
+
+        naive_equality = tuple(self) == tuple(other_ref)
+        if not naive_equality:
+            return False
+        return True
+
     @classmethod
     def from_string(cls, uri_string):
         """Parse a URI reference from the given unicode URI string.
@@ -151,6 +167,7 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
         :returns: The URI Reference reconstituted as a string.
         :rtype: str
         """
+        # See http://tools.ietf.org/html/rfc3986#section-5.3
         result_list = []
         if self.scheme:
             result_list.extend([self.scheme, ':'])

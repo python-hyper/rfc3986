@@ -2,6 +2,7 @@
 import pytest
 
 from rfc3986.exceptions import InvalidAuthority
+from rfc3986.misc import URI_MATCHER
 from rfc3986.uri import URIReference
 
 
@@ -253,7 +254,6 @@ class TestURIValidation:
 
 
 class TestURIReferenceUnsplits:
-    # Valid URI tests
     def test_basic_uri_unsplits(self, basic_uri):
         uri = URIReference.from_string(basic_uri)
         assert uri.unsplit() == basic_uri
@@ -290,3 +290,82 @@ class TestURIReferenceUnsplits:
     def test_scheme_and_path_uri_unsplits(self, scheme_and_path_uri):
         uri = URIReference.from_string(scheme_and_path_uri)
         assert uri.unsplit() == scheme_and_path_uri
+
+
+class TestURIReferenceComparesToStrings:
+    def test_basic_uri(self, basic_uri):
+        uri = URIReference.from_string(basic_uri)
+        assert uri == basic_uri
+
+    def test_basic_uri_with_port(self, basic_uri_with_port):
+        uri = URIReference.from_string(basic_uri_with_port)
+        assert uri == basic_uri_with_port
+
+    def test_uri_with_port_and_userinfo(self, uri_with_port_and_userinfo):
+        uri = URIReference.from_string(uri_with_port_and_userinfo)
+        assert uri == uri_with_port_and_userinfo
+
+    def test_basic_uri_with_path(self, basic_uri_with_path):
+        uri = URIReference.from_string(basic_uri_with_path)
+        assert uri == basic_uri_with_path
+
+    def test_uri_with_path_and_query(self, uri_with_path_and_query):
+        uri = URIReference.from_string(uri_with_path_and_query)
+        assert uri == uri_with_path_and_query
+
+    def test_uri_with_everything(self, uri_with_everything):
+        uri = URIReference.from_string(uri_with_everything)
+        assert uri == uri_with_everything
+
+    def test_relative_uri(self, relative_uri):
+        uri = URIReference.from_string(relative_uri)
+        assert uri == relative_uri
+
+    def test_absolute_path_uri(self, absolute_path_uri):
+        uri = URIReference.from_string(absolute_path_uri)
+        assert uri == absolute_path_uri
+
+    def test_scheme_and_path_uri(self, scheme_and_path_uri):
+        uri = URIReference.from_string(scheme_and_path_uri)
+        assert uri == scheme_and_path_uri
+
+
+class TestURIReferenceComparesToTuples:
+    def to_tuple(self, uri):
+        return URI_MATCHER.match(uri).groups()
+
+    def test_basic_uri(self, basic_uri):
+        uri = URIReference.from_string(basic_uri)
+        assert uri == self.to_tuple(basic_uri)
+
+    def test_basic_uri_with_port(self, basic_uri_with_port):
+        uri = URIReference.from_string(basic_uri_with_port)
+        assert uri == self.to_tuple(basic_uri_with_port)
+
+    def test_uri_with_port_and_userinfo(self, uri_with_port_and_userinfo):
+        uri = URIReference.from_string(uri_with_port_and_userinfo)
+        assert uri == self.to_tuple(uri_with_port_and_userinfo)
+
+    def test_basic_uri_with_path(self, basic_uri_with_path):
+        uri = URIReference.from_string(basic_uri_with_path)
+        assert uri == self.to_tuple(basic_uri_with_path)
+
+    def test_uri_with_path_and_query(self, uri_with_path_and_query):
+        uri = URIReference.from_string(uri_with_path_and_query)
+        assert uri == self.to_tuple(uri_with_path_and_query)
+
+    def test_uri_with_everything(self, uri_with_everything):
+        uri = URIReference.from_string(uri_with_everything)
+        assert uri == self.to_tuple(uri_with_everything)
+
+    def test_relative_uri(self, relative_uri):
+        uri = URIReference.from_string(relative_uri)
+        assert uri == self.to_tuple(relative_uri)
+
+    def test_absolute_path_uri(self, absolute_path_uri):
+        uri = URIReference.from_string(absolute_path_uri)
+        assert uri == self.to_tuple(absolute_path_uri)
+
+    def test_scheme_and_path_uri(self, scheme_and_path_uri):
+        uri = URIReference.from_string(scheme_and_path_uri)
+        assert uri == self.to_tuple(scheme_and_path_uri)
