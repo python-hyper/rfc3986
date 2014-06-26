@@ -369,3 +369,19 @@ class TestURIReferenceComparesToTuples:
     def test_scheme_and_path_uri(self, scheme_and_path_uri):
         uri = URIReference.from_string(scheme_and_path_uri)
         assert uri == self.to_tuple(scheme_and_path_uri)
+
+
+def test_uri_comparison_raises_TypeError(basic_uri):
+    uri = URIReference.from_string(basic_uri)
+    with pytest.raises(TypeError):
+        uri == 1
+
+
+class TestURIReferenceComparesToURIReferences:
+    def test_same_basic_uri(self, basic_uri):
+        uri = URIReference.from_string(basic_uri)
+        assert uri == uri
+
+    def test_different_basic_uris(self, basic_uri, basic_uri_with_port):
+        uri = URIReference.from_string(basic_uri)
+        assert (uri == URIReference.from_string(basic_uri_with_port)) is False
