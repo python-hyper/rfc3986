@@ -78,7 +78,7 @@ class TestURIReferenceParsesURIs:
         assert uri.scheme == 'http'
         assert uri.authority == basic_uri[7:]  # len('http://')
         assert uri.host == uri.authority
-        assert uri.path == ''
+        assert uri.path is None
         assert uri.query is None
         assert uri.fragment is None
         assert uri.port is None
@@ -91,7 +91,7 @@ class TestURIReferenceParsesURIs:
         assert uri.authority == basic_uri_with_port[6:]  # len('ftp://')
         assert uri.host != uri.authority
         assert uri.port == '21'
-        assert uri.path == ''
+        assert uri.path is None
         assert uri.query is None
         assert uri.fragment is None
         assert uri.userinfo is None
@@ -107,7 +107,7 @@ class TestURIReferenceParsesURIs:
         assert uri.authority == uri_with_port_and_userinfo[6:]
         assert uri.host != uri.authority
         assert uri.port == '22'
-        assert uri.path == ''
+        assert uri.path is None
         assert uri.query is None
         assert uri.fragment is None
         assert uri.userinfo == 'user:pass'

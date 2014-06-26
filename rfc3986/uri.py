@@ -9,8 +9,11 @@ from .misc import (
 
 
 class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
-    def __init__(self, scheme, authority, path, query, fragment):
-        super(URIReference, self).__init__(
+    slots = ()
+
+    def __new__(cls, scheme, authority, path, query, fragment):
+        return super(URIReference, cls).__new__(
+            cls,
             scheme or None,
             authority or None,
             path or None,
