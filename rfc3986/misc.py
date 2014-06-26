@@ -153,7 +153,7 @@ path_absolute = '/(%s)?' % path_rootless
 path_abempty = '(/%(segment)s)*' % segments
 
 # Matcher used to validate path components
-PATH_MATCHER = re.compile('(%s|%s|%s|%s|%s)' % (
+PATH_MATCHER = re.compile('^(%s|%s|%s|%s|%s)$' % (
     path_abempty, path_absolute, path_noscheme, path_rootless, path_empty
     ))
 
@@ -163,11 +163,14 @@ PATH_MATCHER = re.compile('(%s|%s|%s|%s|%s)' % (
 # ##################################
 
 QUERY_MATCHER = re.compile(
-    '([/?:@' + important_characters['re_unreserved']
+    '^([/?:@' + important_characters['re_unreserved']
     + important_characters['re_sub_delimiters']
-    + '|%s)*' % pct_encoded)
+    + ']|%s)*$' % pct_encoded)
 
 FRAGMENT_MATCHER = QUERY_MATCHER
+
+# Scheme validation, see: http://tools.ietf.org/html/rfc3986#section-3.1
+SCHEME_MATCHER = re.compile('^[A-Za-z][A-Za-z0-9+.\-]*$')
 
 # Relative reference matcher
 
@@ -177,7 +180,7 @@ relative_part = '(//%s%s|%s|%s|%s)' % (
     path_noscheme, path_empty
     )
 
-RELATIVE_REF_MATCHER = re.compile('%s(\?%s)?(#%s)?' % (
+RELATIVE_REF_MATCHER = re.compile('^%s(\?%s)?(#%s)?$' % (
     relative_part, QUERY_MATCHER.pattern, FRAGMENT_MATCHER.pattern
     ))
 
@@ -188,6 +191,6 @@ hier_part = '(//%s%s|%s|%s|%s)' % (
     )
 
 # See http://tools.ietf.org/html/rfc3986#section-4.3
-ABSOLUTE_URI_MATCHER = re.compile('%s:%s(\?%s)' % (
+ABSOLUTE_URI_MATCHER = re.compile('^%s:%s(\?%s)$' % (
     component_pattern_dict['scheme'], hier_part, QUERY_MATCHER.pattern
     ))

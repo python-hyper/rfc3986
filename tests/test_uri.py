@@ -189,3 +189,52 @@ class TestURIReferenceParsesURIs:
         assert uri.port is None
         assert uri.userinfo is None
         assert uri.authority is None
+
+
+class TestURIValidation:
+    # Valid URI tests
+    def test_basic_uri_is_valid(self, basic_uri):
+        uri = URIReference.from_string(basic_uri)
+        assert uri.is_valid() is True
+
+    def test_basic_uri_with_port_is_valid(self, basic_uri_with_port):
+        uri = URIReference.from_string(basic_uri_with_port)
+        assert uri.is_valid() is True
+
+    def test_uri_with_port_and_userinfo_is_valid(self,
+                                                 uri_with_port_and_userinfo):
+        uri = URIReference.from_string(uri_with_port_and_userinfo)
+        assert uri.is_valid() is True
+
+    def test_basic_uri_with_path_is_valid(self, basic_uri_with_path):
+        uri = URIReference.from_string(basic_uri_with_path)
+        assert uri.is_valid() is True
+
+    def test_uri_with_path_and_query_is_valid(self, uri_with_path_and_query):
+        uri = URIReference.from_string(uri_with_path_and_query)
+        assert uri.is_valid() is True
+
+    def test_uri_with_everything_is_valid(self, uri_with_everything):
+        uri = URIReference.from_string(uri_with_everything)
+        assert uri.is_valid() is True
+
+    def test_relative_uri_is_valid(self, relative_uri):
+        uri = URIReference.from_string(relative_uri)
+        assert uri.is_valid() is True
+
+    def test_absolute_path_uri_is_valid(self, absolute_path_uri):
+        uri = URIReference.from_string(absolute_path_uri)
+        assert uri.is_valid() is True
+
+    def test_scheme_and_path_uri_is_valid(self, scheme_and_path_uri):
+        uri = URIReference.from_string(scheme_and_path_uri)
+        assert uri.is_valid() is True
+
+    # Invalid URI tests
+    def test_invalid_uri_is_not_valid(self, invalid_uri):
+        uri = URIReference.from_string(invalid_uri)
+        assert uri.is_valid() is False
+
+    def test_invalid_query_component(self):
+        uri = URIReference(None, None, None, 'foo#bar', None)
+        assert uri.is_valid() is False
