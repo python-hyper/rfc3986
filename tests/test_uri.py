@@ -250,3 +250,43 @@ class TestURIValidation:
     def test_invalid_fragment_component(self):
         uri = URIReference(None, None, None, None, 'foo#bar')
         assert uri.is_valid() is False
+
+
+class TestURIReferenceUnsplits:
+    # Valid URI tests
+    def test_basic_uri_unsplits(self, basic_uri):
+        uri = URIReference.from_string(basic_uri)
+        assert uri.unsplit() == basic_uri
+
+    def test_basic_uri_with_port_unsplits(self, basic_uri_with_port):
+        uri = URIReference.from_string(basic_uri_with_port)
+        assert uri.unsplit() == basic_uri_with_port
+
+    def test_uri_with_port_and_userinfo_unsplits(self,
+                                                 uri_with_port_and_userinfo):
+        uri = URIReference.from_string(uri_with_port_and_userinfo)
+        assert uri.unsplit() == uri_with_port_and_userinfo
+
+    def test_basic_uri_with_path_unsplits(self, basic_uri_with_path):
+        uri = URIReference.from_string(basic_uri_with_path)
+        assert uri.unsplit() == basic_uri_with_path
+
+    def test_uri_with_path_and_query_unsplits(self, uri_with_path_and_query):
+        uri = URIReference.from_string(uri_with_path_and_query)
+        assert uri.unsplit() == uri_with_path_and_query
+
+    def test_uri_with_everything_unsplits(self, uri_with_everything):
+        uri = URIReference.from_string(uri_with_everything)
+        assert uri.unsplit() == uri_with_everything
+
+    def test_relative_uri_unsplits(self, relative_uri):
+        uri = URIReference.from_string(relative_uri)
+        assert uri.unsplit() == relative_uri
+
+    def test_absolute_path_uri_unsplits(self, absolute_path_uri):
+        uri = URIReference.from_string(absolute_path_uri)
+        assert uri.unsplit() == absolute_path_uri
+
+    def test_scheme_and_path_uri_unsplits(self, scheme_and_path_uri):
+        uri = URIReference.from_string(scheme_and_path_uri)
+        assert uri.unsplit() == scheme_and_path_uri

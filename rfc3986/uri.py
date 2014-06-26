@@ -144,3 +144,22 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
         if self.fragment is None or FRAGMENT_MATCHER.match(self.fragment):
             return True
         return False
+
+    def unsplit(self):
+        """Create a URI string from the components.
+
+        :returns: The URI Reference reconstituted as a string.
+        :rtype: str
+        """
+        result_list = []
+        if self.scheme:
+            result_list.extend([self.scheme, ':'])
+        if self.authority:
+            result_list.extend(['//', self.authority])
+        if self.path:
+            result_list.append(self.path)
+        if self.query:
+            result_list.extend(['?', self.query])
+        if self.fragment:
+            result_list.extend(['#', self.fragment])
+        return ''.join(result_list)
