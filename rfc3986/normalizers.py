@@ -20,7 +20,15 @@ def normalize_scheme(scheme):
 
 
 def normalize_authority(authority):
-    return normalize_percent_characters(authority)
+    userinfo, host, port = authority
+    result = ''
+    if userinfo:
+        result += normalize_percent_characters(userinfo) + '@'
+    if host:
+        result += host.lower()
+    if port:
+        result += ':' + port
+    return result
 
 
 def normalize_path(path):

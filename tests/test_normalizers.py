@@ -59,3 +59,14 @@ def test_remove_dot_segments(path_fixture):
 
 def test_normalized_equality(uris):
     assert uris[0] == uris[1]
+
+
+def test_hostname_normalization():
+    assert (URIReference(None, 'EXAMPLE.COM', None, None, None) ==
+            URIReference(None, 'example.com', None, None, None))
+
+
+def test_authority_normalization():
+    uri = URIReference(
+        None, 'user%2aName@EXAMPLE.COM', None, None, None).normalize()
+    assert uri.authority == 'user%2AName@example.com'

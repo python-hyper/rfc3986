@@ -176,7 +176,8 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
         # See http://tools.ietf.org/html/rfc3986#section-6.2.2 for logic in
         # this method.
         return URIReference(normalize_scheme(self.scheme or ''),
-                            normalize_authority(self.authority or ''),
+                            normalize_authority(
+                                (self.userinfo, self.host, self.port)),
                             normalize_path(self.path or ''),
                             normalize_query(self.query or ''),
                             normalize_fragment(self.fragment or ''))
