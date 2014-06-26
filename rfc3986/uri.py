@@ -6,6 +6,10 @@ from .misc import (
     FRAGMENT_MATCHER, PATH_MATCHER, QUERY_MATCHER, SCHEME_MATCHER,
     SUBAUTHORITY_MATCHER, URI_MATCHER, URI_COMPONENTS
     )
+from .normalizers import (
+    normalize_scheme, normalize_authority, normalize_path, normalize_query,
+    normalize_fragment
+    )
 
 
 class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
@@ -31,10 +35,9 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
                 'Unable to compare URIReference() to {0}()'.format(
                     type(other).__name__))
 
+        # See http://tools.ietf.org/html/rfc3986#section-6.2
         naive_equality = tuple(self) == tuple(other_ref)
-        if not naive_equality:
-            return False
-        return True
+        return naive_equality or self.normalized_equality(other_ref)
 
     @classmethod
     def from_string(cls, uri_string):
@@ -160,6 +163,33 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
         if self.fragment is None or FRAGMENT_MATCHER.match(self.fragment):
             return True
         return False
+
+    def normalize(self):
+        """Normalize this reference as described in Section 6.2.2
+
+        This is not an in-place normalization. Instead this creates a new
+        URIReference.
+
+        :returns: A new reference object with normalized components.
+        :rtype: URIReference
+        """
+        # See http://tools.ietf.org/html/rfc3986#section-6.2.2 for logic in
+        # this method.
+        return URIReference(normalize_scheme(self.scheme),
+                            normalize_authority(self.authority),
+                            normalize_path(self.path),
+                            normalize_query(self.query),
+                            normalize_fragment(self.fragment))
+
+    def normalized_equality(self, other_ref):
+        """Compare this URIReference to another URIReference.
+
+        :param URIReference other_ref: (required), The reference with which
+            we're comparing.
+        :returns: ``True`` if the references are equal, ``False`` otherwise.
+        :rtype: bool
+        """
+        return tuple(self.normalize()) == tuple(other_ref.normalize())
 
     def unsplit(self):
         """Create a URI string from the components.
