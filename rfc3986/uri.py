@@ -175,11 +175,11 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
         """
         # See http://tools.ietf.org/html/rfc3986#section-6.2.2 for logic in
         # this method.
-        return URIReference(normalize_scheme(self.scheme),
-                            normalize_authority(self.authority),
-                            normalize_path(self.path),
-                            normalize_query(self.query),
-                            normalize_fragment(self.fragment))
+        return URIReference(normalize_scheme(self.scheme or ''),
+                            normalize_authority(self.authority or ''),
+                            normalize_path(self.path or ''),
+                            normalize_query(self.query or ''),
+                            normalize_fragment(self.fragment or ''))
 
     def normalized_equality(self, other_ref):
         """Compare this URIReference to another URIReference.

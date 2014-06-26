@@ -29,13 +29,11 @@ def normalize_path(path):
 
 
 def normalize_query(query):
-    query = normalize_percent_characters(query)
-    return query
+    return normalize_percent_characters(query)
 
 
 def normalize_fragment(fragment):
-    fragment = normalize_percent_characters(fragment)
-    return fragment
+    return normalize_percent_characters(fragment)
 
 
 PERCENT_MATCHER = re.compile('%[A-Fa-f0-9]{2}')
@@ -55,13 +53,29 @@ def normalize_percent_characters(s):
 
 def remove_dot_segments(s):
     # See http://tools.ietf.org/html/rfc3986#section-5.2.4 for pseudo-code
-    segments = s.split('/')
-    output = []
+    segments = s.split('/')  # Turn the path into a list of segments
+    output = []  # Initialize the variable to use to store output
+
     for segment in segments:
+        # '.' is the current directory, so ignore it, it is superfluous
         if segment == '.':
             continue
-        elif segment == '..' and output:
-            output.pop()
-        elif segment or segment == '':
+        # Anything other than '..', should be appended to the output
+        elif segment != '..':
             output.append(segment)
+        # In this case segment == '..', if we can, we should pop the last
+        # element
+        elif output:
+            output.pop()
+
+    # If the path starts with '/' and the output is empty or the first string
+    # is non-empty
+    if s.startswith('/') and (not output or output[0]):
+        output.insert(0, '')
+
+    # If the path starts with '/.' or '/..' ensure we add one more empty
+    # string to add a trailing '/'
+    if s.endswith(('/.', '/..')):
+        output.append('')
+
     return '/'.join(output)
