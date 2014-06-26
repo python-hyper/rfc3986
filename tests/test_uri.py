@@ -7,7 +7,7 @@ from rfc3986.uri import URIReference
 
 parameters = [
     '[21DA:00D3:0000:2F3B:02AA:00FF:FE28:9C5A]', '[::1]', '127.0.0.1',
-    'www.example.com'
+    'www.example.com', 'localhost'
     ]
 
 
