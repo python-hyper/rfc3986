@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import pytest
 
+from rfc3986.uri import URIReference
 from rfc3986.normalizers import (
     normalize_scheme, normalize_percent_characters, remove_dot_segments
     )
@@ -44,6 +45,17 @@ def path_fixture(request):
     return request.param
 
 
+@pytest.fixture(params=paths)
+def uris(request):
+    to_norm, normalized = request.param
+    return (URIReference(None, None, to_norm, None, None),
+            URIReference(None, None, normalized, None, None))
+
+
 def test_remove_dot_segments(path_fixture):
     to_normalize, expected = path_fixture
     assert expected == remove_dot_segments(to_normalize)
+
+
+def test_normalized_equality(uris):
+    assert uris[0] == uris[1]
