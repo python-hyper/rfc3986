@@ -49,15 +49,26 @@ ls32 = '({hex}:{hex}|{ipv4})'.format(hex=hexdig, ipv4=ipv4)
 # http://tools.ietf.org/html/rfc3986#page-20
 subs = {'hex': hexdig, 'ls32': ls32}
 
+# Below: h16 = hexdig, see: https://tools.ietf.org/html/rfc5234 for details
+# about ABNF (Augmented Backus-Naur Form) use in the comments
 variations = [
+    #                            6( h16 ":" ) ls32
     '(%(hex)s:){6}%(ls32)s' % subs,
+    #                       "::" 5( h16 ":" ) ls32
     '::(%(hex)s:){5}%(ls32)s' % subs,
+    # [               h16 ] "::" 4( h16 ":" ) ls32
     '(%(hex)s)?::(%(hex)s:){4}%(ls32)s' % subs,
+    # [ *1( h16 ":" ) h16 ] "::" 3( h16 ":" ) ls32
     '((%(hex)s:)?%(hex)s)?::(%(hex)s:){3}%(ls32)s' % subs,
+    # [ *2( h16 ":" ) h16 ] "::" 2( h16 ":" ) ls32
     '((%(hex)s){0,2}:%(hex)s)?::(%(hex)s:){2}%(ls32)s' % subs,
+    # [ *3( h16 ":" ) h16 ] "::"    h16 ":"   ls32
     '((%(hex)s){0,3}:%(hex)s)?::%(hex)s:%(ls32)s' % subs,
+    # [ *4( h16 ":" ) h16 ] "::"              ls32
     '((%(hex)s){0,4}:%(hex)s)?::%(ls32)s' % subs,
+    # [ *5( h16 ":" ) h16 ] "::"              h16
     '((%(hex)s){0,5}:%(hex)s)?::%(hex)s' % subs,
+    # [ *6( h16 ":" ) h16 ] "::"
     '((%(hex)s){0,6}:%(hex)s)?::' % subs,
     ]
 
