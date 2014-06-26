@@ -7,7 +7,7 @@ from rfc3986.uri import URIReference
 
 parameters = [
     '[21DA:00D3:0000:2F3B:02AA:00FF:FE28:9C5A]', '[::1]', '127.0.0.1',
-    'www.example.com',
+    'www.example.com'
     ]
 
 
@@ -43,8 +43,8 @@ def uri_with_everything(request):
 
 
 @pytest.fixture(params=parameters)
-def relative_uri():
-    return '//[21DA:00D3:0000:2F3B:02AA:00FF:FE28:9C5A]'
+def relative_uri(request):
+    return '//%s' % request.param
 
 
 @pytest.fixture
