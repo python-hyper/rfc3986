@@ -48,6 +48,11 @@ def relative_uri(request):
 
 
 @pytest.fixture
+def absolute_path_uri():
+    return '/path/to/file'
+
+
+@pytest.fixture
 def invalid_ipv6():
     return 'https://[FADF:01]'
 
@@ -143,3 +148,8 @@ class TestURIReferenceParsesURIs:
         uri = URIReference.from_string(relative_uri)
         assert uri.scheme is None
         assert uri.authority == relative_uri[2:]
+
+    def test_handles_absolute_path_uris(self, absolute_path_uri):
+        """Test that URIReference can handle a path-only URI."""
+        uri = URIReference.from_string(absolute_path_uri)
+        assert uri.path == absolute_path_uri
