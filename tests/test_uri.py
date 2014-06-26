@@ -5,13 +5,11 @@ from rfc3986.exceptions import InvalidAuthority
 from rfc3986.uri import URIReference
 
 
-# ##########
-# IPv6 Tests
-# ##########
 parameters = [
     '[21DA:00D3:0000:2F3B:02AA:00FF:FE28:9C5A]', '[::1]', '127.0.0.1',
     'www.example.com',
     ]
+
 
 @pytest.fixture(params=parameters)
 def basic_uri(request):
@@ -57,7 +55,7 @@ def invalid_ipv6():
 class TestURIReferenceParsesURIs:
     """Tests for URIReference handling of URIs."""
     def test_handles_basic_uri(self, basic_uri):
-        """Test that URIReference can handle a simple IPv6 URI."""
+        """Test that URIReference can handle a simple URI."""
         uri = URIReference.from_string(basic_uri)
         assert uri.scheme == 'http'
         assert uri.authority == basic_uri[7:]  # len('http://')
@@ -69,7 +67,7 @@ class TestURIReferenceParsesURIs:
         assert uri.userinfo is None
 
     def test_handles_basic_uri_with_port(self, basic_uri_with_port):
-        """Test that URIReference can handle a simple IPv6 URI with a port."""
+        """Test that URIReference can handle a simple URI with a port."""
         uri = URIReference.from_string(basic_uri_with_port)
         assert uri.scheme == 'ftp'
         assert uri.authority == basic_uri_with_port[6:]  # len('ftp://')
@@ -83,7 +81,7 @@ class TestURIReferenceParsesURIs:
     def test_handles_uri_with_port_and_userinfo(
             self, uri_with_port_and_userinfo):
         """
-        Test that URIReference can handle a IPv6 URI with a port and userinfo.
+        Test that URIReference can handle a URI with a port and userinfo.
         """
         uri = URIReference.from_string(uri_with_port_and_userinfo)
         assert uri.scheme == 'ssh'
@@ -97,7 +95,7 @@ class TestURIReferenceParsesURIs:
         assert uri.userinfo == 'user:pass'
 
     def test_handles_basic_uri_with_path(self, basic_uri_with_path):
-        """Test that URIReference can handle a IPv6 URI with a path."""
+        """Test that URIReference can handle a URI with a path."""
         uri = URIReference.from_string(basic_uri_with_path)
         assert uri.scheme == 'http'
         assert basic_uri_with_path == (uri.scheme + '://' + uri.authority
@@ -111,7 +109,7 @@ class TestURIReferenceParsesURIs:
 
     def test_handles_uri_with_path_and_query(self, uri_with_path_and_query):
         """
-        Test that URIReference can handle a IPv6 URI with a path and query.
+        Test that URIReference can handle a URI with a path and query.
         """
         uri = URIReference.from_string(uri_with_path_and_query)
         assert uri.scheme == 'http'
@@ -124,7 +122,7 @@ class TestURIReferenceParsesURIs:
 
     def test_handles_uri_with_everything(self, uri_with_everything):
         """
-        Test that URIReference can handle and IPv6 with everything in it.
+        Test that URIReference can handle and with everything in it.
         """
         uri = URIReference.from_string(uri_with_everything)
         assert uri.scheme == 'https'
@@ -141,7 +139,7 @@ class TestURIReferenceParsesURIs:
             uri.authority_info()
 
     def test_handles_relative_uri(self, relative_uri):
-        """Test that URIReference can handle a relative IPv6 URI."""
+        """Test that URIReference can handle a relative URI."""
         uri = URIReference.from_string(relative_uri)
         assert uri.scheme is None
         assert uri.authority == relative_uri[2:]
