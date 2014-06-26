@@ -235,6 +235,18 @@ class TestURIValidation:
         uri = URIReference.from_string(invalid_uri)
         assert uri.is_valid() is False
 
+    def test_invalid_scheme(self):
+        uri = URIReference('123', None, None, None, None)
+        assert uri.is_valid() is False
+
+    def test_invalid_path(self):
+        uri = URIReference(None, None, 'foo#bar', None, None)
+        assert uri.is_valid() is False
+
     def test_invalid_query_component(self):
         uri = URIReference(None, None, None, 'foo#bar', None)
+        assert uri.is_valid() is False
+
+    def test_invalid_fragment_component(self):
+        uri = URIReference(None, None, None, None, 'foo#bar')
         assert uri.is_valid() is False
