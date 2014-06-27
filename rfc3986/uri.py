@@ -28,12 +28,13 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
         other_ref = other
         if isinstance(other, tuple):
             other_ref = URIReference(*other)
-        elif isinstance(other, str):
-            other_ref = URIReference.from_string(other)
         elif not isinstance(other, URIReference):
-            raise TypeError(
-                'Unable to compare URIReference() to {0}()'.format(
-                    type(other).__name__))
+            try:
+                other_ref = URIReference.from_string(other)
+            except TypeError:
+                raise TypeError(
+                    'Unable to compare URIReference() to {0}()'.format(
+                        type(other).__name__))
 
         # See http://tools.ietf.org/html/rfc3986#section-6.2
         naive_equality = tuple(self) == tuple(other_ref)
