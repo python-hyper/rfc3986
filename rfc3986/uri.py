@@ -7,8 +7,8 @@ from .misc import (
     SUBAUTHORITY_MATCHER, URI_MATCHER, URI_COMPONENTS
     )
 from .normalizers import (
-    normalize_scheme, normalize_authority, normalize_path, normalize_query,
-    normalize_fragment
+    encode_component, normalize_scheme, normalize_authority, normalize_path,
+    normalize_query, normalize_fragment
     )
 
 
@@ -40,13 +40,21 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
         return naive_equality or self.normalized_equality(other_ref)
 
     @classmethod
-    def from_string(cls, uri_string):
+    def from_string(cls, uri_string, encoding='utf-8'):
         """Parse a URI reference from the given unicode URI string.
 
         :param str uri_string: Unicode URI to be parsed into a reference.
+        :param str encoding: The encoding of the string provided
         :returns: :class:`URIReference` or subclass thereof
         """
-        return URIReference(*URI_MATCHER.match(uri_string).groups())
+        if hasattr(uri_string, 'decode'):
+            uri_string = uri_string.decode(encoding)
+
+        split_uri = URI_MATCHER.match(uri_string).groupdict()
+        return URIReference(split_uri['scheme'], split_uri['authority'],
+                            encode_component(split_uri['path'], encoding),
+                            encode_component(split_uri['query'], encoding),
+                            encode_component(split_uri['fragment'], encoding))
 
     def authority_info(self):
         """Returns a dictionary with the ``userinfo``, ``host``, and ``port``.

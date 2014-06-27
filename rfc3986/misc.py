@@ -44,6 +44,7 @@ RESERVED_CHARS = GENERIC_DELIMITERS.union(SUB_DELIMITERS)
 # For details about unreserved characters, see:
 # http://tools.ietf.org/html/rfc3986#section-2.3
 UNRESERVED_CHARS = set(important_characters['unreserved_chars'])
+NON_PCT_ENCODED = RESERVED_CHARS.union(UNRESERVED_CHARS).union('%')
 
 # Extracted from http://tools.ietf.org/html/rfc3986#appendix-B
 component_pattern_dict = {

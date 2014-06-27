@@ -14,6 +14,8 @@
 # limitations under the License.
 import re
 
+from .misc import NON_PCT_ENCODED
+
 
 def normalize_scheme(scheme):
     return scheme.lower()
@@ -87,3 +89,26 @@ def remove_dot_segments(s):
         output.append('')
 
     return '/'.join(output)
+
+
+def encode_component(uri_component, encoding):
+    if uri_component is None:
+        return uri_component
+
+    # We had a conditional to ensure we wouldn't hit a NoMethodError on
+    # Python3, but we're guaranteed to always have a unicode string passed in.
+    # I couldn't craft a test that would hit the else condition
+    uri_bytes = uri_component.encode(encoding)
+
+    encoded_uri = bytearray()
+
+    for i in range(0, len(uri_bytes)):
+        # Will return a single character bytestring on both Python 2 & 3
+        byte = uri_bytes[i:i+1]
+        byte_ord = ord(byte)
+        if byte_ord < 128 and byte.decode() in NON_PCT_ENCODED:
+            encoded_uri.extend(byte)
+            continue
+        encoded_uri.extend('%{0:02x}'.format(byte_ord).encode())
+
+    return encoded_uri.decode(encoding)

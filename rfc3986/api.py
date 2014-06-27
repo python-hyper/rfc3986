@@ -23,20 +23,21 @@ provides access to the class ``URIReference``.
 from .uri import URIReference
 
 
-def uri_reference(uri):
+def uri_reference(uri, encoding='utf-8'):
     """Parse a URI string into a URIReference.
 
     This is a convenience function. You could achieve the same end by using
     ``URIReference.from_string(uri)``.
 
     :param str uri: The URI which needs to be parsed into a reference.
+    :param str encoding: The encoding of the string provided
     :returns: A parsed URI
     :rtype: :class:`URIReference`
     """
-    return URIReference.from_string(uri)
+    return URIReference.from_string(uri, encoding)
 
 
-def is_valid_uri(uri):
+def is_valid_uri(uri, encoding='utf-8'):
     """Determine if the URI given is valid.
 
     This is a convenience function. You could use either
@@ -44,13 +45,14 @@ def is_valid_uri(uri):
     ``URIReference.from_string(uri).is_valid()`` to achieve the same result.
 
     :param str uri: The URI to be validated.
+    :param str encoding: The encoding of the string provided
     :returns: ``True`` if the URI is valid, ``False`` otherwise.
     :rtype: bool
     """
-    return URIReference.from_string(uri).is_valid()
+    return URIReference.from_string(uri, encoding).is_valid()
 
 
-def normalize_uri(uri):
+def normalize_uri(uri, encoding='utf-8'):
     """Normalize the given URI.
 
     This is a convenience function. You could use either
@@ -58,8 +60,9 @@ def normalize_uri(uri):
     ``URIReference.from_string(uri).normalize().unsplit()`` instead.
 
     :param str uri: The URI to be normalized.
+    :param str encoding: The encoding of the string provided
     :returns: The normalized URI.
     :rtype: str
     """
-    normalized_reference = URIReference.from_string(uri).normalize()
+    normalized_reference = URIReference.from_string(uri, encoding).normalize()
     return normalized_reference.unsplit()
