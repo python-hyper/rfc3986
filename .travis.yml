@@ -12,8 +12,15 @@ before_script:
   - pip install -r dev-requirements.txt
 
 script:
-  - py.test --cov rfc3986 tests/
-  - coverage report --fail-under 100 -m
+  # Stolen from
+  # https://github.com/Lukasa/hyper/blob/583f5579b681f03eb44a2867f92c07acca418c27/.travis.yml
+  - >
+      if [[ "$TRAVIS_PYTHON_VERSION" == "pypy" ]] ; then
+          py.test tests/
+      else
+          py.test --cov rfc3986 tests/
+          coverage report --fail-under 100 -m
+      fi
 
 notifications:
   on_success: change
