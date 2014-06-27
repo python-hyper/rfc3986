@@ -1,0 +1,8 @@
+include README.rst
+include LICENSE
+include HISTORY.rst
+include AUTHORS.rst
+prune *.pyc
+#recursive-include docs *.rst *.py Makefile
+recursive-include tests *.py
+prune docs/_build
