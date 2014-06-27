@@ -14,6 +14,7 @@
 # limitations under the License.
 import re
 
+from .compat import to_bytes
 from .misc import NON_PCT_ENCODED
 
 
@@ -95,10 +96,7 @@ def encode_component(uri_component, encoding):
     if uri_component is None:
         return uri_component
 
-    # We had a conditional to ensure we wouldn't hit a NoMethodError on
-    # Python3, but we're guaranteed to always have a unicode string passed in.
-    # I couldn't craft a test that would hit the else condition
-    uri_bytes = uri_component.encode(encoding)
+    uri_bytes = to_bytes(uri_component, encoding)
 
     encoded_uri = bytearray()
 

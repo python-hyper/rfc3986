@@ -1,6 +1,20 @@
 # -*- coding: utf-8 -*-
+# Copyright (c) 2014 Rackspace
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+# implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 from collections import namedtuple
 
+from .compat import to_str
 from .exceptions import InvalidAuthority
 from .misc import (
     FRAGMENT_MATCHER, PATH_MATCHER, QUERY_MATCHER, SCHEME_MATCHER,
@@ -48,8 +62,7 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
         :param str encoding: The encoding of the string provided
         :returns: :class:`URIReference` or subclass thereof
         """
-        if hasattr(uri_string, 'decode'):
-            uri_string = uri_string.decode(encoding)
+        uri_string = to_str(uri_string, encoding)
 
         split_uri = URI_MATCHER.match(uri_string).groupdict()
         return URIReference(split_uri['scheme'], split_uri['authority'],
