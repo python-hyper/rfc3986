@@ -82,6 +82,39 @@ You can also very simply validate a URI::
 
     assert is_valid_uri('hTTp://exAMPLe.COM/Some/reallY/biZZare/pAth')
 
+Requiring Components
+~~~~~~~~~~~~~~~~~~~~
+
+You can validate that a particular string is a valid URI and require
+independent components::
+
+    from rfc3986 import is_valid_uri
+
+    assert is_valid_uri('http://localhost:8774/v2/resource',
+                        require_scheme=True,
+                        require_authority=True,
+                        require_path=True)
+
+    # Assert that a mailto URI is invalid if you require an authority
+    # component
+    assert is_valid_uri('mailto:user@example.com', require_authority=True) is False
+
+If you have an instance of a ``URIReference``, you can pass the same arguments
+to ``URIReference#is_valid``, e.g.,
+
+.. code::
+
+    from rfc3986 import uri_reference
+
+    http = uri_reference('http://localhost:8774/v2/resource')
+    assert uri.is_valid(require_scheme=True,
+                        require_authority=True,
+                        require_path=True)
+
+    # Assert that a mailto URI is invalid if you require an authority
+    # component
+    mailto = uri_reference('mailto:user@example.com')
+    assert uri.is_valid(require_authority=True) is False
 
 Alternatives
 ------------

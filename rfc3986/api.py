@@ -37,7 +37,7 @@ def uri_reference(uri, encoding='utf-8'):
     return URIReference.from_string(uri, encoding)
 
 
-def is_valid_uri(uri, encoding='utf-8'):
+def is_valid_uri(uri, encoding='utf-8', **kwargs):
     """Determine if the URI given is valid.
 
     This is a convenience function. You could use either
@@ -46,10 +46,20 @@ def is_valid_uri(uri, encoding='utf-8'):
 
     :param str uri: The URI to be validated.
     :param str encoding: The encoding of the string provided
+    :param bool require_scheme: Set to ``True`` if you wish to require the
+        presence of the scheme component.
+    :param bool require_authority: Set to ``True`` if you wish to require the
+        presence of the authority component.
+    :param bool require_path: Set to ``True`` if you wish to require the
+        presence of the path component.
+    :param bool require_query: Set to ``True`` if you wish to require the
+        presence of the query component.
+    :param bool require_fragment: Set to ``True`` if you wish to require the
+        presence of the fragment component.
     :returns: ``True`` if the URI is valid, ``False`` otherwise.
     :rtype: bool
     """
-    return URIReference.from_string(uri, encoding).is_valid()
+    return URIReference.from_string(uri, encoding).is_valid(**kwargs)
 
 
 def normalize_uri(uri, encoding='utf-8'):
