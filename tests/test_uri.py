@@ -198,6 +198,27 @@ class TestURIValidation:
         uri = URIReference.from_string(basic_uri)
         assert uri.is_valid() is True
 
+    def test_basic_uri_requiring_scheme(self, basic_uri):
+        uri = URIReference.from_string(basic_uri)
+        assert uri.is_valid(require_scheme=True) is True
+
+    def test_basic_uri_requiring_authority(self, basic_uri):
+        uri = URIReference.from_string(basic_uri)
+        assert uri.is_valid(require_authority=True) is True
+
+    def test_uri_with_everything_requiring_path(self, uri_with_everything):
+        uri = URIReference.from_string(uri_with_everything)
+        assert uri.is_valid(require_path=True) is True
+
+    def test_uri_with_everything_requiring_query(self, uri_with_everything):
+        uri = URIReference.from_string(uri_with_everything)
+        assert uri.is_valid(require_query=True) is True
+
+    def test_uri_with_everything_requiring_fragment(self,
+                                                    uri_with_everything):
+        uri = URIReference.from_string(uri_with_everything)
+        assert uri.is_valid(require_fragment=True) is True
+
     def test_basic_uri_with_port_is_valid(self, basic_uri_with_port):
         uri = URIReference.from_string(basic_uri_with_port)
         assert uri.is_valid() is True

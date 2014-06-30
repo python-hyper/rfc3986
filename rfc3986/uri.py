@@ -124,67 +124,88 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
             return None
         return authority['userinfo']
 
-    def is_valid(self):
+    def is_valid(self, **kwargs):
         """Determines if the URI is valid.
 
+        :param bool require_scheme: Set to ``True`` if you wish to require the
+            presence of the scheme component.
+        :param bool require_authority: Set to ``True`` if you wish to require
+            the presence of the authority component.
+        :param bool require_path: Set to ``True`` if you wish to require the
+            presence of the path component.
+        :param bool require_query: Set to ``True`` if you wish to require the
+            presence of the query component.
+        :param bool require_fragment: Set to ``True`` if you wish to require
+            the presence of the fragment component.
         :returns: ``True`` if the URI is valid. ``False`` otherwise.
         :rtype: bool
         """
-        validators = [self.authority_is_valid, self.scheme_is_valid,
-                      self.path_is_valid, self.query_is_valid,
-                      self.fragment_is_valid]
-        return all(v() for v in validators)
+        validators = [
+            (self.scheme_is_valid, kwargs.get('require_scheme', False)),
+            (self.authority_is_valid, kwargs.get('require_authority', False)),
+            (self.path_is_valid, kwargs.get('require_path', False)),
+            (self.query_is_valid, kwargs.get('require_query', False)),
+            (self.fragment_is_valid, kwargs.get('require_fragment', False)),
+            ]
+        return all(v(r) for v, r in validators)
 
-    def authority_is_valid(self):
+    def _is_valid(self, value, matcher, require):
+        if require:
+            return (value is not None
+                    and matcher.match(value))
+
+        # require is False and value is not None
+        return value is None or matcher.match(value)
+
+    def authority_is_valid(self, require=False):
         """Determines if the authority component is valid.
 
+        :param str require: Set to ``True`` to require the presence of this
+            component.
         :returns: ``True`` if the authority is valid. ``False`` otherwise.
         :rtype: bool
         """
-        if (self.authority is None or
-                SUBAUTHORITY_MATCHER.match(self.authority)):
-            return True
-        return False
+        return self._is_valid(self.authority, SUBAUTHORITY_MATCHER, require)
 
-    def scheme_is_valid(self):
+    def scheme_is_valid(self, require=False):
         """Determines if the scheme component is valid.
 
+        :param str require: Set to ``True`` to require the presence of this
+            component.
         :returns: ``True`` if the scheme is valid. ``False`` otherwise.
         :rtype: bool
         """
-        if self.scheme is None or SCHEME_MATCHER.match(self.scheme):
-            return True
-        return False
+        return self._is_valid(self.scheme, SCHEME_MATCHER, require)
 
-    def path_is_valid(self):
+    def path_is_valid(self, require=False):
         """Determines if the path component is valid.
 
+        :param str require: Set to ``True`` to require the presence of this
+            component.
         :returns: ``True`` if the path is valid. ``False`` otherwise.
         :rtype: bool
         """
-        if self.path is None or PATH_MATCHER.match(self.path):
-            return True
-        return False
+        return self._is_valid(self.path, PATH_MATCHER, require)
 
-    def query_is_valid(self):
+    def query_is_valid(self, require=False):
         """Determines if the query component is valid.
 
+        :param str require: Set to ``True`` to require the presence of this
+            component.
         :returns: ``True`` if the query is valid. ``False`` otherwise.
         :rtype: bool
         """
-        if self.query is None or QUERY_MATCHER.match(self.query):
-            return True
-        return False
+        return self._is_valid(self.query, QUERY_MATCHER, require)
 
-    def fragment_is_valid(self):
+    def fragment_is_valid(self, require=False):
         """Determines if the fragment component is valid.
 
+        :param str require: Set to ``True`` to require the presence of this
+            component.
         :returns: ``True`` if the fragment is valid. ``False`` otherwise.
         :rtype: bool
         """
-        if self.fragment is None or FRAGMENT_MATCHER.match(self.fragment):
-            return True
-        return False
+        return self._is_valid(self.fragment, FRAGMENT_MATCHER, require)
 
     def normalize(self):
         """Normalize this reference as described in Section 6.2.2
