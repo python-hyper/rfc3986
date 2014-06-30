@@ -102,7 +102,7 @@ independent components::
 If you have an instance of a ``URIReference``, you can pass the same arguments
 to ``URIReference#is_valid``, e.g.,
 
-.. code::
+::
 
     from rfc3986 import uri_reference
 
