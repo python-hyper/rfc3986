@@ -1,3 +1,10 @@
+0.2.1 -- 2014-07-xx
+-------------------
+
+- Check that the bytes of an IPv4 Host Address are within the valid range.
+  Otherwise, URIs like "http://256.255.255.0/v1/resource" are considered
+  valid.
+
 0.2.0 -- 2014-06-30
 -------------------
 
