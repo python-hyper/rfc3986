@@ -125,6 +125,8 @@ SUBAUTHORITY_MATCHER = re.compile((
     ':?(?P<port>\d+)?$'  # port
     ).format(HOST_PATTERN))
 
+IPv4_MATCHER = re.compile('^' + ipv4 + '$')
+
 
 # ####################
 # Path Matcher Section

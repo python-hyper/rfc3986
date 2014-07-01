@@ -16,7 +16,8 @@ valid_hosts = [
 invalid_hosts = [
     '[FF02::3::5]',  # IPv6 can only have one ::
     '[FADF:01]',  # Not properly compacted (missing a :)
-    'localhost:80:80:80'  # Too many ports
+    'localhost:80:80:80',  # Too many ports
+    '256.256.256.256'  # Invalid IPv4 Address
     ]
 
 
