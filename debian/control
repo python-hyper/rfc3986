@@ -1,0 +1,31 @@
+Source: rfc3986
+Maintainer: Ian Cordasco <ian.cordasco@rackspace.com>
+Section: python
+Priority: optional
+Build-Depends: python-setuptools (>= 0.6b3), python-all (>= 2.6.6-3), debhelper (>= 7)
+Standards-Version: 3.9.1
+
+Package: python-rfc3986
+Architecture: all
+Depends: ${misc:Depends}, ${python:Depends}
+Description: Validating URI References per RFC 3986
+ rfc3986
+ =======
+ .
+ A Python implementation of `RFC 3986`_ including validation and authority 
+ parsing. Coming soon: `Reference Resolution <http://tools.ietf.org/html/rfc3986#section-5>`_.
+ .
+ Installation
+ ------------
+ .
+ Simply use pip to install ``rfc3986`` like so::
+ .
+     pip install rfc3986
+ .
+ License
+ -------
+ .
+ `Apache License Version 2.0`_
+ .
+ Example Usage
+ -------------

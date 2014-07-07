@@ -1,0 +1,5 @@
+rfc3986 (0.2.0-1) unstable; urgency=low
+
+  * Create a .deb package for v0.2.0
+
+ -- Ian Cordasco <ian.cordasco@rackspace.com>  Mon, 07 Jul 2014 19:39:42 +0000
