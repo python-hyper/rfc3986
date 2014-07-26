@@ -194,6 +194,17 @@ hier_part = '(//%s%s|%s|%s|%s)' % (
     )
 
 # See http://tools.ietf.org/html/rfc3986#section-4.3
-ABSOLUTE_URI_MATCHER = re.compile('^%s:%s(\?%s)$' % (
-    component_pattern_dict['scheme'], hier_part, QUERY_MATCHER.pattern
+ABSOLUTE_URI_MATCHER = re.compile('^%s:%s(\?%s)?$' % (
+    component_pattern_dict['scheme'], hier_part, QUERY_MATCHER.pattern[1:-1]
     ))
+
+
+# Path merger as defined in http://tools.ietf.org/html/rfc3986#section-5.2.3
+def merge_paths(base_uri, relative_path):
+    """Merge a base URI's path with a relative URI's path."""
+    if base_uri.path is None and base_uri.authority is not None:
+        return '/' + relative_path
+    else:
+        path = base_uri.path or ''
+        index = path.rfind('/')
+        return path[:index] + '/' + relative_path

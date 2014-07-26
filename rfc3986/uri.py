@@ -15,10 +15,11 @@
 from collections import namedtuple
 
 from .compat import to_str
-from .exceptions import InvalidAuthority
+from .exceptions import InvalidAuthority, ResolutionError
 from .misc import (
-    FRAGMENT_MATCHER, IPv4_MATCHER, PATH_MATCHER, QUERY_MATCHER,
-    SCHEME_MATCHER, SUBAUTHORITY_MATCHER, URI_MATCHER, URI_COMPONENTS
+    ABSOLUTE_URI_MATCHER, FRAGMENT_MATCHER, IPv4_MATCHER, PATH_MATCHER,
+    QUERY_MATCHER, SCHEME_MATCHER, SUBAUTHORITY_MATCHER, URI_MATCHER,
+    URI_COMPONENTS, merge_paths
     )
 from .normalizers import (
     encode_component, normalize_scheme, normalize_authority, normalize_path,
@@ -138,6 +139,18 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
         except InvalidAuthority:
             return None
         return authority['userinfo']
+
+    def is_absolute(self):
+        """Determine if this URI Reference is an absolute URI.
+
+        See http://tools.ietf.org/html/rfc3986#section-4.3 for explanation.
+
+        :returns: ``True`` if it is an absolute URI, ``False`` otherwise.
+        :rtype: bool
+        """
+        if ABSOLUTE_URI_MATCHER.match(self.unsplit()):
+            return True
+        return False
 
     def is_valid(self, **kwargs):
         """Determines if the URI is valid.
@@ -265,6 +278,70 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
         :rtype: bool
         """
         return tuple(self.normalize()) == tuple(other_ref.normalize())
+
+    def resolve(self, base_uri, strict=False):
+        """Use an absolute URI Reference to resolve this relative reference.
+
+        See http://tools.ietf.org/html/rfc3986#section-5 for more information.
+
+        :param base_uri: Either a string or URIReference. It must be an
+            absolute URI or it will raise an exception.
+        :returns: A new URIReference which is the result of resolving this
+            reference using ``base_uri``.
+        :rtype: :class:`URIReference`
+        :raises ResolutionError: If the ``base_uri`` is not an absolute URI.
+        """
+        if not isinstance(base_uri, URIReference):
+            base_uri = URIReference.from_string(base_uri)
+
+        if not base_uri.is_absolute():
+            raise ResolutionError(base_uri)
+
+        # This is optional per
+        # http://tools.ietf.org/html/rfc3986#section-5.2.1
+        base_uri = base_uri.normalize()
+
+        # The reference we're resolving
+        resolving = self
+
+        if not strict and resolving.scheme == base_uri.scheme:
+            resolving = resolving._replace(scheme=None)
+
+        # http://tools.ietf.org/html/rfc3986#page-32
+        if resolving.scheme is not None:
+            target = resolving._replace(path=normalize_path(resolving.path))
+        else:
+            if resolving.authority is not None:
+                target = resolving._replace(
+                    scheme=base_uri.scheme,
+                    path=normalize_path(resolving.path)
+                )
+            else:
+                if resolving.path is None:
+                    if resolving.query is not None:
+                        query = resolving.query
+                    else:
+                        query = base_uri.query
+                    target = resolving._replace(
+                        scheme=base_uri.scheme,
+                        authority=base_uri.authority,
+                        path=base_uri.path,
+                        query=query
+                    )
+                else:
+                    if resolving.path.startswith('/'):
+                        path = normalize_path(resolving.path)
+                    else:
+                        path = normalize_path(
+                            merge_paths(base_uri, resolving.path)
+                        )
+                    target = resolving._replace(
+                        scheme=base_uri.scheme,
+                        authority=base_uri.authority,
+                        path=path,
+                        query=resolving.query
+                    )
+        return target
 
     def unsplit(self):
         """Create a URI string from the components.
