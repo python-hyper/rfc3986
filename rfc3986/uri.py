@@ -19,7 +19,7 @@ from .exceptions import InvalidAuthority, ResolutionError
 from .misc import (
     ABSOLUTE_URI_MATCHER, FRAGMENT_MATCHER, IPv4_MATCHER, PATH_MATCHER,
     QUERY_MATCHER, SCHEME_MATCHER, SUBAUTHORITY_MATCHER, URI_MATCHER,
-    URI_COMPONENTS
+    URI_COMPONENTS, merge_paths
     )
 from .normalizers import (
     encode_component, normalize_scheme, normalize_authority, normalize_path,
@@ -300,6 +300,48 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
         # This is optional per
         # http://tools.ietf.org/html/rfc3986#section-5.2.1
         base_uri = base_uri.normalize()
+
+        # The reference we're resolving
+        resolving = self
+
+        if not strict and resolving.scheme == base_uri.scheme:
+            resolving = resolving._replace(scheme=None)
+
+        # http://tools.ietf.org/html/rfc3986#page-32
+        if resolving.scheme is not None:
+            target = resolving._replace(path=normalize_path(resolving.path))
+        else:
+            if resolving.authority is not None:
+                target = resolving._replace(
+                    scheme=base_uri.scheme,
+                    path=normalize_path(resolving.path)
+                )
+            else:
+                if resolving.path is None:
+                    if resolving.query is not None:
+                        query = resolving.query
+                    else:
+                        query = base_uri.query
+                    target = resolving._replace(
+                        scheme=base_uri.scheme,
+                        authority=base_uri.authority,
+                        path=base_uri.path,
+                        query=query
+                    )
+                else:
+                    if resolving.path.startswith('/'):
+                        path = normalize_path(resolving.path)
+                    else:
+                        path = normalize_path(
+                            merge_paths(base_uri, resolving.path)
+                        )
+                    target = resolving._replace(
+                        scheme=base_uri.scheme,
+                        authority=base_uri.authority,
+                        path=path,
+                        query=resolving.query
+                    )
+        return target
 
     def unsplit(self):
         """Create a URI string from the components.

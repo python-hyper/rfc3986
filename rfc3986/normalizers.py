@@ -35,6 +35,9 @@ def normalize_authority(authority):
 
 
 def normalize_path(path):
+    if not path:
+        return path
+
     path = normalize_percent_characters(path)
     return remove_dot_segments(path)
 

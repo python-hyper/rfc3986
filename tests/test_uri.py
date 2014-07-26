@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-from rfc3986.exceptions import InvalidAuthority
+from rfc3986.exceptions import InvalidAuthority, ResolutionError
 from rfc3986.misc import URI_MATCHER
 from rfc3986.uri import URIReference
 
@@ -429,3 +429,53 @@ class TestURIReferenceIsAbsolute:
     def test_absolute_paths_are_not_absolute_uris(self, absolute_path_uri):
         uri = URIReference.from_string(absolute_path_uri)
         assert uri.is_absolute() is False
+
+
+# @pytest.fixture(params=[
+#     basic_uri, basic_uri_with_port, basic_uri_with_path,
+#     scheme_and_path_uri, uri_with_path_and_query
+#     ])
+# @pytest.fixture(params=[absolute_path_uri, relative_uri])
+
+
+class TestURIReferencesResolve:
+    def test_with_basic_and_relative_uris(self, basic_uri, relative_uri):
+        R = URIReference.from_string(relative_uri)
+        B = URIReference.from_string(basic_uri)
+        T = R.resolve(B)
+        assert T.scheme == B.scheme
+        assert T.host == R.host
+        assert T.path == R.path
+
+    def test_with_basic_and_absolute_path_uris(self, basic_uri,
+                                               absolute_path_uri):
+        R = URIReference.from_string(absolute_path_uri)
+        B = URIReference.from_string(basic_uri).normalize()
+        T = R.resolve(B)
+        assert T.scheme == B.scheme
+        assert T.host == B.host
+        assert T.path == R.path
+
+    def test_with_basic_uri_and_relative_path(self, basic_uri):
+        R = URIReference.from_string('foo/bar/bogus')
+        B = URIReference.from_string(basic_uri).normalize()
+        T = R.resolve(B)
+        assert T.scheme == B.scheme
+        assert T.host == B.host
+        assert T.path == '/' + R.path
+
+    def test_basic_uri_with_path_and_relative_path(self, basic_uri_with_path):
+        R = URIReference.from_string('foo/bar/bogus')
+        B = URIReference.from_string(basic_uri_with_path).normalize()
+        T = R.resolve(B)
+        assert T.scheme == B.scheme
+        assert T.host == B.host
+
+        index = B.path.rfind('/')
+        assert T.path == B.path[:index] + '/' + R.path
+
+    def test_uri_with_everything_raises_exception(self, uri_with_everything):
+        R = URIReference.from_string('foo/bar/bogus')
+        B = URIReference.from_string(uri_with_everything)
+        with pytest.raises(ResolutionError):
+            R.resolve(B)
