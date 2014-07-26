@@ -442,7 +442,7 @@ class TestURIReferencesResolve:
     def test_with_basic_and_relative_uris(self, basic_uri, relative_uri):
         R = URIReference.from_string(relative_uri)
         B = URIReference.from_string(basic_uri)
-        T = R.resolve(basic_uri)
+        T = R.resolve_with(basic_uri)
         assert T.scheme == B.scheme
         assert T.host == R.host
         assert T.path == R.path
@@ -451,7 +451,7 @@ class TestURIReferencesResolve:
                                                absolute_path_uri):
         R = URIReference.from_string(absolute_path_uri)
         B = URIReference.from_string(basic_uri).normalize()
-        T = R.resolve(B)
+        T = R.resolve_with(B)
         assert T.scheme == B.scheme
         assert T.host == B.host
         assert T.path == R.path
@@ -459,7 +459,7 @@ class TestURIReferencesResolve:
     def test_with_basic_uri_and_relative_path(self, basic_uri):
         R = URIReference.from_string('foo/bar/bogus')
         B = URIReference.from_string(basic_uri).normalize()
-        T = R.resolve(B)
+        T = R.resolve_with(B)
         assert T.scheme == B.scheme
         assert T.host == B.host
         assert T.path == '/' + R.path
@@ -467,7 +467,7 @@ class TestURIReferencesResolve:
     def test_basic_uri_with_path_and_relative_path(self, basic_uri_with_path):
         R = URIReference.from_string('foo/bar/bogus')
         B = URIReference.from_string(basic_uri_with_path).normalize()
-        T = R.resolve(B)
+        T = R.resolve_with(B)
         assert T.scheme == B.scheme
         assert T.host == B.host
 
@@ -478,30 +478,30 @@ class TestURIReferencesResolve:
         R = URIReference.from_string('foo/bar/bogus')
         B = URIReference.from_string(uri_with_everything)
         with pytest.raises(ResolutionError):
-            R.resolve(B)
+            R.resolve_with(B)
 
     def test_basic_uri_resolves_itself(self, basic_uri):
         R = URIReference.from_string(basic_uri)
         B = URIReference.from_string(basic_uri)
-        T = R.resolve(B)
+        T = R.resolve_with(B)
         assert T == B
 
     def test_differing_schemes(self, basic_uri):
         R = URIReference.from_string('https://example.com/path')
         B = URIReference.from_string(basic_uri)
-        T = R.resolve(B)
+        T = R.resolve_with(B)
         assert T.scheme == R.scheme
 
     def test_resolve_pathless_fragment(self, basic_uri):
         R = URIReference.from_string('#fragment')
         B = URIReference.from_string(basic_uri)
-        T = R.resolve(B)
+        T = R.resolve_with(B)
         assert T.path is None
         assert T.fragment == 'fragment'
 
     def test_resolve_pathless_query(self, basic_uri):
         R = URIReference.from_string('?query')
         B = URIReference.from_string(basic_uri)
-        T = R.resolve(B)
+        T = R.resolve_with(B)
         assert T.path is None
         assert T.query == 'query'

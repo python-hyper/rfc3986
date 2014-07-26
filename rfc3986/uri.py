@@ -279,8 +279,11 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
         """
         return tuple(self.normalize()) == tuple(other_ref.normalize())
 
-    def resolve(self, base_uri, strict=False):
+    def resolve_with(self, base_uri, strict=False):
         """Use an absolute URI Reference to resolve this relative reference.
+
+        Assuming this is a relative reference that you would like to resolve,
+        use the provided base URI to resolve it.
 
         See http://tools.ietf.org/html/rfc3986#section-5 for more information.
 
