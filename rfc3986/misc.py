@@ -194,8 +194,8 @@ hier_part = '(//%s%s|%s|%s|%s)' % (
     )
 
 # See http://tools.ietf.org/html/rfc3986#section-4.3
-ABSOLUTE_URI_MATCHER = re.compile('^%s:%s(\?%s)$' % (
-    component_pattern_dict['scheme'], hier_part, QUERY_MATCHER.pattern
+ABSOLUTE_URI_MATCHER = re.compile('^%s:%s(\?%s)?$' % (
+    component_pattern_dict['scheme'], hier_part, QUERY_MATCHER.pattern[1:-1]
     ))
 
 

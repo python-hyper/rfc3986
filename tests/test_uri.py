@@ -407,3 +407,25 @@ class TestURIReferenceComparesToURIReferences:
     def test_different_basic_uris(self, basic_uri, basic_uri_with_port):
         uri = URIReference.from_string(basic_uri)
         assert (uri == URIReference.from_string(basic_uri_with_port)) is False
+
+
+class TestURIReferenceIsAbsolute:
+    def test_basic_uris_are_absolute(self, basic_uri):
+        uri = URIReference.from_string(basic_uri)
+        assert uri.is_absolute() is True
+
+    def test_basic_uris_with_ports_are_absolute(self, basic_uri_with_port):
+        uri = URIReference.from_string(basic_uri_with_port)
+        assert uri.is_absolute() is True
+
+    def test_basic_uris_with_paths_are_absolute(self, basic_uri_with_path):
+        uri = URIReference.from_string(basic_uri_with_path)
+        assert uri.is_absolute() is True
+
+    def test_uri_with_everything_are_not_absolute(self, uri_with_everything):
+        uri = URIReference.from_string(uri_with_everything)
+        assert uri.is_absolute() is False
+
+    def test_absolute_paths_are_not_absolute_uris(self, absolute_path_uri):
+        uri = URIReference.from_string(absolute_path_uri)
+        assert uri.is_absolute() is False
