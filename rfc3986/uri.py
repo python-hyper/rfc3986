@@ -308,14 +308,14 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
         resolving = self
 
         if not strict and resolving.scheme == base_uri.scheme:
-            resolving = resolving._replace(scheme=None)
+            resolving = resolving.replace(scheme=None)
 
         # http://tools.ietf.org/html/rfc3986#page-32
         if resolving.scheme is not None:
-            target = resolving._replace(path=normalize_path(resolving.path))
+            target = resolving.replace(path=normalize_path(resolving.path))
         else:
             if resolving.authority is not None:
-                target = resolving._replace(
+                target = resolving.replace(
                     scheme=base_uri.scheme,
                     path=normalize_path(resolving.path)
                 )
@@ -325,7 +325,7 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
                         query = resolving.query
                     else:
                         query = base_uri.query
-                    target = resolving._replace(
+                    target = resolving.replace(
                         scheme=base_uri.scheme,
                         authority=base_uri.authority,
                         path=base_uri.path,
@@ -338,7 +338,7 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
                         path = normalize_path(
                             merge_paths(base_uri, resolving.path)
                         )
-                    target = resolving._replace(
+                    target = resolving.replace(
                         scheme=base_uri.scheme,
                         authority=base_uri.authority,
                         path=path,
@@ -365,6 +365,9 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
         if self.fragment:
             result_list.extend(['#', self.fragment])
         return ''.join(result_list)
+
+    def replace(self, **kwargs):
+        return self._replace(**kwargs)
 
 
 def valid_ipv4_host_address(host):
