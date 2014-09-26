@@ -370,13 +370,4 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
 def valid_ipv4_host_address(host):
     # If the host exists, and it might be IPv4, check each byte in the
     # address.
-    for byte in host.split('.'):
-        byte_val = int(byte, base=10)
-        if byte_val < 0 or byte_val > 255:
-            # If the value is not in the correct range it is invalid.
-            # Return False immediately
-            return False
-
-    # If we haven't returned yet, the host existed, and appeared to be
-    # IPv4, then it should be a valid IPv4
-    return True
+    return all([0 <= int(byte, base=10) <= 255 for byte in host.split('.')])
