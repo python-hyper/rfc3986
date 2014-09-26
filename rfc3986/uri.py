@@ -69,11 +69,10 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
         uri_string = to_str(uri_string, encoding)
 
         split_uri = URI_MATCHER.match(uri_string).groupdict()
-        return URIReference(split_uri['scheme'], split_uri['authority'],
-                            encode_component(split_uri['path'], encoding),
-                            encode_component(split_uri['query'], encoding),
-                            encode_component(split_uri['fragment'], encoding),
-                            encoding)
+        return cls(split_uri['scheme'], split_uri['authority'],
+                   encode_component(split_uri['path'], encoding),
+                   encode_component(split_uri['query'], encoding),
+                   encode_component(split_uri['fragment'], encoding), encoding)
 
     def authority_info(self):
         """Returns a dictionary with the ``userinfo``, ``host``, and ``port``.
