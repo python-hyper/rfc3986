@@ -147,9 +147,7 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
         :returns: ``True`` if it is an absolute URI, ``False`` otherwise.
         :rtype: bool
         """
-        if ABSOLUTE_URI_MATCHER.match(self.unsplit()):
-            return True
-        return False
+        return bool(ABSOLUTE_URI_MATCHER.match(self.unsplit()))
 
     def is_valid(self, **kwargs):
         """Determines if the URI is valid.
