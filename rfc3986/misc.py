@@ -32,7 +32,7 @@ important_characters = {
     # We need to escape the '*' in this case
     're_sub_delimiters': "!$&'()\*+,;=",
     'unreserved_chars': ('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
-                         '012345789._~-'),
+                         '0123456789._~-'),
     # We need to escape the '-' in this case:
     're_unreserved': 'A-Za-z0-9._~\-',
     }
