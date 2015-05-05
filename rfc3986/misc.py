@@ -73,7 +73,11 @@ URI_MATCHER = re.compile(expression)
 
 # Host patterns, see: http://tools.ietf.org/html/rfc3986#section-3.2.2
 # The pattern for a regular name, e.g.,  www.google.com, api.github.com
-reg_name = '[\w\d.]+'
+reg_name = '(({0})*|[{1}]*)'.format(
+    '%[0-9A-Fa-f]{2}',
+    important_characters['re_sub_delimiters'] +
+    important_characters['re_unreserved']
+    )
 # The pattern for an IPv4 address, e.g., 192.168.255.255, 127.0.0.1,
 ipv4 = '(\d{1,3}.){3}\d{1,3}'
 # Hexadecimal characters used in each piece of an IPv6 address
