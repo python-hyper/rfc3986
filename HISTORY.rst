@@ -1,3 +1,10 @@
+0.2.2 -- 2015-05-27
+-------------------
+
+- Update the regular name regular expression to accept all of the characters
+  allowed in the RFC. Closes bug #11 (Thanks Viktor Haag). Previously URIs
+  similar to "http://http-bin.org" would be considered invalid.
+
 0.2.1 -- 2015-03-20
 -------------------
 
