@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import io
 import os
 import sys
 
@@ -18,10 +19,10 @@ packages = [
     'rfc3986',
 ]
 
-with open('README.rst') as f:
+with io.open('README.rst', encoding='utf-8') as f:
     readme = f.read()
 
-with open('HISTORY.rst') as f:
+with io.open('HISTORY.rst', encoding='utf-8') as f:
     history = f.read()
 
 setup(
