@@ -69,11 +69,10 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
         uri_string = to_str(uri_string, encoding)
 
         split_uri = URI_MATCHER.match(uri_string).groupdict()
-        return URIReference(split_uri['scheme'], split_uri['authority'],
-                            encode_component(split_uri['path'], encoding),
-                            encode_component(split_uri['query'], encoding),
-                            encode_component(split_uri['fragment'], encoding),
-                            encoding)
+        return cls(split_uri['scheme'], split_uri['authority'],
+                   encode_component(split_uri['path'], encoding),
+                   encode_component(split_uri['query'], encoding),
+                   encode_component(split_uri['fragment'], encoding), encoding)
 
     def authority_info(self):
         """Returns a dictionary with the ``userinfo``, ``host``, and ``port``.
@@ -148,9 +147,7 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
         :returns: ``True`` if it is an absolute URI, ``False`` otherwise.
         :rtype: bool
         """
-        if ABSOLUTE_URI_MATCHER.match(self.unsplit()):
-            return True
-        return False
+        return bool(ABSOLUTE_URI_MATCHER.match(self.unsplit()))
 
     def is_valid(self, **kwargs):
         """Determines if the URI is valid.
@@ -308,14 +305,14 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
         resolving = self
 
         if not strict and resolving.scheme == base_uri.scheme:
-            resolving = resolving._replace(scheme=None)
+            resolving = resolving.replace(scheme=None)
 
         # http://tools.ietf.org/html/rfc3986#page-32
         if resolving.scheme is not None:
-            target = resolving._replace(path=normalize_path(resolving.path))
+            target = resolving.replace(path=normalize_path(resolving.path))
         else:
             if resolving.authority is not None:
-                target = resolving._replace(
+                target = resolving.replace(
                     scheme=base_uri.scheme,
                     path=normalize_path(resolving.path)
                 )
@@ -325,7 +322,7 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
                         query = resolving.query
                     else:
                         query = base_uri.query
-                    target = resolving._replace(
+                    target = resolving.replace(
                         scheme=base_uri.scheme,
                         authority=base_uri.authority,
                         path=base_uri.path,
@@ -338,7 +335,7 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
                         path = normalize_path(
                             merge_paths(base_uri, resolving.path)
                         )
-                    target = resolving._replace(
+                    target = resolving.replace(
                         scheme=base_uri.scheme,
                         authority=base_uri.authority,
                         path=path,
@@ -366,17 +363,11 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
             result_list.extend(['#', self.fragment])
         return ''.join(result_list)
 
+    def replace(self, **kwargs):
+        return self._replace(**kwargs)
+
 
 def valid_ipv4_host_address(host):
     # If the host exists, and it might be IPv4, check each byte in the
     # address.
-    for byte in host.split('.'):
-        byte_val = int(byte, base=10)
-        if byte_val < 0 or byte_val > 255:
-            # If the value is not in the correct range it is invalid.
-            # Return False immediately
-            return False
-
-    # If we haven't returned yet, the host existed, and appeared to be
-    # IPv4, then it should be a valid IPv4
-    return True
+    return all([0 <= int(byte, base=10) <= 255 for byte in host.split('.')])
