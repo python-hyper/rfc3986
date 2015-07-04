@@ -14,6 +14,7 @@
 # limitations under the License.
 from collections import namedtuple
 
+from . import exceptions
 from . import normalizers
 from . import uri
 
@@ -40,19 +41,35 @@ class ParseResult(namedtuple('ParseResult', PARSED_COMPONENTS)):
         return parse_result
 
     @classmethod
-    def from_string(cls, uri_string, encoding='utf-8'):
+    def from_string(cls, uri_string, encoding='utf-8', strict=True):
         """Parse a URI from the given unicode URI string.
 
         :param str uri_string: Unicode URI to be parsed into a reference.
         :param str encoding: The encoding of the string provided
+        :param bool strict: Parse strictly according to :rfc:`3986` if True.
+            If False, parse similarly to the standard library's urlparse
+            function.
         :returns: :class:`ParseResult` or subclass thereof
         """
         reference = uri.URIReference.from_string(uri_string, encoding)
-        subauthority = reference.authority_info()
-        # Thanks to Richard Barrell for this idea:
-        # https://twitter.com/0x2ba22e11/status/617338811975139328
-        userinfo, host, port = (subauthority.get(p)
-                                for p in ('userinfo', 'host', 'port'))
+        try:
+            subauthority = reference.authority_info()
+        except exceptions.InvalidAuthority:
+            if strict:
+                raise
+            userinfo, host, port = split_authority(reference.authority)
+        else:
+            # Thanks to Richard Barrell for this idea:
+            # https://twitter.com/0x2ba22e11/status/617338811975139328
+            userinfo, host, port = (subauthority.get(p)
+                                    for p in ('userinfo', 'host', 'port'))
+
+        if port:
+            try:
+                port = int(port)
+            except ValueError:
+                raise exceptions.InvalidPort(port)
+
         return cls(scheme=reference.scheme,
                    userinfo=userinfo,
                    host=host,
@@ -101,6 +118,25 @@ class ParseResult(namedtuple('ParseResult', PARSED_COMPONENTS)):
                                        fragment=attrs_dict.get('fragment'))
         return ParseResult(uri_ref=ref, **attrs_dict)
 
+    def geturl(self):
+        """Standard library shim to the unsplit method."""
+        return self.unsplit()
+
+    @property
+    def hostname(self):
+        """Standard library shim for the host portion of the URI."""
+        return self.host
+
+    @property
+    def netloc(self):
+        """Standard library shim for the authority portion of the URI."""
+        return self.authority
+
+    @property
+    def params(self):
+        """Standard library shim for the query portion of the URI."""
+        return self.query
+
     def unsplit(self):
         """Create a URI string from the components.
 
@@ -108,3 +144,27 @@ class ParseResult(namedtuple('ParseResult', PARSED_COMPONENTS)):
         :rtype: str
         """
         return self.reference.unsplit()
+
+
+def split_authority(authority):
+    # Initialize our expected return values
+    userinfo = host = port = None
+    # Initialize an extra var we may need to use
+    extra_host = None
+    # Set-up rest in case there is no userinfo portion
+    rest = authority
+
+    if u'@' in authority:
+        userinfo, rest = authority.rsplit(u'@', 1)
+
+    # Handle IPv6 host addresses
+    if rest.startswith(u'['):
+        host, rest = rest.split(u']', 1)
+
+    if ':' in rest:
+        extra_host, port = rest.split(u':', 1)
+
+    if extra_host and not host:
+        host = extra_host
+
+    return userinfo, host, port

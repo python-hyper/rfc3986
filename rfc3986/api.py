@@ -21,6 +21,7 @@ provides access to the class ``URIReference``.
 """
 
 from .uri import URIReference
+from .parseresult import ParseResult
 
 
 def uri_reference(uri, encoding='utf-8'):
@@ -76,3 +77,16 @@ def normalize_uri(uri, encoding='utf-8'):
     """
     normalized_reference = URIReference.from_string(uri, encoding).normalize()
     return normalized_reference.unsplit()
+
+
+def urlparse(uri, encoding='utf-8'):
+    """Parse a given URI and return a ParseResult.
+
+    This is a partial replacement of the standard library's urlparse function.
+
+    :param str uri: The URI to be parsed.
+    :param str encoding: The encoding of the string provided.
+    :returns: A parsed URI
+    :rtype: :class:`~rfc3986.parseresult.ParseResult`
+    """
+    return ParseResult.from_string(uri, encoding, strict=False)

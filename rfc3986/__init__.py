@@ -29,8 +29,17 @@ __author__ = 'Ian Cordasco'
 __author_email__ = 'ian.cordasco@rackspace.com'
 __license__ = 'Apache v2.0'
 __copyright__ = 'Copyright 2014 Rackspace'
-__version__ = '0.2.2'
+__version__ = '0.3.0.dev1'
 
-from .api import (URIReference, uri_reference, is_valid_uri, normalize_uri)
+from .api import (URIReference, uri_reference, is_valid_uri, normalize_uri,
+                  urlparse)
+from .parseresult import ParseResult
 
-__all__ = ['URIReference', 'uri_reference', 'is_valid_uri', 'normalize_uri']
+__all__ = (
+    'ParseResult',
+    'URIReference',
+    'is_valid_uri',
+    'normalize_uri',
+    'uri_reference',
+    'urlparse',
+)
