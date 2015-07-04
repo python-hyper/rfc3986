@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2014 Rackspace
+# Copyright (c) 2015 Ian Cordasco
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -25,6 +26,7 @@ from .normalizers import (
     encode_component, normalize_scheme, normalize_authority, normalize_path,
     normalize_query, normalize_fragment
     )
+from .util import remove_none_values
 
 
 class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
@@ -372,9 +374,7 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
             'query': query,
             'fragment': fragment,
         }
-        for attr, value in list(attributes.items()):
-            if value is None:
-                del attributes[attr]
+        attributes = remove_none_values(attributes)
         return self._replace(**attributes)
 
 
