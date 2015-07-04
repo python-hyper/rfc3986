@@ -16,7 +16,6 @@ from collections import namedtuple
 
 from . import normalizers
 from . import uri
-from . import util
 
 PARSED_COMPONENTS = ('scheme', 'userinfo', 'host', 'port', 'path', 'query',
                      'fragment')

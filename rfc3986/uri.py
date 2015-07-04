@@ -26,7 +26,6 @@ from .normalizers import (
     encode_component, normalize_scheme, normalize_authority, normalize_path,
     normalize_query, normalize_fragment
     )
-from .util import remove_none_values
 
 
 class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
@@ -374,7 +373,9 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
             'query': query,
             'fragment': fragment,
         }
-        attributes = remove_none_values(attributes)
+        for key, value in list(attributes.items()):
+            if value is None:
+                del attributes[key]
         return self._replace(**attributes)
 
 
