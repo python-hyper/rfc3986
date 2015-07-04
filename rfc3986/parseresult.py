@@ -137,13 +137,18 @@ class ParseResult(namedtuple('ParseResult', PARSED_COMPONENTS)):
         """Standard library shim for the query portion of the URI."""
         return self.query
 
-    def unsplit(self):
+    def unsplit(self, use_idna=False):
         """Create a URI string from the components.
 
         :returns: The parsed URI reconstituted as a string.
         :rtype: str
         """
-        return self.reference.unsplit()
+        parse_result = self
+        if use_idna:
+            hostbytes = self.host.encode('idna')
+            host = hostbytes.decode(self.encoding)
+            parse_result = self.copy_with(host=host)
+        return parse_result.reference.unsplit()
 
 
 def split_authority(authority):
@@ -163,6 +168,8 @@ def split_authority(authority):
 
     if ':' in rest:
         extra_host, port = rest.split(u':', 1)
+    elif not host and rest:
+        host = rest
 
     if extra_host and not host:
         host = extra_host
