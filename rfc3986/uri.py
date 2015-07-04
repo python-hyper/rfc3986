@@ -305,14 +305,14 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
         resolving = self
 
         if not strict and resolving.scheme == base_uri.scheme:
-            resolving = resolving.replace(scheme=None)
+            resolving = resolving.copy_with(scheme=None)
 
         # http://tools.ietf.org/html/rfc3986#page-32
         if resolving.scheme is not None:
-            target = resolving.replace(path=normalize_path(resolving.path))
+            target = resolving.copy_with(path=normalize_path(resolving.path))
         else:
             if resolving.authority is not None:
-                target = resolving.replace(
+                target = resolving.copy_with(
                     scheme=base_uri.scheme,
                     path=normalize_path(resolving.path)
                 )
@@ -322,7 +322,7 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
                         query = resolving.query
                     else:
                         query = base_uri.query
-                    target = resolving.replace(
+                    target = resolving.copy_with(
                         scheme=base_uri.scheme,
                         authority=base_uri.authority,
                         path=base_uri.path,
@@ -335,7 +335,7 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
                         path = normalize_path(
                             merge_paths(base_uri, resolving.path)
                         )
-                    target = resolving.replace(
+                    target = resolving.copy_with(
                         scheme=base_uri.scheme,
                         authority=base_uri.authority,
                         path=path,
@@ -363,8 +363,19 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
             result_list.extend(['#', self.fragment])
         return ''.join(result_list)
 
-    def replace(self, **kwargs):
-        return self._replace(**kwargs)
+    def copy_with(self, scheme=None, authority=None, path=None, query=None,
+                  fragment=None):
+        attributes = {
+            'scheme': scheme,
+            'authority': authority,
+            'path': path,
+            'query': query,
+            'fragment': fragment,
+        }
+        for attr, value in list(attributes.items()):
+            if value is None:
+                del attributes[attr]
+        return self._replace(**attributes)
 
 
 def valid_ipv4_host_address(host):
