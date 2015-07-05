@@ -12,8 +12,6 @@ SNOWMAN_PARAMS = b'http://example.com?utf8=' + SNOWMAN
 SNOWMAN_HOST = b'http://' + SNOWMAN + b'.com'
 SNOWMAN_IDNA_HOST = 'http://xn--n3h.com'
 
-INVALID_PORTS = ['443:80', '443:80:443', 'abcdef', 'port', '43port']
-
 
 def test_unicode_uri():
     url_bytestring = SNOWMAN_PARAMS
@@ -67,9 +65,3 @@ def test_unsplit_idna_a_unicode_hostname():
 def test_strict_urlparsing():
     with pytest.raises(exceptions.InvalidAuthority):
         parseresult.ParseResult.from_string(SNOWMAN_HOST)
-
-
-@pytest.mark.parametrize('port', INVALID_PORTS)
-def test_port_parsing(port):
-    with pytest.raises(exceptions.InvalidPort):
-        urlparse('https://httpbin.org:{0}/get'.format(port))
