@@ -9,6 +9,12 @@ class InvalidAuthority(RFC3986Exception):
             "The authority ({0}) is not valid.".format(authority))
 
 
+class InvalidPort(RFC3986Exception):
+    def __init__(self, port):
+        super(InvalidPort, self).__init__(
+            'The port ("{0}") is not valid.'.format(port))
+
+
 class ResolutionError(RFC3986Exception):
     def __init__(self, uri):
         super(ResolutionError, self).__init__(
