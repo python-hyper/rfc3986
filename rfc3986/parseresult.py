@@ -156,16 +156,16 @@ def split_authority(authority):
     # Set-up rest in case there is no userinfo portion
     rest = authority
 
-    if u'@' in authority:
-        userinfo, rest = authority.rsplit(u'@', 1)
+    if '@' in authority:
+        userinfo, rest = authority.rsplit('@', 1)
 
     # Handle IPv6 host addresses
-    if rest.startswith(u'['):
-        host, rest = rest.split(u']', 1)
-        host += u']'
+    if rest.startswith('['):
+        host, rest = rest.split(']', 1)
+        host += ']'
 
     if ':' in rest:
-        extra_host, port = rest.split(u':', 1)
+        extra_host, port = rest.split(':', 1)
     elif not host and rest:
         host = rest
 
