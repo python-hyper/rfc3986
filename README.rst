@@ -19,6 +19,41 @@ License
 Example Usage
 -------------
 
+The following are the two most common use cases envisioned for ``rfc3986``.
+
+Replacing ``urlparse``
+``````````````````````
+
+To parse a URI and receive something very similar to the standard library's
+:func:`~urllib.parse.urlparse`:
+
+.. code-block:: python
+
+    from rfc3986 import urlparse
+
+    ssh = urlparse('ssh://user@git.openstack.org:29418/openstack/glance.git')
+    print(ssh.scheme)  # => ssh
+    print(ssh.userinfo)  # => user
+    print(ssh.params)  # => None
+    print(ssh.port)  # => 29418
+
+To create a copy of it with new pieces you can use ``copy_with``:
+
+.. code-block:: python
+
+    new_ssh = ssh.copy_with(
+        scheme='https'
+        userinfo='',
+        port=443,
+        path='/openstack/glance'
+    )
+    print(new_ssh.scheme)  # => https
+    print(new_ssh.userinfo)  # => None
+    # etc.
+
+Strictly Parsing a URI and Applying Validation
+``````````````````````````````````````````````
+
 To parse a URI into a convenient named tuple, you can simply:
 
 .. code-block:: python
