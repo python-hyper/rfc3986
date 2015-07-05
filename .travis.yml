@@ -1,26 +1,24 @@
 language: python
+sudo: false
 
 python:
-  - 2.6
-  - 2.7
-  - 3.2
-  - 3.3
   - 3.4
-  - pypy
 
 before_script:
-  - pip install -r dev-requirements.txt
+  - pip install tox
 
-script:
-  # Stolen from
-  # https://github.com/Lukasa/hyper/blob/583f5579b681f03eb44a2867f92c07acca418c27/.travis.yml
-  - >
-      if [[ "$TRAVIS_PYTHON_VERSION" == "pypy" ]] ; then
-          py.test tests/
-      else
-          py.test --cov rfc3986 tests/
-          coverage report --fail-under 100 -m
-      fi
+script: tox
+
+env:
+  matrix:
+    - TOXENV=py26
+    - TOXENV=py27
+    - TOXENV=py32
+    - TOXENV=py33
+    - TOXENV=py34
+    - TOXENV=pypy
+    - TOXENV=py27-flake8
+    - TOXENV=py34-flake8
 
 notifications:
   on_success: change
