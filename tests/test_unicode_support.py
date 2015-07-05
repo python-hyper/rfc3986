@@ -45,6 +45,20 @@ def test_urlparse_a_unicode_hostname():
     assert parsed.host == unicode_url[7:]
 
 
+def test_urlparse_a_unicode_hostname_with_auth():
+    url = b'http://userinfo@' + SNOWMAN + b'.com'
+    parsed = urlparse(url)
+    assert parsed.userinfo == 'userinfo'
+
+
+def test_urlparse_an_invalid_authority_parses_port():
+    url = 'http://foo:b@r@[::1]:80/get'
+    parsed = urlparse(url)
+    assert parsed.port == 80
+    assert parsed.userinfo == 'foo:b@r'
+    assert parsed.hostname == '[::1]'
+
+
 def test_unsplit_idna_a_unicode_hostname():
     parsed = urlparse(SNOWMAN_HOST)
     assert parsed.unsplit(use_idna=True) == SNOWMAN_IDNA_HOST

@@ -83,12 +83,7 @@ class ParseResult(namedtuple('ParseResult', PARSED_COMPONENTS)):
     @property
     def authority(self):
         """Normalized authority generated from the subauthority parts."""
-        _authority = getattr(self, '_authority', None)
-        if _authority is None:
-            _authority = self._authority = normalizers.normalize_authority(
-                (self.userinfo, self.host, self.port)
-            )
-        return _authority
+        return self.reference.authority
 
     def _generate_authority(self, attributes):
         # I swear I did not align the comparisons below. That's just how they
@@ -98,6 +93,8 @@ class ParseResult(namedtuple('ParseResult', PARSED_COMPONENTS)):
         if (self.userinfo != userinfo or
                 self.host != host or
                 self.port != port):
+            if port:
+                port = '{0}'.format(port)
             return normalizers.normalize_authority((userinfo, host, port))
         return self.authority
 
@@ -165,6 +162,7 @@ def split_authority(authority):
     # Handle IPv6 host addresses
     if rest.startswith(u'['):
         host, rest = rest.split(u']', 1)
+        host += u']'
 
     if ':' in rest:
         extra_host, port = rest.split(u':', 1)
