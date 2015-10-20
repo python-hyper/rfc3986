@@ -1,3 +1,11 @@
+0.3.0 -- 2015-10-20
+-------------------
+
+- Read README and HISTORY files using the appropriate codec so rfc3986 can be
+  installed on systems with locale's other than utf-8 (specifically C)
+
+- Replace the standard library's urlparse behaviour
+
 0.2.2 -- 2015-05-27
 -------------------
 
