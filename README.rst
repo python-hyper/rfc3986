@@ -25,7 +25,7 @@ Replacing ``urlparse``
 ``````````````````````
 
 To parse a URI and receive something very similar to the standard library's
-:func:`~urllib.parse.urlparse`:
+``urllib.parse.urlparse``
 
 .. code-block:: python
 
