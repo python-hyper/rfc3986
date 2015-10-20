@@ -2,6 +2,7 @@ include README.rst
 include LICENSE
 include HISTORY.rst
 include AUTHORS.rst
+include setup.cfg
 prune *.pyc
 #recursive-include docs *.rst *.py Makefile
 recursive-include tests *.py
