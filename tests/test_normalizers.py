@@ -70,3 +70,9 @@ def test_authority_normalization():
     uri = URIReference(
         None, 'user%2aName@EXAMPLE.COM', None, None, None).normalize()
     assert uri.authority == 'user%2AName@example.com'
+
+
+def test_fragment_normalization():
+    uri = URIReference(
+        None, 'example.com', None, None, 'fiz%DF').normalize()
+    assert uri.fragment == 'fiz%DF'

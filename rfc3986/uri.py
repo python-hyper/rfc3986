@@ -38,8 +38,8 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
             scheme or None,
             authority or None,
             path or None,
-            query or None,
-            fragment or None)
+            query,
+            fragment)
         ref.encoding = encoding
         return ref
 
@@ -264,8 +264,8 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
                             normalize_authority(
                                 (self.userinfo, self.host, self.port)),
                             normalize_path(self.path or ''),
-                            normalize_query(self.query or ''),
-                            normalize_fragment(self.fragment or ''))
+                            normalize_query(self.query),
+                            normalize_fragment(self.fragment))
 
     def normalized_equality(self, other_ref):
         """Compare this URIReference to another URIReference.
@@ -358,9 +358,9 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
             result_list.extend(['//', self.authority])
         if self.path:
             result_list.append(self.path)
-        if self.query:
+        if self.query is not None:
             result_list.extend(['?', self.query])
-        if self.fragment:
+        if self.fragment is not None:
             result_list.extend(['#', self.fragment])
         return ''.join(result_list)
 

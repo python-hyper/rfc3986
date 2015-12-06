@@ -43,10 +43,14 @@ def normalize_path(path):
 
 
 def normalize_query(query):
+    if not query:
+        return query
     return normalize_percent_characters(query)
 
 
 def normalize_fragment(fragment):
+    if not fragment:
+        return fragment
     return normalize_percent_characters(fragment)
 
 

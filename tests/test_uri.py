@@ -337,3 +337,10 @@ class TestURIReferencesResolve:
         T = R.resolve_with(B)
         assert T.path is None
         assert T.query == 'query'
+
+
+def test_empty_querystrings_persist():
+    url = 'https://httpbin.org/get?'
+    ref = URIReference.from_string(url)
+    assert ref.query == ''
+    assert ref.unsplit() == url

@@ -76,8 +76,8 @@ class ParseResult(namedtuple('ParseResult', PARSED_COMPONENTS),
             host,
             port or None,
             path or None,
-            query or None,
-            fragment or None)
+            query,
+            fragment)
         parse_result.encoding = encoding
         parse_result.reference = uri_ref
         return parse_result
