@@ -1,3 +1,8 @@
+0.3.1 -- 2015-12-15
+-------------------
+
+- Preserve empty query strings during normalization
+
 0.3.0 -- 2015-10-20
 -------------------
 
