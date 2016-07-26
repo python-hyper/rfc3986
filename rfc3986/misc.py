@@ -79,7 +79,7 @@ reg_name = '(({0})*|[{1}]*)'.format(
     important_characters['re_unreserved']
     )
 # The pattern for an IPv4 address, e.g., 192.168.255.255, 127.0.0.1,
-ipv4 = '(\d{1,3}.){3}\d{1,3}'
+ipv4 = '([0-9]{1,3}.){3}[0-9]{1,3}'
 # Hexadecimal characters used in each piece of an IPv6 address
 hexdig = '[0-9A-Fa-f]{1,4}'
 # Least-significant 32 bits of an IPv6 address
@@ -126,7 +126,7 @@ HOST_PATTERN = '({0}|{1}|{2})'.format(reg_name, ipv4, ip_literal)
 SUBAUTHORITY_MATCHER = re.compile((
     '^(?:(?P<userinfo>[A-Za-z0-9_.~\-%:]+)@)?'  # userinfo
     '(?P<host>{0}?)'  # host
-    ':?(?P<port>\d+)?$'  # port
+    ':?(?P<port>[0-9]+)?$'  # port
     ).format(HOST_PATTERN))
 
 IPv4_MATCHER = re.compile('^' + ipv4 + '$')
