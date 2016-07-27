@@ -24,16 +24,16 @@ http://rfc3986.rtfd.org/ for documentation.
 :license: Apache v2.0, see LICENSE for details
 """
 
+from .api import (URIReference, uri_reference, is_valid_uri, normalize_uri,
+                  urlparse)
+from .parseresult import ParseResult
+
 __title__ = 'rfc3986'
 __author__ = 'Ian Cordasco'
 __author_email__ = 'ian.cordasco@rackspace.com'
 __license__ = 'Apache v2.0'
 __copyright__ = 'Copyright 2014 Rackspace'
 __version__ = '0.3.1'
-
-from .api import (URIReference, uri_reference, is_valid_uri, normalize_uri,
-                  urlparse)
-from .parseresult import ParseResult
 
 __all__ = (
     'ParseResult',
@@ -42,4 +42,10 @@ __all__ = (
     'normalize_uri',
     'uri_reference',
     'urlparse',
+    '__title__',
+    '__author__',
+    '__author_email__',
+    '__license__',
+    '__copyright__',
+    '__version__',
 )
