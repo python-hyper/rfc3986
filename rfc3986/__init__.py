@@ -30,10 +30,10 @@ from .parseresult import ParseResult
 
 __title__ = 'rfc3986'
 __author__ = 'Ian Cordasco'
-__author_email__ = 'ian.cordasco@rackspace.com'
+__author_email__ = 'graffatcolmingov@gmail.com'
 __license__ = 'Apache v2.0'
 __copyright__ = 'Copyright 2014 Rackspace'
-__version__ = '0.3.1'
+__version__ = '0.4.0'
 
 __all__ = (
     'ParseResult',
