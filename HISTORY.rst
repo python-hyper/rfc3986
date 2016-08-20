@@ -1,3 +1,9 @@
+0.4.2 -- 2016-08-22
+-------------------
+
+- Avoid parsing an string with just an IPv6 address as having a scheme of
+  ``[``.
+
 0.4.1 -- 2016-08-22
 -------------------
 

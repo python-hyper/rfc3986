@@ -55,6 +55,13 @@ class TestURIReferenceParsesURIs(base.BaseTestParsesURIs):
         assert uri.userinfo is None
         assert uri.authority is None
 
+    def test_parses_ipv6_to_path(self):
+        """Verify that we don't parse [ as a scheme."""
+        uri = self.test_class.from_string('[::1]')
+        assert uri.scheme is None
+        assert uri.authority is None
+        assert uri.path == '[::1]'
+
 
 class TestURIValidation:
     # Valid URI tests

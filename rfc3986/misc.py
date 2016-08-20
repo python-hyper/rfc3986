@@ -48,7 +48,12 @@ NON_PCT_ENCODED = RESERVED_CHARS.union(UNRESERVED_CHARS).union('%')
 
 # Extracted from http://tools.ietf.org/html/rfc3986#appendix-B
 component_pattern_dict = {
-    'scheme': '[^:/?#]+',
+    # NOTE(sigmavirus24): Our list of things we want to not match includes one
+    # item more than the RFC. We want to not parse the leading '[' from an
+    # IPv6 address into the scheme when provided something akin to:
+    # >>> rfc3986.uri_reference('[::1]')
+    # We would rather that appear to be a path than not.
+    'scheme': '[^:/?#[]+',
     'authority': '[^/?#]*',
     'path': '[^?#]*',
     'query': '[^#]*',
