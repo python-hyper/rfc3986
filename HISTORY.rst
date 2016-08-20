@@ -1,3 +1,9 @@
+0.4.1 -- 2016-08-22
+-------------------
+
+- Normalize URIs constructed using ``ParseResult.from_parts`` and
+  ``ParseResultBytes.from_parts``
+
 0.4.0 -- 2016-08-20
 -------------------
 

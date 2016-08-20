@@ -37,6 +37,7 @@ def test_port_parsing(port):
     (('https', 'user', 'httpbin.org'), u'https://user@httpbin.org'),
     (('https', None, 'httpbin.org', 443, '/get'),
         u'https://httpbin.org:443/get'),
+    (('HTTPS', None, 'HTTPBIN.ORG'), u'https://httpbin.org'),
 ])
 def test_from_parts(parts, unsplit):
     uri = pr.ParseResult.from_parts(*parts)
@@ -48,6 +49,7 @@ def test_from_parts(parts, unsplit):
     (('https', 'user', 'httpbin.org'), b'https://user@httpbin.org'),
     (('https', None, 'httpbin.org', 443, '/get'),
         b'https://httpbin.org:443/get'),
+    (('HTTPS', None, 'HTTPBIN.ORG'), b'https://httpbin.org'),
 ])
 def test_bytes_from_parts(parts, unsplit):
     uri = pr.ParseResultBytes.from_parts(*parts)

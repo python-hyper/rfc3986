@@ -98,14 +98,15 @@ class ParseResult(namedtuple('ParseResult', PARSED_COMPONENTS),
                                    path=path,
                                    query=query,
                                    fragment=fragment,
-                                   encoding=encoding)
-        return cls(scheme=scheme,
+                                   encoding=encoding).normalize()
+        userinfo, host, port = authority_from(uri_ref, strict=True)
+        return cls(scheme=uri_ref.scheme,
                    userinfo=userinfo,
                    host=host,
                    port=port,
-                   path=path,
-                   query=query,
-                   fragment=fragment,
+                   path=uri_ref.path,
+                   query=uri_ref.query,
+                   fragment=uri_ref.fragment,
                    uri_ref=uri_ref,
                    encoding=encoding)
 
@@ -121,17 +122,7 @@ class ParseResult(namedtuple('ParseResult', PARSED_COMPONENTS),
         :returns: :class:`ParseResult` or subclass thereof
         """
         reference = uri.URIReference.from_string(uri_string, encoding)
-        try:
-            subauthority = reference.authority_info()
-        except exceptions.InvalidAuthority:
-            if strict:
-                raise
-            userinfo, host, port = split_authority(reference.authority)
-        else:
-            # Thanks to Richard Barrell for this idea:
-            # https://twitter.com/0x2ba22e11/status/617338811975139328
-            userinfo, host, port = (subauthority.get(p)
-                                    for p in ('userinfo', 'host', 'port'))
+        userinfo, host, port = authority_from(reference, strict)
 
         if port:
             try:
@@ -230,8 +221,9 @@ class ParseResultBytes(namedtuple('ParseResultBytes', PARSED_COMPONENTS),
                                    path=path,
                                    query=query,
                                    fragment=fragment,
-                                   encoding=encoding)
+                                   encoding=encoding).normalize()
         to_bytes = compat.to_bytes
+        userinfo, host, port = authority_from(uri_ref, strict=True)
         return cls(scheme=to_bytes(scheme, encoding),
                    userinfo=to_bytes(userinfo, encoding),
                    host=to_bytes(host, encoding),
@@ -254,17 +246,7 @@ class ParseResultBytes(namedtuple('ParseResultBytes', PARSED_COMPONENTS),
         :returns: :class:`ParseResultBytes` or subclass thereof
         """
         reference = uri.URIReference.from_string(uri_string, encoding)
-        try:
-            subauthority = reference.authority_info()
-        except exceptions.InvalidAuthority:
-            if strict:
-                raise
-            userinfo, host, port = split_authority(reference.authority)
-        else:
-            # Thanks to Richard Barrell for this idea:
-            # https://twitter.com/0x2ba22e11/status/617338811975139328
-            userinfo, host, port = (subauthority.get(p)
-                                    for p in ('userinfo', 'host', 'port'))
+        userinfo, host, port = authority_from(reference, strict)
 
         if port:
             try:
@@ -355,4 +337,19 @@ def split_authority(authority):
     if extra_host and not host:
         host = extra_host
 
+    return userinfo, host, port
+
+
+def authority_from(reference, strict):
+    try:
+        subauthority = reference.authority_info()
+    except exceptions.InvalidAuthority:
+        if strict:
+            raise
+        userinfo, host, port = split_authority(reference.authority)
+    else:
+        # Thanks to Richard Barrell for this idea:
+        # https://twitter.com/0x2ba22e11/status/617338811975139328
+        userinfo, host, port = (subauthority.get(p)
+                                for p in ('userinfo', 'host', 'port'))
     return userinfo, host, port
