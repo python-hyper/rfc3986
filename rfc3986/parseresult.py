@@ -83,6 +83,33 @@ class ParseResult(namedtuple('ParseResult', PARSED_COMPONENTS),
         return parse_result
 
     @classmethod
+    def from_parts(cls, scheme=None, userinfo=None, host=None, port=None,
+                   path=None, query=None, fragment=None, encoding='utf-8'):
+        """Create a ParseResult instance from its parts."""
+        authority = ''
+        if userinfo is not None:
+            authority += userinfo + '@'
+        if host is not None:
+            authority += host
+        if port is not None:
+            authority += ':{0}'.format(port)
+        uri_ref = uri.URIReference(scheme=scheme,
+                                   authority=authority,
+                                   path=path,
+                                   query=query,
+                                   fragment=fragment,
+                                   encoding=encoding)
+        return cls(scheme=scheme,
+                   userinfo=userinfo,
+                   host=host,
+                   port=port,
+                   path=path,
+                   query=query,
+                   fragment=fragment,
+                   uri_ref=uri_ref,
+                   encoding=encoding)
+
+    @classmethod
     def from_string(cls, uri_string, encoding='utf-8', strict=True):
         """Parse a URI from the given unicode URI string.
 
@@ -186,6 +213,34 @@ class ParseResultBytes(namedtuple('ParseResultBytes', PARSED_COMPONENTS),
         parse_result.encoding = encoding
         parse_result.reference = uri_ref
         return parse_result
+
+    @classmethod
+    def from_parts(cls, scheme=None, userinfo=None, host=None, port=None,
+                   path=None, query=None, fragment=None, encoding='utf-8'):
+        """Create a ParseResult instance from its parts."""
+        authority = ''
+        if userinfo is not None:
+            authority += userinfo + '@'
+        if host is not None:
+            authority += host
+        if port is not None:
+            authority += ':{0}'.format(port)
+        uri_ref = uri.URIReference(scheme=scheme,
+                                   authority=authority,
+                                   path=path,
+                                   query=query,
+                                   fragment=fragment,
+                                   encoding=encoding)
+        to_bytes = compat.to_bytes
+        return cls(scheme=to_bytes(scheme, encoding),
+                   userinfo=to_bytes(userinfo, encoding),
+                   host=to_bytes(host, encoding),
+                   port=port,
+                   path=to_bytes(path, encoding),
+                   query=to_bytes(query, encoding),
+                   fragment=to_bytes(fragment, encoding),
+                   uri_ref=uri_ref,
+                   encoding=encoding)
 
     @classmethod
     def from_string(cls, uri_string, encoding='utf-8', strict=True):

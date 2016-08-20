@@ -32,6 +32,28 @@ def test_port_parsing(port):
         rfc3986.urlparse('https://httpbin.org:{0}/get'.format(port))
 
 
+@pytest.mark.parametrize('parts, unsplit', [
+    (('https', None, 'httpbin.org'), u'https://httpbin.org'),
+    (('https', 'user', 'httpbin.org'), u'https://user@httpbin.org'),
+    (('https', None, 'httpbin.org', 443, '/get'),
+        u'https://httpbin.org:443/get'),
+])
+def test_from_parts(parts, unsplit):
+    uri = pr.ParseResult.from_parts(*parts)
+    assert uri.unsplit() == unsplit
+
+
+@pytest.mark.parametrize('parts, unsplit', [
+    (('https', None, 'httpbin.org'), b'https://httpbin.org'),
+    (('https', 'user', 'httpbin.org'), b'https://user@httpbin.org'),
+    (('https', None, 'httpbin.org', 443, '/get'),
+        b'https://httpbin.org:443/get'),
+])
+def test_bytes_from_parts(parts, unsplit):
+    uri = pr.ParseResultBytes.from_parts(*parts)
+    assert uri.unsplit() == unsplit
+
+
 class TestParseResultParsesURIs(base.BaseTestParsesURIs):
     test_class = pr.ParseResult
 
