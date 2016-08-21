@@ -265,7 +265,8 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
                                 (self.userinfo, self.host, self.port)),
                             normalize_path(self.path or ''),
                             normalize_query(self.query),
-                            normalize_fragment(self.fragment))
+                            normalize_fragment(self.fragment),
+                            self.encoding)
 
     def normalized_equality(self, other_ref):
         """Compare this URIReference to another URIReference.
@@ -376,7 +377,9 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
         for key, value in list(attributes.items()):
             if value is None:
                 del attributes[key]
-        return self._replace(**attributes)
+        uri = self._replace(**attributes)
+        uri.encoding = self.encoding
+        return uri
 
 
 def valid_ipv4_host_address(host):

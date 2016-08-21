@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import itertools
 import sys
 
 import pytest
@@ -21,10 +22,38 @@ invalid_hosts = [
     SNOWMAN.decode('utf-8')
     ]
 
+equivalent_hostnames = [
+    'example.com',
+    'eXample.com',
+    'example.COM',
+    'EXAMPLE.com',
+    'ExAMPLE.com',
+    'eXample.COM',
+    'example.COM',
+    'EXAMPLE.COM',
+    'ExAMPLE.COM',
+]
+equivalent_schemes = [
+    'https',
+    'HTTPS',
+    'HttPs',
+    'hTTpS',
+    'HtTpS',
+]
+equivalent_schemes_and_hostnames = list(itertools.product(
+    equivalent_schemes,
+    equivalent_hostnames,
+))
+
 
 @pytest.fixture(params=valid_hosts)
 def basic_uri(request):
     return 'http://%s' % request.param
+
+
+@pytest.fixture(params=equivalent_schemes_and_hostnames)
+def uri_to_normalize(request):
+    return '%s://%s' % request.param
 
 
 @pytest.fixture(params=valid_hosts)

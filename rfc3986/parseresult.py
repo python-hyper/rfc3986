@@ -111,7 +111,8 @@ class ParseResult(namedtuple('ParseResult', PARSED_COMPONENTS),
                    encoding=encoding)
 
     @classmethod
-    def from_string(cls, uri_string, encoding='utf-8', strict=True):
+    def from_string(cls, uri_string, encoding='utf-8', strict=True,
+                    lazy_normalize=True):
         """Parse a URI from the given unicode URI string.
 
         :param str uri_string: Unicode URI to be parsed into a reference.
@@ -122,13 +123,9 @@ class ParseResult(namedtuple('ParseResult', PARSED_COMPONENTS),
         :returns: :class:`ParseResult` or subclass thereof
         """
         reference = uri.URIReference.from_string(uri_string, encoding)
+        if not lazy_normalize:
+            reference = reference.normalize()
         userinfo, host, port = authority_from(reference, strict)
-
-        if port:
-            try:
-                port = int(port)
-            except ValueError:
-                raise exceptions.InvalidPort(port)
 
         return cls(scheme=reference.scheme,
                    userinfo=userinfo,
@@ -191,7 +188,7 @@ class ParseResult(namedtuple('ParseResult', PARSED_COMPONENTS),
 class ParseResultBytes(namedtuple('ParseResultBytes', PARSED_COMPONENTS),
                        ParseResultMixin):
     def __new__(cls, scheme, userinfo, host, port, path, query, fragment,
-                uri_ref, encoding='utf-8'):
+                uri_ref, encoding='utf-8', lazy_normalize=True):
         parse_result = super(ParseResultBytes, cls).__new__(
             cls,
             scheme or None,
@@ -203,11 +200,13 @@ class ParseResultBytes(namedtuple('ParseResultBytes', PARSED_COMPONENTS),
             fragment or None)
         parse_result.encoding = encoding
         parse_result.reference = uri_ref
+        parse_result.lazy_normalize = lazy_normalize
         return parse_result
 
     @classmethod
     def from_parts(cls, scheme=None, userinfo=None, host=None, port=None,
-                   path=None, query=None, fragment=None, encoding='utf-8'):
+                   path=None, query=None, fragment=None, encoding='utf-8',
+                   lazy_normalize=True):
         """Create a ParseResult instance from its parts."""
         authority = ''
         if userinfo is not None:
@@ -215,13 +214,15 @@ class ParseResultBytes(namedtuple('ParseResultBytes', PARSED_COMPONENTS),
         if host is not None:
             authority += host
         if port is not None:
-            authority += ':{0}'.format(port)
+            authority += ':{0}'.format(int(port))
         uri_ref = uri.URIReference(scheme=scheme,
                                    authority=authority,
                                    path=path,
                                    query=query,
                                    fragment=fragment,
-                                   encoding=encoding).normalize()
+                                   encoding=encoding)
+        if not lazy_normalize:
+            uri_ref = uri_ref.normalize()
         to_bytes = compat.to_bytes
         userinfo, host, port = authority_from(uri_ref, strict=True)
         return cls(scheme=to_bytes(scheme, encoding),
@@ -232,10 +233,12 @@ class ParseResultBytes(namedtuple('ParseResultBytes', PARSED_COMPONENTS),
                    query=to_bytes(query, encoding),
                    fragment=to_bytes(fragment, encoding),
                    uri_ref=uri_ref,
-                   encoding=encoding)
+                   encoding=encoding,
+                   lazy_normalize=lazy_normalize)
 
     @classmethod
-    def from_string(cls, uri_string, encoding='utf-8', strict=True):
+    def from_string(cls, uri_string, encoding='utf-8', strict=True,
+                    lazy_normalize=True):
         """Parse a URI from the given unicode URI string.
 
         :param str uri_string: Unicode URI to be parsed into a reference.
@@ -246,13 +249,9 @@ class ParseResultBytes(namedtuple('ParseResultBytes', PARSED_COMPONENTS),
         :returns: :class:`ParseResultBytes` or subclass thereof
         """
         reference = uri.URIReference.from_string(uri_string, encoding)
+        if not lazy_normalize:
+            reference = reference.normalize()
         userinfo, host, port = authority_from(reference, strict)
-
-        if port:
-            try:
-                port = int(port)
-            except ValueError:
-                raise exceptions.InvalidPort(port)
 
         to_bytes = compat.to_bytes
         return cls(scheme=to_bytes(reference.scheme, encoding),
@@ -263,7 +262,8 @@ class ParseResultBytes(namedtuple('ParseResultBytes', PARSED_COMPONENTS),
                    query=to_bytes(reference.query, encoding),
                    fragment=to_bytes(reference.fragment, encoding),
                    uri_ref=reference,
-                   encoding=encoding)
+                   encoding=encoding,
+                   lazy_normalize=lazy_normalize)
 
     @property
     def authority(self):
@@ -271,7 +271,7 @@ class ParseResultBytes(namedtuple('ParseResultBytes', PARSED_COMPONENTS),
         return self.reference.authority.encode(self.encoding)
 
     def copy_with(self, scheme=None, userinfo=None, host=None, port=None,
-                  path=None, query=None, fragment=None):
+                  path=None, query=None, fragment=None, lazy_normalize=True):
         attributes = zip(PARSED_COMPONENTS,
                          (scheme, userinfo, host, port, path, query, fragment))
         attrs_dict = {}
@@ -285,14 +285,17 @@ class ParseResultBytes(namedtuple('ParseResultBytes', PARSED_COMPONENTS),
         to_str = compat.to_str
         ref = self.reference.copy_with(
             scheme=to_str(attrs_dict['scheme'], self.encoding),
-            authority=authority,
+            authority=to_str(authority, self.encoding),
             path=to_str(attrs_dict['path'], self.encoding),
             query=to_str(attrs_dict['query'], self.encoding),
             fragment=to_str(attrs_dict['fragment'], self.encoding)
         )
+        if not lazy_normalize:
+            ref = ref.normalize()
         return ParseResultBytes(
             uri_ref=ref,
             encoding=self.encoding,
+            lazy_normalize=lazy_normalize,
             **attrs_dict
         )
 
@@ -309,6 +312,8 @@ class ParseResultBytes(namedtuple('ParseResultBytes', PARSED_COMPONENTS),
             host = self.host.decode(self.encoding)
             hostbytes = host.encode('idna')
             parse_result = self.copy_with(host=hostbytes)
+        if self.lazy_normalize:
+            parse_result = parse_result.copy_with(lazy_normalize=False)
         uri = parse_result.reference.unsplit()
         return uri.encode(self.encoding)
 
@@ -352,4 +357,10 @@ def authority_from(reference, strict):
         # https://twitter.com/0x2ba22e11/status/617338811975139328
         userinfo, host, port = (subauthority.get(p)
                                 for p in ('userinfo', 'host', 'port'))
+
+    if port:
+        try:
+            port = int(port)
+        except ValueError:
+            raise exceptions.InvalidPort(port)
     return userinfo, host, port

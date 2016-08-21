@@ -64,6 +64,14 @@ class TestParseResultUnsplits(base.BaseTestUnsplits):
     test_class = pr.ParseResult
 
 
+def test_normalizes_uris_when_using_from_string(uri_to_normalize):
+    """Verify we always get the same thing out as we expect."""
+    result = pr.ParseResult.from_string(uri_to_normalize,
+                                        lazy_normalize=False)
+    assert result.scheme == 'https'
+    assert result.host == 'example.com'
+
+
 class TestStdlibShims:
     def test_uri_with_everything(self, uri_with_everything):
         uri = pr.ParseResult.from_string(uri_with_everything)
@@ -139,3 +147,18 @@ class TestParseResultBytes:
         )
         idna_encoded = SNOWMAN_IDNA_HOST.encode('utf-8') + b'/path'
         assert uri.unsplit(use_idna=True) == idna_encoded
+
+    def test_eager_normalization_from_string(self):
+        uri = pr.ParseResultBytes.from_string(
+            b'http://' + SNOWMAN + b'.com/path',
+            strict=False,
+            lazy_normalize=False,
+        )
+        assert uri.unsplit() == b'http:/path'
+
+    def test_eager_normalization_from_parts(self):
+        uri = pr.ParseResultBytes.from_parts(
+            scheme='http', host=SNOWMAN.decode('utf-8'), path='/path',
+            lazy_normalize=False,
+        )
+        assert uri.unsplit() == b'http:/path'
