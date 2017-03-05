@@ -20,6 +20,7 @@ from . import compat
 from . import exceptions as exc
 from . import misc
 from . import normalizers
+from . import validators
 
 
 class URIReference(namedtuple('URIReference', misc.URI_COMPONENTS)):
@@ -162,7 +163,7 @@ class URIReference(namedtuple('URIReference', misc.URI_COMPONENTS)):
         host = matches.get('host')
 
         if (host and misc.IPv4_MATCHER.match(host) and not
-                valid_ipv4_host_address(host)):
+                validators.valid_ipv4_host_address(host)):
             # If we have a host, it appears to be IPv4 and it does not have
             # valid bytes, it is an InvalidAuthority.
             raise exc.InvalidAuthority(self.authority.encode(self.encoding))
@@ -231,39 +232,26 @@ class URIReference(namedtuple('URIReference', misc.URI_COMPONENTS)):
             ]
         return all(v(r) for v, r in validators)
 
-    def _is_valid(self, value, matcher, require):
-        if require:
-            return (value is not None
-                    and matcher.match(value))
-
-        # require is False and value is not None
-        return value is None or matcher.match(value)
-
     def authority_is_valid(self, require=False):
         """Determine if the authority component is valid.
 
-        :param str require: Set to ``True`` to require the presence of this
-            component.
-        :returns: ``True`` if the authority is valid. ``False`` otherwise.
-        :rtype: bool
+        :param bool require:
+            Set to ``True`` to require the presence of this component.
+        :returns:
+            ``True`` if the authority is valid. ``False`` otherwise.
+        :rtype:
+            bool
         """
         try:
             self.authority_info()
         except exc.InvalidAuthority:
             return False
 
-        is_valid = self._is_valid(self.authority,
-                                  misc.SUBAUTHORITY_MATCHER,
-                                  require)
-
-        # Ensure that IPv4 addresses have valid bytes
-        if is_valid and self.host and misc.IPv4_MATCHER.match(self.host):
-            return valid_ipv4_host_address(self.host)
-
-        # Perhaps the host didn't exist or if it did, it wasn't an IPv4-like
-        # address. In either case, we want to rely on the `_is_valid` check,
-        # so let's return that.
-        return is_valid
+        return validators.authority_is_valid(
+            self.authority,
+            host=self.host,
+            require=require,
+        )
 
     def scheme_is_valid(self, require=False):
         """Determine if the scheme component is valid.
@@ -273,7 +261,7 @@ class URIReference(namedtuple('URIReference', misc.URI_COMPONENTS)):
         :returns: ``True`` if the scheme is valid. ``False`` otherwise.
         :rtype: bool
         """
-        return self._is_valid(self.scheme, misc.SCHEME_MATCHER, require)
+        return validators.scheme_is_valid(self.scheme, require)
 
     def path_is_valid(self, require=False):
         """Determine if the path component is valid.
@@ -283,7 +271,7 @@ class URIReference(namedtuple('URIReference', misc.URI_COMPONENTS)):
         :returns: ``True`` if the path is valid. ``False`` otherwise.
         :rtype: bool
         """
-        return self._is_valid(self.path, misc.PATH_MATCHER, require)
+        return validators.path_is_valid(self.path, require)
 
     def query_is_valid(self, require=False):
         """Determine if the query component is valid.
@@ -293,7 +281,7 @@ class URIReference(namedtuple('URIReference', misc.URI_COMPONENTS)):
         :returns: ``True`` if the query is valid. ``False`` otherwise.
         :rtype: bool
         """
-        return self._is_valid(self.query, misc.QUERY_MATCHER, require)
+        return validators.query_is_valid(self.query, require)
 
     def fragment_is_valid(self, require=False):
         """Determine if the fragment component is valid.
@@ -303,7 +291,7 @@ class URIReference(namedtuple('URIReference', misc.URI_COMPONENTS)):
         :returns: ``True`` if the fragment is valid. ``False`` otherwise.
         :rtype: bool
         """
-        return self._is_valid(self.fragment, misc.FRAGMENT_MATCHER, require)
+        return validators.fragment_is_valid(self.fragment, require)
 
     def normalize(self):
         """Normalize this reference as described in Section 6.2.2.
@@ -456,10 +444,3 @@ class URIReference(namedtuple('URIReference', misc.URI_COMPONENTS)):
         uri = self._replace(**attributes)
         uri.encoding = self.encoding
         return uri
-
-
-def valid_ipv4_host_address(host):
-    """Determine if the given host is a valid IPv4 address."""
-    # If the host exists, and it might be IPv4, check each byte in the
-    # address.
-    return all([0 <= int(byte, base=10) <= 255 for byte in host.split('.')])
