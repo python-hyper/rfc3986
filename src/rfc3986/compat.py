@@ -12,6 +12,7 @@
 # implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""Compatibility module for Python 2 and 3 support."""
 import sys
 
 
@@ -20,12 +21,14 @@ if sys.version_info >= (3, 0):
 
 
 def to_str(b, encoding):
+    """Ensure that b is text in the specified encoding."""
     if hasattr(b, 'decode') and not isinstance(b, unicode):
         b = b.decode('utf-8')
     return b
 
 
 def to_bytes(s, encoding):
+    """Ensure that s is converted to bytes from the encoding."""
     if hasattr(s, 'encode') and not isinstance(s, bytes):
         s = s.encode('utf-8')
     return s

@@ -1,3 +1,4 @@
+"""Module containing the implementation of the URIReference class."""
 # -*- coding: utf-8 -*-
 # Copyright (c) 2014 Rackspace
 # Copyright (c) 2015 Ian Cordasco
@@ -15,24 +16,75 @@
 # limitations under the License.
 from collections import namedtuple
 
-from .compat import to_str
-from .exceptions import InvalidAuthority, ResolutionError
-from .misc import (
-    ABSOLUTE_URI_MATCHER, FRAGMENT_MATCHER, IPv4_MATCHER, PATH_MATCHER,
-    QUERY_MATCHER, SCHEME_MATCHER, SUBAUTHORITY_MATCHER, URI_MATCHER,
-    URI_COMPONENTS, merge_paths
-    )
-from .normalizers import (
-    encode_component, normalize_scheme, normalize_authority, normalize_path,
-    normalize_query, normalize_fragment
-    )
+from . import compat
+from . import exceptions as exc
+from . import misc
+from . import normalizers
 
 
-class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
+class URIReference(namedtuple('URIReference', misc.URI_COMPONENTS)):
+    """Immutable object representing a parsed URI Reference.
+
+    .. note::
+
+        This class is not intended to be directly instantiated by the user.
+
+    This object exposes attributes for the following components of a
+    URI:
+
+    - scheme
+    - authority
+    - path
+    - query
+    - fragment
+
+    .. attribute:: scheme
+
+        The scheme that was parsed for the URI Reference. For example,
+        ``http``, ``https``, ``smtp``, ``imap``, etc.
+
+    .. attribute:: authority
+
+        Component of the URI that contains the user information, host,
+        and port sub-components. For example,
+        ``google.com``, ``127.0.0.1:5000``, ``username@[::1]``,
+        ``username:password@example.com:443``, etc.
+
+    .. attribute:: path
+
+        The path that was parsed for the given URI Reference. For example,
+        ``/``, ``/index.php``, etc.
+
+    .. attribute:: query
+
+        The query component for a given URI Reference. For example, ``a=b``,
+        ``a=b%20c``, ``a=b+c``, ``a=b,c=d,e=%20f``, etc.
+
+    .. attribute:: fragment
+
+        The fragment component of a URI. For example, ``section-3.1``.
+
+    This class also provides extra attributes for easier access to information
+    like the subcomponents of the authority component.
+
+    .. attribute:: userinfo
+
+        The user information parsed from the authority.
+
+    .. attribute:: host
+
+        The hostname, IPv4, or IPv6 adddres parsed from the authority.
+
+    .. attribute:: port
+
+        The port parsed from the authority.
+    """
+
     slots = ()
 
     def __new__(cls, scheme, authority, path, query, fragment,
                 encoding='utf-8'):
+        """Create a new URIReference."""
         ref = super(URIReference, cls).__new__(
             cls,
             scheme or None,
@@ -44,6 +96,7 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
         return ref
 
     def __eq__(self, other):
+        """Compare this reference to another."""
         other_ref = other
         if isinstance(other, tuple):
             other_ref = URIReference(*other)
@@ -67,49 +120,52 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
         :param str encoding: The encoding of the string provided
         :returns: :class:`URIReference` or subclass thereof
         """
-        uri_string = to_str(uri_string, encoding)
+        uri_string = compat.to_str(uri_string, encoding)
 
-        split_uri = URI_MATCHER.match(uri_string).groupdict()
-        return cls(split_uri['scheme'], split_uri['authority'],
-                   encode_component(split_uri['path'], encoding),
-                   encode_component(split_uri['query'], encoding),
-                   encode_component(split_uri['fragment'], encoding), encoding)
+        split_uri = misc.URI_MATCHER.match(uri_string).groupdict()
+        return cls(
+            split_uri['scheme'], split_uri['authority'],
+            normalizers.encode_component(split_uri['path'], encoding),
+            normalizers.encode_component(split_uri['query'], encoding),
+            normalizers.encode_component(split_uri['fragment'], encoding),
+            encoding,
+        )
 
     def authority_info(self):
-        """Returns a dictionary with the ``userinfo``, ``host``, and ``port``.
+        """Return a dictionary with the ``userinfo``, ``host``, and ``port``.
 
-        If the authority is not valid, it will raise a ``InvalidAuthority``
-        Exception.
+        If the authority is not valid, it will raise a
+        :class:`~rfc3986.exceptions.InvalidAuthority` Exception.
 
         :returns:
             ``{'userinfo': 'username:password', 'host': 'www.example.com',
             'port': '80'}``
         :rtype: dict
-        :raises InvalidAuthority: If the authority is not ``None`` and can not
-            be parsed.
+        :raises rfc3986.exceptions.InvalidAuthority:
+            If the authority is not ``None`` and can not be parsed.
         """
         if not self.authority:
             return {'userinfo': None, 'host': None, 'port': None}
 
-        match = SUBAUTHORITY_MATCHER.match(self.authority)
+        match = misc.SUBAUTHORITY_MATCHER.match(self.authority)
 
         if match is None:
             # In this case, we have an authority that was parsed from the URI
             # Reference, but it cannot be further parsed by our
-            # SUBAUTHORITY_MATCHER. In this case it must not be a valid
+            # misc.SUBAUTHORITY_MATCHER. In this case it must not be a valid
             # authority.
-            raise InvalidAuthority(self.authority.encode(self.encoding))
+            raise exc.InvalidAuthority(self.authority.encode(self.encoding))
 
         # We had a match, now let's ensure that it is actually a valid host
         # address if it is IPv4
         matches = match.groupdict()
         host = matches.get('host')
 
-        if (host and IPv4_MATCHER.match(host) and not
+        if (host and misc.IPv4_MATCHER.match(host) and not
                 valid_ipv4_host_address(host)):
             # If we have a host, it appears to be IPv4 and it does not have
             # valid bytes, it is an InvalidAuthority.
-            raise InvalidAuthority(self.authority.encode(self.encoding))
+            raise exc.InvalidAuthority(self.authority.encode(self.encoding))
 
         return matches
 
@@ -118,16 +174,16 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
         """If present, a string representing the host."""
         try:
             authority = self.authority_info()
-        except InvalidAuthority:
+        except exc.InvalidAuthority:
             return None
         return authority['host']
 
     @property
     def port(self):
-        """If present, the port (as a string) extracted from the authority."""
+        """If present, the port extracted from the authority."""
         try:
             authority = self.authority_info()
-        except InvalidAuthority:
+        except exc.InvalidAuthority:
             return None
         return authority['port']
 
@@ -136,7 +192,7 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
         """If present, the userinfo extracted from the authority."""
         try:
             authority = self.authority_info()
-        except InvalidAuthority:
+        except exc.InvalidAuthority:
             return None
         return authority['userinfo']
 
@@ -148,10 +204,10 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
         :returns: ``True`` if it is an absolute URI, ``False`` otherwise.
         :rtype: bool
         """
-        return bool(ABSOLUTE_URI_MATCHER.match(self.unsplit()))
+        return bool(misc.ABSOLUTE_URI_MATCHER.match(self.unsplit()))
 
     def is_valid(self, **kwargs):
-        """Determines if the URI is valid.
+        """Determine if the URI is valid.
 
         :param bool require_scheme: Set to ``True`` if you wish to require the
             presence of the scheme component.
@@ -184,7 +240,7 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
         return value is None or matcher.match(value)
 
     def authority_is_valid(self, require=False):
-        """Determines if the authority component is valid.
+        """Determine if the authority component is valid.
 
         :param str require: Set to ``True`` to require the presence of this
             component.
@@ -193,15 +249,15 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
         """
         try:
             self.authority_info()
-        except InvalidAuthority:
+        except exc.InvalidAuthority:
             return False
 
         is_valid = self._is_valid(self.authority,
-                                  SUBAUTHORITY_MATCHER,
+                                  misc.SUBAUTHORITY_MATCHER,
                                   require)
 
         # Ensure that IPv4 addresses have valid bytes
-        if is_valid and self.host and IPv4_MATCHER.match(self.host):
+        if is_valid and self.host and misc.IPv4_MATCHER.match(self.host):
             return valid_ipv4_host_address(self.host)
 
         # Perhaps the host didn't exist or if it did, it wasn't an IPv4-like
@@ -210,47 +266,47 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
         return is_valid
 
     def scheme_is_valid(self, require=False):
-        """Determines if the scheme component is valid.
+        """Determine if the scheme component is valid.
 
         :param str require: Set to ``True`` to require the presence of this
             component.
         :returns: ``True`` if the scheme is valid. ``False`` otherwise.
         :rtype: bool
         """
-        return self._is_valid(self.scheme, SCHEME_MATCHER, require)
+        return self._is_valid(self.scheme, misc.SCHEME_MATCHER, require)
 
     def path_is_valid(self, require=False):
-        """Determines if the path component is valid.
+        """Determine if the path component is valid.
 
         :param str require: Set to ``True`` to require the presence of this
             component.
         :returns: ``True`` if the path is valid. ``False`` otherwise.
         :rtype: bool
         """
-        return self._is_valid(self.path, PATH_MATCHER, require)
+        return self._is_valid(self.path, misc.PATH_MATCHER, require)
 
     def query_is_valid(self, require=False):
-        """Determines if the query component is valid.
+        """Determine if the query component is valid.
 
         :param str require: Set to ``True`` to require the presence of this
             component.
         :returns: ``True`` if the query is valid. ``False`` otherwise.
         :rtype: bool
         """
-        return self._is_valid(self.query, QUERY_MATCHER, require)
+        return self._is_valid(self.query, misc.QUERY_MATCHER, require)
 
     def fragment_is_valid(self, require=False):
-        """Determines if the fragment component is valid.
+        """Determine if the fragment component is valid.
 
         :param str require: Set to ``True`` to require the presence of this
             component.
         :returns: ``True`` if the fragment is valid. ``False`` otherwise.
         :rtype: bool
         """
-        return self._is_valid(self.fragment, FRAGMENT_MATCHER, require)
+        return self._is_valid(self.fragment, misc.FRAGMENT_MATCHER, require)
 
     def normalize(self):
-        """Normalize this reference as described in Section 6.2.2
+        """Normalize this reference as described in Section 6.2.2.
 
         This is not an in-place normalization. Instead this creates a new
         URIReference.
@@ -260,12 +316,12 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
         """
         # See http://tools.ietf.org/html/rfc3986#section-6.2.2 for logic in
         # this method.
-        return URIReference(normalize_scheme(self.scheme or ''),
-                            normalize_authority(
+        return URIReference(normalizers.normalize_scheme(self.scheme or ''),
+                            normalizers.normalize_authority(
                                 (self.userinfo, self.host, self.port)),
-                            normalize_path(self.path or ''),
-                            normalize_query(self.query),
-                            normalize_fragment(self.fragment),
+                            normalizers.normalize_path(self.path or ''),
+                            normalizers.normalize_query(self.query),
+                            normalizers.normalize_fragment(self.fragment),
                             self.encoding)
 
     def normalized_equality(self, other_ref):
@@ -291,13 +347,14 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
         :returns: A new URIReference which is the result of resolving this
             reference using ``base_uri``.
         :rtype: :class:`URIReference`
-        :raises ResolutionError: If the ``base_uri`` is not an absolute URI.
+        :raises rfc3986.exceptions.ResolutionError:
+            If the ``base_uri`` is not an absolute URI.
         """
         if not isinstance(base_uri, URIReference):
             base_uri = URIReference.from_string(base_uri)
 
         if not base_uri.is_absolute():
-            raise ResolutionError(base_uri)
+            raise exc.ResolutionError(base_uri)
 
         # This is optional per
         # http://tools.ietf.org/html/rfc3986#section-5.2.1
@@ -311,12 +368,14 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
 
         # http://tools.ietf.org/html/rfc3986#page-32
         if resolving.scheme is not None:
-            target = resolving.copy_with(path=normalize_path(resolving.path))
+            target = resolving.copy_with(
+                path=normalizers.normalize_path(resolving.path)
+            )
         else:
             if resolving.authority is not None:
                 target = resolving.copy_with(
                     scheme=base_uri.scheme,
-                    path=normalize_path(resolving.path)
+                    path=normalizers.normalize_path(resolving.path)
                 )
             else:
                 if resolving.path is None:
@@ -332,10 +391,10 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
                     )
                 else:
                     if resolving.path.startswith('/'):
-                        path = normalize_path(resolving.path)
+                        path = normalizers.normalize_path(resolving.path)
                     else:
-                        path = normalize_path(
-                            merge_paths(base_uri, resolving.path)
+                        path = normalizers.normalize_path(
+                            misc.merge_paths(base_uri, resolving.path)
                         )
                     target = resolving.copy_with(
                         scheme=base_uri.scheme,
@@ -367,6 +426,23 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
 
     def copy_with(self, scheme=None, authority=None, path=None, query=None,
                   fragment=None):
+        """Create a copy of this reference with the new components.
+
+        :param str scheme:
+            (optional) The scheme to use for the new reference.
+        :param str authority:
+            (optional) The authority to use for the new reference.
+        :param str path:
+            (optional) The path to use for the new reference.
+        :param str query:
+            (optional) The query to use for the new reference.
+        :param str fragment:
+            (optional) The fragment to use for the new reference.
+        :returns:
+            New URIReference with provided components.
+        :rtype:
+            URIReference
+        """
         attributes = {
             'scheme': scheme,
             'authority': authority,
@@ -383,6 +459,7 @@ class URIReference(namedtuple('URIReference', URI_COMPONENTS)):
 
 
 def valid_ipv4_host_address(host):
+    """Determine if the given host is a valid IPv4 address."""
     # If the host exists, and it might be IPv4, check each byte in the
     # address.
     return all([0 <= int(byte, base=10) <= 255 for byte in host.split('.')])

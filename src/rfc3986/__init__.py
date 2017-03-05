@@ -14,18 +14,19 @@
 # limitations under the License.
 
 """
-rfc3986
-=======
+An implementation of semantics and validations described in RFC 3986.
 
-An implementation of semantics and validations described in RFC 3986. See
-http://rfc3986.rtfd.org/ for documentation.
+See http://rfc3986.readthedocs.io/ for detailed documentation.
 
 :copyright: (c) 2014 Rackspace
 :license: Apache v2.0, see LICENSE for details
 """
 
-from .api import (URIReference, uri_reference, is_valid_uri, normalize_uri,
-                  urlparse)
+from .api import is_valid_uri
+from .api import normalize_uri
+from .api import uri_reference
+from .api import URIReference
+from .api import urlparse
 from .parseresult import ParseResult
 
 __title__ = 'rfc3986'
@@ -33,7 +34,7 @@ __author__ = 'Ian Cordasco'
 __author_email__ = 'graffatcolmingov@gmail.com'
 __license__ = 'Apache v2.0'
 __copyright__ = 'Copyright 2014 Rackspace'
-__version__ = '0.4.1'
+__version__ = '1.0.0.0b0'
 
 __all__ = (
     'ParseResult',

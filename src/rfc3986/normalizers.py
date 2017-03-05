@@ -12,17 +12,20 @@
 # implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""Module with functions to normalize components."""
 import re
 
-from .compat import to_bytes
-from .misc import NON_PCT_ENCODED
+from . import compat
+from . import misc
 
 
 def normalize_scheme(scheme):
+    """Normalize the scheme component."""
     return scheme.lower()
 
 
 def normalize_authority(authority):
+    """Normalize an authority tuple to a string."""
     userinfo, host, port = authority
     result = ''
     if userinfo:
@@ -35,6 +38,7 @@ def normalize_authority(authority):
 
 
 def normalize_path(path):
+    """Normalize the path string."""
     if not path:
         return path
 
@@ -43,12 +47,14 @@ def normalize_path(path):
 
 
 def normalize_query(query):
+    """Normalize the query string."""
     if not query:
         return query
     return normalize_percent_characters(query)
 
 
 def normalize_fragment(fragment):
+    """Normalize the fragment string."""
     if not fragment:
         return fragment
     return normalize_percent_characters(fragment)
@@ -70,6 +76,10 @@ def normalize_percent_characters(s):
 
 
 def remove_dot_segments(s):
+    """Remove dot segments from the string.
+
+    See also Section 5.2.4 of :rfc:`3986`.
+    """
     # See http://tools.ietf.org/html/rfc3986#section-5.2.4 for pseudo-code
     segments = s.split('/')  # Turn the path into a list of segments
     output = []  # Initialize the variable to use to store output
@@ -100,10 +110,11 @@ def remove_dot_segments(s):
 
 
 def encode_component(uri_component, encoding):
+    """Encode the specific component in the provided encoding."""
     if uri_component is None:
         return uri_component
 
-    uri_bytes = to_bytes(uri_component, encoding)
+    uri_bytes = compat.to_bytes(uri_component, encoding)
 
     encoded_uri = bytearray()
 
@@ -111,7 +122,7 @@ def encode_component(uri_component, encoding):
         # Will return a single character bytestring on both Python 2 & 3
         byte = uri_bytes[i:i+1]
         byte_ord = ord(byte)
-        if byte_ord < 128 and byte.decode() in NON_PCT_ENCODED:
+        if byte_ord < 128 and byte.decode() in misc.NON_PCT_ENCODED:
             encoded_uri.extend(byte)
             continue
         encoded_uri.extend('%{0:02x}'.format(byte_ord).encode())

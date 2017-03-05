@@ -12,6 +12,7 @@
 # implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""Module containing the urlparse compatibility logic."""
 from collections import namedtuple
 
 from . import compat
@@ -65,10 +66,17 @@ class ParseResultMixin(object):
 
 class ParseResult(namedtuple('ParseResult', PARSED_COMPONENTS),
                   ParseResultMixin):
+    """Implementation of urlparse compatibility class.
+
+    This uses the URIReference logic to handle compatibility with the
+    urlparse.ParseResult class.
+    """
+
     slots = ()
 
     def __new__(cls, scheme, userinfo, host, port, path, query, fragment,
                 uri_ref, encoding='utf-8'):
+        """Create a new ParseResult."""
         parse_result = super(ParseResult, cls).__new__(
             cls,
             scheme or None,
@@ -144,6 +152,7 @@ class ParseResult(namedtuple('ParseResult', PARSED_COMPONENTS),
 
     def copy_with(self, scheme=None, userinfo=None, host=None, port=None,
                   path=None, query=None, fragment=None):
+        """Create a copy of this instance replacing with specified parts."""
         attributes = zip(PARSED_COMPONENTS,
                          (scheme, userinfo, host, port, path, query, fragment))
         attrs_dict = {}
@@ -160,6 +169,7 @@ class ParseResult(namedtuple('ParseResult', PARSED_COMPONENTS),
         return ParseResult(uri_ref=ref, encoding=self.encoding, **attrs_dict)
 
     def encode(self, encoding=None):
+        """Convert to an instance of ParseResultBytes."""
         encoding = encoding or self.encoding
         attrs = dict(
             zip(PARSED_COMPONENTS,
@@ -187,8 +197,11 @@ class ParseResult(namedtuple('ParseResult', PARSED_COMPONENTS),
 
 class ParseResultBytes(namedtuple('ParseResultBytes', PARSED_COMPONENTS),
                        ParseResultMixin):
+    """Compatibility shim for the urlparse.ParseResultBytes object."""
+
     def __new__(cls, scheme, userinfo, host, port, path, query, fragment,
                 uri_ref, encoding='utf-8', lazy_normalize=True):
+        """Create a new ParseResultBytes instance."""
         parse_result = super(ParseResultBytes, cls).__new__(
             cls,
             scheme or None,
@@ -272,6 +285,7 @@ class ParseResultBytes(namedtuple('ParseResultBytes', PARSED_COMPONENTS),
 
     def copy_with(self, scheme=None, userinfo=None, host=None, port=None,
                   path=None, query=None, fragment=None, lazy_normalize=True):
+        """Create a copy of this instance replacing with specified parts."""
         attributes = zip(PARSED_COMPONENTS,
                          (scheme, userinfo, host, port, path, query, fragment))
         attrs_dict = {}

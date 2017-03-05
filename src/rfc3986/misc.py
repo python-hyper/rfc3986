@@ -13,8 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-rfc3986.misc
-~~~~~~~~~~~~
+Module containing compiled regular expressions and constants.
 
 This module contains important constants, patterns, and compiled regular
 expressions for parsing and validating URIs and their components.

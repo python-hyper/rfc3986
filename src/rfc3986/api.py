@@ -13,15 +13,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-rfc3986.api
-~~~~~~~~~~~
+Module containing the simple and functional API for rfc3986.
 
-This defines the simple API to rfc3986. This module defines 3 functions and
-provides access to the class ``URIReference``.
+This module defines functions and provides access to the public attributes
+and classes of rfc3986.
 """
 
-from .uri import URIReference
 from .parseresult import ParseResult
+from .uri import URIReference
 
 
 def uri_reference(uri, encoding='utf-8'):
