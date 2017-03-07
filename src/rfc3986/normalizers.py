@@ -31,10 +31,15 @@ def normalize_authority(authority):
     if userinfo:
         result += normalize_percent_characters(userinfo) + '@'
     if host:
-        result += host.lower()
+        result += normalize_host(host)
     if port:
         result += ':' + port
     return result
+
+
+def normalize_host(host):
+    """Normalize a host string."""
+    return host.lower()
 
 
 def normalize_path(path):

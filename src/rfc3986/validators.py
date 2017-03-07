@@ -13,7 +13,184 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Module containing the validation logic for rfc3986."""
+from . import exceptions
 from . import misc
+from . import normalizers
+
+
+class Validator(object):
+    """Object used to configure validation of all objects in rfc3986.
+
+    Example usage:
+
+    .. code-block:: python
+
+        >>> uri = rfc3986.uri_reference('https://github.com/')
+        >>> validator = rfc3986.Validator().require_components(
+        ...    'scheme', 'host', 'path',
+        ... ).allow_schemes(
+        ...    'http', 'https',
+        ... ).allow_hosts(
+        ...    '127.0.0.1', 'github.com',
+        ... )
+        ...
+        >>> validator.validate(uri)
+        >>> invalid_uri = rfc3986.uri_reference('imap://mail.google.com')
+        >>> validator.validate(invalid_uri)
+        Traceback (most recent call last):
+        ...
+        ValidationErrors("Invalid scheme", "Missing path")
+
+    """
+
+    COMPONENT_NAMES = frozenset([
+        'scheme',
+        'userinfo',
+        'host',
+        'port',
+        'path',
+        'query',
+        'fragment',
+    ])
+
+    def __init__(self):
+        """Initialize our default validations."""
+        self.allowed_schemes = set()
+        self.allowed_hosts = set()
+        self.allowed_ports = set()
+        self.allow_password = True
+        self.require_presence_of = {
+            'scheme': False,
+            'userinfo': False,
+            'host': False,
+            'port': False,
+            'path': False,
+            'query': False,
+            'fragment': False,
+        }
+
+    def allow_schemes(self, *schemes):
+        """Require the scheme to be one of the provided schemes.
+
+        :param schemes:
+            Schemes, without ``://`` that are allowed.
+        :returns:
+            The validator instance.
+        :rtype:
+            Validator
+        """
+        for scheme in schemes:
+            self.allowed_schemes.add(normalizers.normalize_scheme(scheme))
+        return self
+
+    def allow_hosts(self, *hosts):
+        """Require the host to be one of the provided hosts.
+
+        :param hosts:
+            Hosts that are allowed.
+        :returns:
+            The validator instance.
+        :rtype:
+            Validator
+        """
+        for host in hosts:
+            self.allowed_hosts.add(normalizers.normalize_host(host))
+        return self
+
+    def allow_ports(self, *ports):
+        """Require the port to be one of the provided ports.
+
+        :param ports:
+            Ports that are allowed.
+        :returns:
+            The validator instance.
+        :rtype:
+            Validator
+        """
+        for port in ports:
+            port_int = int(port, base=10)
+            if 0 <= port_int <= 65535:
+                self.allowed_ports.add(port_int)
+        return self
+
+    def allow_use_of_password(self):
+        """Allow passwords to be present in the URI."""
+        self.allow_password = True
+        return self
+
+    def forbid_use_of_password(self):
+        """Prevent passwords from being included in the URI."""
+        self.allow_password = False
+        return self
+
+    def require_components(self, *components):
+        """Require the components provided.
+
+        :param components:
+            Names of components from :attr:`Validator.COMPONENT_NAMES`.
+        :returns:
+            The validator instance.
+        :rtype:
+            Validator
+        """
+        components = [c.lower() for c in components]
+        for component in components:
+            if component not in self.COMPONENT_NAMES:
+                raise ValueError(
+                    '"{}" is not a valid component'.format(component)
+                )
+        self.require_presence_of({
+            component: True for component in components
+        })
+        return self
+
+    def validate(self, uri):
+        """Check a URI for conditions specified on this validator.
+
+        :param uri:
+            Parsed URI to validate.
+        :type uri:
+            rfc3986.uri.URIReference
+        :raises MissingComponentError:
+            When a required component is missing.
+        :raises UnpermittedComponentError:
+            When a component is not one of those allowed.
+        :raises PasswordForbidden:
+            When a password is present in the userinfo component but is
+            not permitted by configuration.
+        """
+        if not self.allow_password:
+            check_password(uri)
+
+        required_components = [
+            component
+            for component, required in self.require_presence_of.items()
+            if required
+        ]
+        if required_components:
+            ensure_required_components_exist(uri, required_components)
+
+
+def check_password(uri):
+    """Assert that there is no password present in the uri."""
+    userinfo = uri.userinfo
+    if not userinfo:
+        return
+    credentials = userinfo.split(':', 1)
+    if len(credentials) <= 1:
+        return
+    raise exceptions.PasswordForbidden(uri)
+
+
+def ensure_required_components_exist(uri, required_components):
+    """Assert that all required components are present in the URI."""
+    missing_components = sorted([
+        component
+        for component in required_components
+        if getattr(uri, component) is None
+    ])
+    if missing_components:
+        raise exceptions.MissingComponentError(uri)
 
 
 def is_valid(value, matcher, require):

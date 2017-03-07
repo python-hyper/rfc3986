@@ -33,3 +33,54 @@ class ResolutionError(RFC3986Exception):
         """Initialize the error with the failed URI."""
         super(ResolutionError, self).__init__(
             "{0} is not an absolute URI.".format(uri.unsplit()))
+
+
+class ValidationError(RFC3986Exception):
+    """Exception raised during Validation of a URI."""
+
+    pass
+
+
+class MissingComponentError(ValidationError):
+    """Exception raised when a required component is missing."""
+
+    def __init__(self, uri, *component_names):
+        """Initialize the error with the missing component name."""
+        verb = 'was'
+        if len(component_names) > 1:
+            verb = 'were'
+
+        components = ', '.join(sorted(component_names))
+        super(MissingComponentError, self).__init__(
+            "{} {} required but missing".format(components, verb),
+            uri,
+            component_names,
+        )
+
+
+class UnpermittedComponentError(ValidationError):
+    """Exception raised when a component has an unpermitted value."""
+
+    def __init__(self, component_name, component_value, allowed_values):
+        """Initialize the error with the unpermitted component."""
+        super(UnpermittedComponentError, self).__init__(
+            "{} was required to be one of {!r} but was '{!r}'".format(
+                component_name, list(sorted(allowed_values)), component_value,
+            ),
+            component_name,
+            component_value,
+            allowed_values,
+        )
+
+
+class PasswordForbidden(ValidationError):
+    """Exception raised when a URL has a password in the userinfo section."""
+
+    def __init__(self, uri):
+        """Initialize the error with the URI that failed validation."""
+        unsplit = getattr(uri, 'unsplit', lambda: uri)
+        super(PasswordForbidden, self).__init__(
+            '"{}" contained a password when validation forbade it'.format(
+                unsplit()
+            )
+        )

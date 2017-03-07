@@ -444,3 +444,14 @@ class URIReference(namedtuple('URIReference', misc.URI_COMPONENTS)):
         uri = self._replace(**attributes)
         uri.encoding = self.encoding
         return uri
+
+    def validate(self, validator):
+        """Validate the URI using the configured validator.
+
+        :param validator:
+            Instantiated and configured Validator.
+        :type validator:
+            rfc3986.validators.Validator
+        :raises ValidatorErrors:
+            In the event of one or more errors in validation.
+        """
