@@ -139,7 +139,7 @@ class Validator(object):
                 raise ValueError(
                     '"{}" is not a valid component'.format(component)
                 )
-        self.require_presence_of({
+        self.require_presence_of.update({
             component: True for component in components
         })
         return self
@@ -190,7 +190,7 @@ def ensure_required_components_exist(uri, required_components):
         if getattr(uri, component) is None
     ])
     if missing_components:
-        raise exceptions.MissingComponentError(uri)
+        raise exceptions.MissingComponentError(uri, *missing_components)
 
 
 def is_valid(value, matcher, require):
