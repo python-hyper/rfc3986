@@ -42,8 +42,8 @@ def test_allowing_ports():
     """Verify the ability select ports to be allowed."""
     validator = validators.Validator().allow_ports('80', '100')
 
-    assert 80 in validator.allowed_ports
-    assert 100 in validator.allowed_ports
+    assert '80' in validator.allowed_ports
+    assert '100' in validator.allowed_ports
 
 
 def test_requiring_invalid_component():
@@ -132,3 +132,14 @@ def test_multiple_missing_components(uri):
         validator.validate(uri)
     exception = captured_exc.value
     assert 2 == len(exception.args[-1])
+
+
+@pytest.mark.parametrize('uri', [
+    rfc3986.uri_reference('smtp://'),
+    rfc3986.uri_reference('telnet://'),
+])
+def test_ensure_uri_has_a_scheme(uri):
+    """Verify validation with allowed schemes."""
+    validator = validators.Validator().allow_schemes('https', 'http')
+    with pytest.raises(exceptions.UnpermittedComponentError):
+        validator.validate(uri)

@@ -110,7 +110,7 @@ class Validator(object):
         for port in ports:
             port_int = int(port, base=10)
             if 0 <= port_int <= 65535:
-                self.allowed_ports.add(port_int)
+                self.allowed_ports.add(port)
         return self
 
     def allow_use_of_password(self):
@@ -170,6 +170,10 @@ class Validator(object):
         if required_components:
             ensure_required_components_exist(uri, required_components)
 
+        ensure_one_of(self.allowed_schemes, uri, 'scheme')
+        ensure_one_of(self.allowed_hosts, uri, 'host')
+        ensure_one_of(self.allowed_ports, uri, 'port')
+
 
 def check_password(uri):
     """Assert that there is no password present in the uri."""
@@ -180,6 +184,15 @@ def check_password(uri):
     if len(credentials) <= 1:
         return
     raise exceptions.PasswordForbidden(uri)
+
+
+def ensure_one_of(allowed_values, uri, attribute):
+    """Assert that the uri's attribute is one of the allowed values."""
+    value = getattr(uri, attribute)
+    if allowed_values and value not in allowed_values:
+        raise exceptions.UnpermittedComponentError(
+            attribute, value, allowed_values,
+        )
 
 
 def ensure_required_components_exist(uri, required_components):
