@@ -50,11 +50,13 @@ class MissingComponentError(ValidationError):
         if len(component_names) > 1:
             verb = 'were'
 
-        components = ', '.join(sorted(component_names))
+        self.uri = uri
+        self.components = sorted(component_names)
+        components = ', '.join(self.components)
         super(MissingComponentError, self).__init__(
             "{} {} required but missing".format(components, verb),
             uri,
-            component_names,
+            self.components,
         )
 
 
@@ -64,13 +66,16 @@ class UnpermittedComponentError(ValidationError):
     def __init__(self, component_name, component_value, allowed_values):
         """Initialize the error with the unpermitted component."""
         super(UnpermittedComponentError, self).__init__(
-            "{} was required to be one of {!r} but was '{!r}'".format(
+            "{} was required to be one of {!r} but was {!r}".format(
                 component_name, list(sorted(allowed_values)), component_value,
             ),
             component_name,
             component_value,
             allowed_values,
         )
+        self.component_name = component_name
+        self.component_value = component_value
+        self.allowed_values = allowed_values
 
 
 class PasswordForbidden(ValidationError):
@@ -84,3 +89,4 @@ class PasswordForbidden(ValidationError):
                 unsplit()
             )
         )
+        self.uri = uri

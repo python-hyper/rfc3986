@@ -11,7 +11,7 @@ def test_defaults():
     """Verify the default Validator settings."""
     validator = validators.Validator()
 
-    assert validator.require_presence_of == {
+    assert validator.required_components == {
         c: False for c in validator.COMPONENT_NAMES
     }
     assert validator.allow_password is True
@@ -49,7 +49,7 @@ def test_allowing_ports():
 def test_requiring_invalid_component():
     """Verify that we validate required component names."""
     with pytest.raises(ValueError):
-        validators.Validator().require_components('frob')
+        validators.Validator().require_presence_of('frob')
 
 
 def test_use_of_password():
@@ -99,7 +99,7 @@ def test_passwordless_uris_pass_validation(uri):
 ])
 def test_missing_host_component(uri):
     """Verify that missing host components cause errors."""
-    validator = validators.Validator().require_components('host')
+    validator = validators.Validator().require_presence_of('host')
     with pytest.raises(exceptions.MissingComponentError):
         validator.validate(uri)
 
@@ -115,7 +115,7 @@ def test_missing_host_component(uri):
 ])
 def test_missing_path_component(uri):
     """Verify that missing path components cause errors."""
-    validator = validators.Validator().require_components('path')
+    validator = validators.Validator().require_presence_of('path')
     with pytest.raises(exceptions.MissingComponentError):
         validator.validate(uri)
 
@@ -127,7 +127,7 @@ def test_missing_path_component(uri):
 ])
 def test_multiple_missing_components(uri):
     """Verify that multiple missing components are caught."""
-    validator = validators.Validator().require_components('scheme', 'path')
+    validator = validators.Validator().require_presence_of('scheme', 'path')
     with pytest.raises(exceptions.MissingComponentError) as captured_exc:
         validator.validate(uri)
     exception = captured_exc.value
@@ -143,3 +143,54 @@ def test_ensure_uri_has_a_scheme(uri):
     validator = validators.Validator().allow_schemes('https', 'http')
     with pytest.raises(exceptions.UnpermittedComponentError):
         validator.validate(uri)
+
+
+@pytest.mark.parametrize('uri, failed_component', [
+    (rfc3986.uri_reference('git://github.com'), 'scheme'),
+    (rfc3986.uri_reference('http://github.com'), 'scheme'),
+    (rfc3986.uri_reference('ssh://gitlab.com'), 'host'),
+    (rfc3986.uri_reference('https://gitlab.com'), 'host'),
+])
+def test_allowed_hosts_and_schemes(uri, failed_component):
+    """Verify each of these fails."""
+    validator = validators.Validator().allow_schemes(
+        'https', 'ssh',
+    ).allow_hosts(
+        'github.com', 'git.openstack.org',
+    )
+    with pytest.raises(exceptions.UnpermittedComponentError) as caught_exc:
+        validator.validate(uri)
+
+    exc = caught_exc.value
+    assert exc.component_name == failed_component
+
+
+@pytest.mark.parametrize('uri', [
+    rfc3986.uri_reference('https://github.com/sigmavirus24'),
+    rfc3986.uri_reference('ssh://github.com/sigmavirus24'),
+    rfc3986.uri_reference('ssh://ssh@github.com:22/sigmavirus24'),
+    rfc3986.uri_reference('https://github.com:443/sigmavirus24'),
+    rfc3986.uri_reference('https://gitlab.com/sigmavirus24'),
+    rfc3986.uri_reference('ssh://gitlab.com/sigmavirus24'),
+    rfc3986.uri_reference('ssh://ssh@gitlab.com:22/sigmavirus24'),
+    rfc3986.uri_reference('https://gitlab.com:443/sigmavirus24'),
+    rfc3986.uri_reference('https://bitbucket.org/sigmavirus24'),
+    rfc3986.uri_reference('ssh://bitbucket.org/sigmavirus24'),
+    rfc3986.uri_reference('ssh://ssh@bitbucket.org:22/sigmavirus24'),
+    rfc3986.uri_reference('https://bitbucket.org:443/sigmavirus24'),
+    rfc3986.uri_reference('https://git.openstack.org/sigmavirus24'),
+    rfc3986.uri_reference('ssh://git.openstack.org/sigmavirus24'),
+    rfc3986.uri_reference('ssh://ssh@git.openstack.org:22/sigmavirus24'),
+    rfc3986.uri_reference('https://git.openstack.org:443/sigmavirus24'),
+])
+def test_successful_complex_validation(uri):
+    """Verify we do not raise ValidationErrors for good URIs."""
+    validators.Validator().allow_schemes(
+        'https', 'ssh',
+    ).allow_hosts(
+        'github.com', 'bitbucket.org', 'gitlab.com', 'git.openstack.org',
+    ).allow_ports(
+        '22', '443',
+    ).require_presence_of(
+        'scheme', 'host', 'path',
+    ).validate(uri)

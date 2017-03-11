@@ -59,7 +59,7 @@ class Validator(object):
         self.allowed_hosts = set()
         self.allowed_ports = set()
         self.allow_password = True
-        self.require_presence_of = {
+        self.required_components = {
             'scheme': False,
             'userinfo': False,
             'host': False,
@@ -123,7 +123,7 @@ class Validator(object):
         self.allow_password = False
         return self
 
-    def require_components(self, *components):
+    def require_presence_of(self, *components):
         """Require the components provided.
 
         :param components:
@@ -139,7 +139,7 @@ class Validator(object):
                 raise ValueError(
                     '"{}" is not a valid component'.format(component)
                 )
-        self.require_presence_of.update({
+        self.required_components.update({
             component: True for component in components
         })
         return self
@@ -164,7 +164,7 @@ class Validator(object):
 
         required_components = [
             component
-            for component, required in self.require_presence_of.items()
+            for component, required in self.required_components.items()
             if required
         ]
         if required_components:
@@ -189,7 +189,7 @@ def check_password(uri):
 def ensure_one_of(allowed_values, uri, attribute):
     """Assert that the uri's attribute is one of the allowed values."""
     value = getattr(uri, attribute)
-    if allowed_values and value not in allowed_values:
+    if value is not None and allowed_values and value not in allowed_values:
         raise exceptions.UnpermittedComponentError(
             attribute, value, allowed_values,
         )
