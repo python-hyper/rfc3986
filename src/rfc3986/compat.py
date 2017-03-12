@@ -15,8 +15,22 @@
 """Compatibility module for Python 2 and 3 support."""
 import sys
 
+try:
+    from urllib.parse import quote as urlquote
+except ImportError:  # Python 2.x
+    from urllib import quote as urlquote
 
-if sys.version_info >= (3, 0):
+__all__ = (
+    'to_bytes',
+    'to_str',
+    'urlquote',
+)
+
+PY3 = (3, 0) <= sys.version_info < (4, 0)
+PY2 = (2, 6) <= sys.version_info < (2, 8)
+
+
+if PY3:
     unicode = str  # Python 3.x
 
 

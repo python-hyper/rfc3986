@@ -37,6 +37,16 @@ def normalize_authority(authority):
     return result
 
 
+def normalize_username(username):
+    """Normalize a username to make it safe to include in userinfo."""
+    return compat.urlquote(username)
+
+
+def normalize_password(password):
+    """Normalize a password to make safe for userinfo."""
+    return compat.urlquote(password)
+
+
 def normalize_host(host):
     """Normalize a host string."""
     return host.lower()
