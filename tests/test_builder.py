@@ -65,3 +65,15 @@ def test_add_credentials_requires_username():
     """Verify one needs a username to add credentials."""
     with pytest.raises(ValueError):
         builder.URIBuilder().add_credentials(None, None)
+
+
+@pytest.mark.parametrize('hostname', [
+    'google.com',
+    'GOOGLE.COM',
+    'gOOgLe.COM',
+    'goOgLE.com',
+])
+def test_add_host(hostname):
+    """Verify we normalize hostnames in add_host."""
+    uribuilder = builder.URIBuilder().add_host(hostname)
+    assert uribuilder.host == 'google.com'

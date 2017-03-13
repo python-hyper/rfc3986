@@ -114,3 +114,23 @@ class URIBuilder(object):
             query=self.query,
             fragment=self.fragment,
         )
+
+    def add_host(self, host):
+        """Add hostname to the URI.
+
+        .. code-block:: python
+
+            >>> URIBuilder().add_host('google.com')
+            URIBuilder(scheme=None, userinfo=None, host='google.com',
+                    port=None, path=None, query=None, fragment=None)
+
+        """
+        return URIBuilder(
+            scheme=self.scheme,
+            userinfo=self.userinfo,
+            host=normalizers.normalize_host(host),
+            port=self.port,
+            path=self.path,
+            query=self.query,
+            fragment=self.fragment,
+        )
