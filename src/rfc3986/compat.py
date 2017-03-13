@@ -20,6 +20,11 @@ try:
 except ImportError:  # Python 2.x
     from urllib import quote as urlquote
 
+try:
+    from urllib.parse import urlencode
+except ImportError:  # Python 2.x
+    from urllib import urlencode
+
 __all__ = (
     'to_bytes',
     'to_str',

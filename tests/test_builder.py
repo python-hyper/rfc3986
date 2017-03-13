@@ -77,3 +77,72 @@ def test_add_host(hostname):
     """Verify we normalize hostnames in add_host."""
     uribuilder = builder.URIBuilder().add_host(hostname)
     assert uribuilder.host == 'google.com'
+
+
+@pytest.mark.parametrize('port', [
+    -100,
+    '-100',
+    -1,
+    '-1',
+    65536,
+    '65536',
+    1000000,
+    '1000000',
+    '',
+    'abc',
+    '0b10',
+])
+def test_add_invalid_port(port):
+    """Verify we raise a ValueError for invalid ports."""
+    with pytest.raises(ValueError):
+        builder.URIBuilder().add_port(port)
+
+
+@pytest.mark.parametrize('port, expected', [
+    (0, '0'),
+    ('0', '0'),
+    (1, '1'),
+    ('1', '1'),
+    (22, '22'),
+    ('22', '22'),
+    (80, '80'),
+    ('80', '80'),
+    (443, '443'),
+    ('443', '443'),
+    (65535, '65535'),
+    ('65535', '65535'),
+])
+def test_add_port(port, expected):
+    """Verify we normalize our port."""
+    uribuilder = builder.URIBuilder().add_port(port)
+    assert uribuilder.port == expected
+
+
+@pytest.mark.parametrize('path', [
+    'sigmavirus24/rfc3986',
+    '/sigmavirus24/rfc3986',
+])
+def test_add_path(path):
+    """Verify we normalize our path value."""
+    uribuilder = builder.URIBuilder().add_path(path)
+    assert uribuilder.path == '/sigmavirus24/rfc3986'
+
+
+@pytest.mark.parametrize('query_items, expected', [
+    ({'a': 'b c'}, 'a=b+c'),
+    ({'a': 'b+c'}, 'a=b%2Bc'),
+    ([('a', 'b c')], 'a=b+c'),
+    ([('a', 'b+c')], 'a=b%2Bc'),
+    ([('a', 'b'), ('c', 'd')], 'a=b&c=d'),
+    ([('a', 'b'), ('username', '@d')], 'a=b&username=%40d'),
+])
+def test_add_query_from(query_items, expected):
+    """Verify the behaviour of add_query_from."""
+    uribuilder = builder.URIBuilder().add_query_from(query_items)
+    assert uribuilder.query == expected
+
+
+def test_add_query():
+    """Verify we do not modify the provided query string."""
+    uribuilder = builder.URIBuilder().add_query('username=@foo')
+    assert uribuilder.query == 'username=@foo'

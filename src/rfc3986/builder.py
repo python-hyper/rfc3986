@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Module containing the logic for the URIBuilder object."""
+from . import compat
 from . import normalizers
 
 
@@ -132,5 +133,117 @@ class URIBuilder(object):
             port=self.port,
             path=self.path,
             query=self.query,
+            fragment=self.fragment,
+        )
+
+    def add_port(self, port):
+        """Add port to the URI.
+
+        .. code-block:: python
+
+            >>> URIBuilder().add_port(80)
+            URIBuilder(scheme=None, userinfo=None, host=None, port='80',
+                    path=None, query=None, fragment=None)
+
+            >>> URIBuilder().add_port(443)
+            URIBuilder(scheme=None, userinfo=None, host=None, port='443',
+                    path=None, query=None, fragment=None)
+
+        """
+        port_int = int(port)
+        if port_int < 0:
+            raise ValueError(
+                'ports are not allowed to be negative. You provided {}'.format(
+                    port_int,
+                )
+            )
+        if port_int > 65535:
+            raise ValueError(
+                'ports are not allowed to be larger than 65535. '
+                'You provided {}'.format(
+                    port_int,
+                )
+            )
+
+        return URIBuilder(
+            scheme=self.scheme,
+            userinfo=self.userinfo,
+            host=self.host,
+            port='{}'.format(port_int),
+            path=self.path,
+            query=self.query,
+            fragment=self.fragment,
+        )
+
+    def add_path(self, path):
+        """Add a path to the URI.
+
+        .. code-block:: python
+
+            >>> URIBuilder().add_path('sigmavirus24/rfc3985')
+            URIBuilder(scheme=None, userinfo=None, host=None, port=None,
+                    path='/sigmavirus24/rfc3986', query=None, fragment=None)
+
+            >>> URIBuilder().add_path('/checkout.php')
+            URIBuilder(scheme=None, userinfo=None, host=None, port=None,
+                    path='/checkout.php', query=None, fragment=None)
+
+        """
+        if not path.startswith('/'):
+            path = '/{}'.format(path)
+
+        return URIBuilder(
+            scheme=self.scheme,
+            userinfo=self.userinfo,
+            host=self.host,
+            port=self.port,
+            path=path,
+            query=self.query,
+            fragment=self.fragment,
+        )
+
+    def add_query_from(self, query_items):
+        """Generate and add a query a dictionary or list of tuples.
+
+        .. code-block:: python
+
+            >>> URIBuilder().add_query_from({'a': 'b c'})
+            URIBuilder(scheme=None, userinfo=None, host=None, port=None,
+                    path=None, query='a=b+c', fragment=None)
+
+            >>> URIBuilder().add_query_from([('a', 'b c')])
+            URIBuilder(scheme=None, userinfo=None, host=None, port=None,
+                    path=None, query='a=b+c', fragment=None)
+
+        """
+        query = compat.urlencode(query_items)
+
+        return URIBuilder(
+            scheme=self.scheme,
+            userinfo=self.userinfo,
+            host=self.host,
+            port=self.port,
+            path=self.path,
+            query=query,
+            fragment=self.fragment,
+        )
+
+    def add_query(self, query):
+        """Add a pre-formated query string to the URI.
+
+        .. code-block:: python
+
+            >>> URIBuilder().add_query('a=b&c=d')
+            URIBuilder(scheme=None, userinfo=None, host=None, port=None,
+                    path=None, query='a=b&c=d', fragment=None)
+
+        """
+        return URIBuilder(
+            scheme=self.scheme,
+            userinfo=self.userinfo,
+            host=self.host,
+            port=self.port,
+            path=self.path,
+            query=query,
             fragment=self.fragment,
         )
