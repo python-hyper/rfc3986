@@ -197,7 +197,7 @@ class URIBuilder(object):
             userinfo=self.userinfo,
             host=self.host,
             port=self.port,
-            path=path,
+            path=normalizers.normalize_path(path),
             query=self.query,
             fragment=self.fragment,
         )
@@ -216,7 +216,7 @@ class URIBuilder(object):
                     path=None, query='a=b+c', fragment=None)
 
         """
-        query = compat.urlencode(query_items)
+        query = normalizers.normalize_query(compat.urlencode(query_items))
 
         return URIBuilder(
             scheme=self.scheme,
@@ -244,6 +244,26 @@ class URIBuilder(object):
             host=self.host,
             port=self.port,
             path=self.path,
-            query=query,
+            query=normalizers.normalize_query(query),
             fragment=self.fragment,
+        )
+
+    def add_fragment(self, fragment):
+        """Add a fragment to the URI.
+
+        .. code-block:: python
+
+            >>> URIBuilder().add_fragment('section-2.6.1')
+            URIBuilder(scheme=None, userinfo=None, host=None, port=None,
+                    path=None, query=None, fragment='section-2.6.1')
+
+        """
+        return URIBuilder(
+            scheme=self.scheme,
+            userinfo=self.userinfo,
+            host=self.host,
+            port=self.port,
+            path=self.path,
+            query=self.query,
+            fragment=normalizers.normalize_fragment(fragment),
         )

@@ -146,3 +146,9 @@ def test_add_query():
     """Verify we do not modify the provided query string."""
     uribuilder = builder.URIBuilder().add_query('username=@foo')
     assert uribuilder.query == 'username=@foo'
+
+
+def test_add_fragment():
+    """Verify our handling of fragments."""
+    uribuilder = builder.URIBuilder().add_fragment('section-2.5.1')
+    assert uribuilder.fragment == 'section-2.5.1'

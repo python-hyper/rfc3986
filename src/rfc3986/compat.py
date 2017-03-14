@@ -29,6 +29,7 @@ __all__ = (
     'to_bytes',
     'to_str',
     'urlquote',
+    'urlencode',
 )
 
 PY3 = (3, 0) <= sys.version_info < (4, 0)
