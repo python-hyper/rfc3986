@@ -15,6 +15,7 @@
 """Module containing the logic for the URIBuilder object."""
 from . import compat
 from . import normalizers
+from . import uri
 
 
 class URIBuilder(object):
@@ -266,4 +267,29 @@ class URIBuilder(object):
             path=self.path,
             query=self.query,
             fragment=normalizers.normalize_fragment(fragment),
+        )
+
+    def finalize(self):
+        """Create a URIReference from our builder.
+
+        .. code-block:: python
+
+            >>> URIBuilder().add_scheme('https').add_host('github.com'
+            ...     ).add_path('sigmavirus24/rfc3986').finalize().unsplit()
+            'https://github.com/sigmavirus24/rfc3986'
+
+            >>> URIBuilder().add_scheme('https').add_host('github.com'
+            ...     ).add_path('sigmavirus24/rfc3986').add_credentials(
+            ...     'sigmavirus24', 'not-re@l').finalize().unsplit()
+            'https://sigmavirus24:not-re%40l@github.com/sigmavirus24/rfc3986'
+
+        """
+        return uri.URIReference(
+            self.scheme,
+            normalizers.normalize_authority(
+                (self.userinfo, self.host, self.port)
+            ),
+            self.path,
+            self.query,
+            self.fragment,
         )

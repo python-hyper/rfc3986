@@ -152,3 +152,14 @@ def test_add_fragment():
     """Verify our handling of fragments."""
     uribuilder = builder.URIBuilder().add_fragment('section-2.5.1')
     assert uribuilder.fragment == 'section-2.5.1'
+
+
+def test_finalize():
+    """Verify the whole thing."""
+    uri = builder.URIBuilder().add_scheme('https').add_credentials(
+        'sigmavirus24', 'not-my-re@l-password'
+    ).add_host('github.com').add_path('sigmavirus24/rfc3986').finalize(
+    ).unsplit()
+    expected = ('https://sigmavirus24:not-my-re%40l-password@github.com/'
+                'sigmavirus24/rfc3986')
+    assert expected == uri
