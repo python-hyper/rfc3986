@@ -2,12 +2,12 @@ rfc3986
 =======
 
 A Python implementation of `RFC 3986`_ including validation and authority 
-parsing. Coming soon: `Reference Resolution <http://tools.ietf.org/html/rfc3986#section-5>`_.
+parsing.
 
 Installation
 ------------
 
-Simply use pip to install ``rfc3986`` like so::
+Use pip to install ``rfc3986`` like so::
 
     pip install rfc3986
 

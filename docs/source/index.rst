@@ -1,20 +1,27 @@
-.. rfc3986 documentation master file, created by
-   sphinx-quickstart on Tue Mar 14 07:06:46 2017.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+=========
+ rfc3986
+=========
 
-Welcome to rfc3986's documentation!
-===================================
+|rfc3986| is a Python implementation of :rfc:`3986` including validation and 
+authority parsing.
+
+The maintainers strongly suggest using `pip`_ to install |rfc3986|. For 
+example,
+
+.. prompt:: bash
+
+    pip install rfc3986
+    python -m pip install rfc3986
+    python3.6 -m pip install rfc3986
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+    :maxdepth: 2
+    :caption: Contents:
+
+    narrative
+    api-ref/uri
 
 
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. links
+.. _pip:
+    https://pypi.python.org/pypi/pip/
