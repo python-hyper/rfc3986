@@ -19,7 +19,7 @@ example,
     :caption: Contents:
 
     narrative
-    api-ref/uri
+    api-ref/index
 
 
 .. links

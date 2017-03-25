@@ -1,3 +1,5 @@
+.. _narrative:
+
 ====================
  User Documentation
 ====================
