@@ -21,25 +21,25 @@ from . import normalizers
 class Validator(object):
     """Object used to configure validation of all objects in rfc3986.
 
-    Example usage:
+    Example usage::
 
-    .. code-block:: python
-
-        >>> uri = rfc3986.uri_reference('https://github.com/')
-        >>> validator = rfc3986.Validator().require_components(
-        ...    'scheme', 'host', 'path',
-        ... ).allow_schemes(
-        ...    'http', 'https',
-        ... ).allow_hosts(
-        ...    '127.0.0.1', 'github.com',
-        ... )
-        ...
-        >>> validator.validate(uri)
-        >>> invalid_uri = rfc3986.uri_reference('imap://mail.google.com')
-        >>> validator.validate(invalid_uri)
-        Traceback (most recent call last):
-        ...
-        ValidationErrors("Invalid scheme", "Missing path")
+         >>> from rfc3986 import api, validators
+         >>> uri = api.uri_reference('https://github.com/')
+         >>> validator = validators.Validator().require_presence_of(
+         ...    'scheme', 'host', 'path',
+         ... ).allow_schemes(
+         ...    'http', 'https',
+         ... ).allow_hosts(
+         ...    '127.0.0.1', 'github.com',
+         ... )
+         >>> validator.validate(uri)
+         >>> invalid_uri = rfc3986.uri_reference('imap://mail.google.com')
+         >>> validator.validate(invalid_uri)
+         Traceback (most recent call last):
+         ...
+         rfc3986.exceptions.MissingComponentError: ('path was required but
+         missing', URIReference(scheme=u'imap', authority=u'mail.google.com',
+         path=None, query=None, fragment=None), ['path'])
 
     """
 
