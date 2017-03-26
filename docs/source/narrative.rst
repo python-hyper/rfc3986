@@ -7,8 +7,8 @@
 |rfc3986| has several API features and convenience methods. The core of
 |rfc3986|'s API revolves around parsing, validating, and building URIs.
 
-There is an API to provide compatibility with :mod:`urllib.parse`, there is an 
-API to parse a URI as a URI Reference, there's an API to provide validation of 
+There is an API to provide compatibility with :mod:`urllib.parse`, there is an
+API to parse a URI as a URI Reference, there's an API to provide validation of
 URIs, and finally there's an API to build URIs.
 
 .. note::
