@@ -24,6 +24,12 @@ Some Examples
 
 First we'll parse the URL that points to the repository for this project.
 
+.. testsetup:: *
+
+    import rfc3986
+    url = rfc3986.urlparse('https://github.com/sigmavirus24/rfc3986')
+    uri = rfc3986.uri_reference('https://github.com/sigmavirus24/rfc3986')
+
 .. code-block:: python
 
     url = rfc3986.urlparse('https://github.com/sigmavirus24/rfc3986')
@@ -31,39 +37,57 @@ First we'll parse the URL that points to the repository for this project.
 
 Then we'll replace parts of that URL with new values:
 
-.. code-block:: python
+.. testcode:: ex0
 
     print(url.copy_with(
         userinfo='username:password',
         port='443',
     ).unsplit())
-    # https://username:password@github.com/sigmavirus24/rfc3986
+
+.. testoutput:: ex0
+
+    https://username:password@github.com:443/sigmavirus24/rfc3986
 
 This, however, does not change the current ``url`` instance of
 :class:`~rfc3986.parseresult.ParseResult`. As the method name might suggest,
 we're copying that instance and then overriding certain attributes.
 In fact, we can make as many copies as we like and nothing will change.
 
-.. code-block:: python
+.. testcode:: ex1
 
     print(url.copy_with(
         scheme='ssh',
         userinfo='git',
     ).unsplit())
-    # ssh://git@github.com/sigmavirus24/rfc3986
+
+.. testoutput:: ex1
+
+    ssh://git@github.com/sigmavirus24/rfc3986
+
+.. testcode:: ex1
+
     print(url.scheme)
-    # https
+
+.. testoutput:: ex1
+
+    https
 
 We can do similar things with URI References as well.
 
 .. code-block:: python
 
     uri = rfc3986.uri_reference('https://github.com/sigmavirus24/rfc3986')
+
+.. testcode:: ex2
+
     print(uri.copy_with(
         authority='username:password@github.com:443',
-        path='sigmavirus24/github3.py',
+        path='/sigmavirus24/github3.py',
     ).unsplit())
-    # https://username:password@github.com/sigmavirus24/github3.py
+
+.. testoutput:: ex2
+
+    https://username:password@github.com:443/sigmavirus24/github3.py
 
 However, URI References may have some unexpected behaviour based strictly on
 the RFC.
