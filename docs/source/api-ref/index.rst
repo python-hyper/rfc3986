@@ -9,4 +9,6 @@ can be utilized, please see :ref:`narrative` instead.
 .. toctree::
     :maxdepth: 1
 
+    api
+    builder
     uri
