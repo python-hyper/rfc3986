@@ -105,7 +105,10 @@ class URIBuilder(object):
         userinfo = normalizers.normalize_username(username)
 
         if password is not None:
-            userinfo += ':{}'.format(normalizers.normalize_password(password))
+            userinfo = '{}:{}'.format(
+                userinfo,
+                normalizers.normalize_password(password),
+            )
 
         return URIBuilder(
             scheme=self.scheme,
