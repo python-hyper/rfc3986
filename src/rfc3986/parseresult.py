@@ -45,22 +45,22 @@ class ParseResultMixin(object):
         return self.authority
 
     def geturl(self):
-        """Standard library shim to the unsplit method."""
+        """Shim to match the standard library method."""
         return self.unsplit()
 
     @property
     def hostname(self):
-        """Standard library shim for the host portion of the URI."""
+        """Shim to match the standard library."""
         return self.host
 
     @property
     def netloc(self):
-        """Standard library shim for the authority portion of the URI."""
+        """Shim to match the standard library."""
         return self.authority
 
     @property
     def params(self):
-        """Standard library shim for the query portion of the URI."""
+        """Shim to match the standard library."""
         return self.query
 
 
@@ -147,7 +147,7 @@ class ParseResult(namedtuple('ParseResult', PARSED_COMPONENTS),
 
     @property
     def authority(self):
-        """Normalized authority generated from the subauthority parts."""
+        """Return the normalized authority."""
         return self.reference.authority
 
     def copy_with(self, scheme=None, userinfo=None, host=None, port=None,
@@ -280,7 +280,7 @@ class ParseResultBytes(namedtuple('ParseResultBytes', PARSED_COMPONENTS),
 
     @property
     def authority(self):
-        """Normalized authority generated from the subauthority parts."""
+        """Return the normalized authority."""
         return self.reference.authority.encode(self.encoding)
 
     def copy_with(self, scheme=None, userinfo=None, host=None, port=None,
