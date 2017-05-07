@@ -412,8 +412,9 @@ class URIReference(namedtuple('URIReference', misc.URI_COMPONENTS)):
             result_list.extend(['#', self.fragment])
         return ''.join(result_list)
 
-    def copy_with(self, scheme=None, authority=None, path=None, query=None,
-                  fragment=None):
+    def copy_with(self, scheme=misc.UseExisting, authority=misc.UseExisting,
+                  path=misc.UseExisting, query=misc.UseExisting,
+                  fragment=misc.UseExisting):
         """Create a copy of this reference with the new components.
 
         :param str scheme:
@@ -439,7 +440,7 @@ class URIReference(namedtuple('URIReference', misc.URI_COMPONENTS)):
             'fragment': fragment,
         }
         for key, value in list(attributes.items()):
-            if value is None:
+            if value is misc.UseExisting:
                 del attributes[key]
         uri = self._replace(**attributes)
         uri.encoding = self.encoding

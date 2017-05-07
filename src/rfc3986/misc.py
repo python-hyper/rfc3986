@@ -31,11 +31,12 @@ important_characters = {
     'generic_delimiters': abnf_regexp.GENERIC_DELIMITERS,
     'sub_delimiters': abnf_regexp.SUB_DELIMITERS,
     # We need to escape the '*' in this case
-    're_sub_delimiters': abnf_regexp.RE_SUB_DELIMITERS,
+    're_sub_delimiters': abnf_regexp.SUB_DELIMITERS_RE,
     'unreserved_chars': abnf_regexp.UNRESERVED_CHARS,
     # We need to escape the '-' in this case:
-    're_unreserved': abnf_regexp.RE_UNRESERVED,
-    }
+    're_unreserved': abnf_regexp.UNRESERVED_RE,
+}
+
 # For details about delimiters and reserved characters, see:
 # http://tools.ietf.org/html/rfc3986#section-2.2
 GENERIC_DELIMITERS = abnf_regexp.GENERIC_DELIMITERS_SET
@@ -96,3 +97,6 @@ def merge_paths(base_uri, relative_path):
         path = base_uri.path or ''
         index = path.rfind('/')
         return path[:index] + '/' + relative_path
+
+
+UseExisting = object()

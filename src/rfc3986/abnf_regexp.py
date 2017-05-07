@@ -20,7 +20,7 @@ GENERIC_DELIMITERS_SET = set(GENERIC_DELIMITERS)
 SUB_DELIMS = SUB_DELIMITERS = "!$&'()*+,;="
 SUB_DELIMITERS_SET = set(SUB_DELIMITERS)
 # Escape the '*' for use in regular expressions
-RE_SUB_DELIMITERS = "!$&'()\*+,;="
+SUB_DELIMITERS_RE = "!$&'()\*+,;="
 RESERVED_CHARS_SET = GENERIC_DELIMITERS_SET.union(SUB_DELIMITERS_SET)
 ALPHA = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
 DIGIT = '0123456789'
@@ -29,24 +29,24 @@ UNRESERVED = UNRESERVED_CHARS = ALPHA + DIGIT + '._!-'
 UNRESERVED_CHARS_SET = set(UNRESERVED_CHARS)
 NON_PCT_ENCODED_SET = RESERVED_CHARS_SET.union(UNRESERVED_CHARS_SET).union('%')
 # We need to escape the '-' in this case:
-RE_UNRESERVED = 'A-Za-z0-9._~\-'
+UNRESERVED_RE = 'A-Za-z0-9._~\-'
 
 # NOTE(sigmavirus24): We're going to use more strict regular expressions
 # than appear in Appendix B for scheme. This will prevent over-eager
 # consuming of items that aren't schemes.
 SCHEME_RE = '[a-zA-Z][a-zA-Z0-9+.-]*'
-AUTHORITY_RE = '[^/?#]*'
-PATH_RE = '[^?#]*'
-QUERY_RE = '[^#]*'
-FRAGMENT_RE = '.*'
+_AUTHORITY_RE = '[^/?#]*'
+_PATH_RE = '[^?#]*'
+_QUERY_RE = '[^#]*'
+_FRAGMENT_RE = '.*'
 
 # Extracted from http://tools.ietf.org/html/rfc3986#appendix-B
 COMPONENT_PATTERN_DICT = {
     'scheme': SCHEME_RE,
-    'authority': AUTHORITY_RE,
-    'path': PATH_RE,
-    'query': QUERY_RE,
-    'fragment': FRAGMENT_RE,
+    'authority': _AUTHORITY_RE,
+    'path': _PATH_RE,
+    'query': _QUERY_RE,
+    'fragment': _FRAGMENT_RE,
 }
 
 # See http://tools.ietf.org/html/rfc3986#appendix-B
@@ -68,7 +68,7 @@ URL_PARSING_RE = (
 # Host patterns, see: http://tools.ietf.org/html/rfc3986#section-3.2.2
 # The pattern for a regular name, e.g.,  www.google.com, api.github.com
 REGULAR_NAME_RE = REG_NAME = '(({0})*|[{1}]*)'.format(
-    '%[0-9A-Fa-f]{2}', RE_SUB_DELIMITERS + RE_UNRESERVED
+    '%[0-9A-Fa-f]{2}', SUB_DELIMITERS_RE + UNRESERVED_RE
 )
 # The pattern for an IPv4 address, e.g., 192.168.255.255, 127.0.0.1,
 IPv4_RE = '([0-9]{1,3}.){3}[0-9]{1,3}'
@@ -108,7 +108,7 @@ IPv6_RE = '(({0})|({1})|({2})|({3})|({4})|({5})|({6})|({7}))'.format(
 )
 
 IPv_FUTURE_RE = 'v[0-9A-Fa-f]+.[%s]+' % (
-    RE_UNRESERVED + RE_SUB_DELIMITERS + ':'
+    UNRESERVED_RE + SUB_DELIMITERS_RE + ':'
 )
 
 IP_LITERAL_RE = '\[({0}|{1})\]'.format(IPv6_RE, IPv_FUTURE_RE)
@@ -131,7 +131,7 @@ PORT_RE = '[0-9]{1,5}'
 
 # Percent encoded character values
 PERCENT_ENCODED = PCT_ENCODED = '%[A-Fa-f0-9]{2}'
-PCHAR = '([' + RE_UNRESERVED + RE_SUB_DELIMITERS + ':@]|%s)' % PCT_ENCODED
+PCHAR = '([' + UNRESERVED_RE + SUB_DELIMITERS_RE + ':@]|%s)' % PCT_ENCODED
 segments = {
     'segment': PCHAR + '*',
     # Non-zero length segment
@@ -151,7 +151,7 @@ PATH_RE = '^(%s|%s|%s|%s|%s)$' % (
 )
 
 FRAGMENT_RE = QUERY_RE = (
-    '^([/?:@' + RE_UNRESERVED + RE_SUB_DELIMITERS + ']|%s)*$' % PCT_ENCODED
+    '^([/?:@' + UNRESERVED_RE + SUB_DELIMITERS_RE + ']|%s)*$' % PCT_ENCODED
 )
 
 # ##########################
