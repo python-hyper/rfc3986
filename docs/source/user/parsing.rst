@@ -92,6 +92,19 @@ We can do similar things with URI References as well.
 However, URI References may have some unexpected behaviour based strictly on
 the RFC.
 
+Finally, if you want to remove a component from a URI, you may pass ``None``
+to remove it, for example:
+
+.. testcode:: ex3
+
+    print(uri.copy_with(path=None).unsplit())
+
+.. testoutput:: ex3
+
+    https://github.com
+
+This will work on both URI References and Parse Results.
+
 
 And Now For Something Slightly Unusual
 ======================================

@@ -17,6 +17,7 @@ from collections import namedtuple
 
 from . import compat
 from . import exceptions
+from . import misc
 from . import normalizers
 from . import uri
 
@@ -150,14 +151,16 @@ class ParseResult(namedtuple('ParseResult', PARSED_COMPONENTS),
         """Return the normalized authority."""
         return self.reference.authority
 
-    def copy_with(self, scheme=None, userinfo=None, host=None, port=None,
-                  path=None, query=None, fragment=None):
+    def copy_with(self, scheme=misc.UseExisting, userinfo=misc.UseExisting,
+                  host=misc.UseExisting, port=misc.UseExisting,
+                  path=misc.UseExisting, query=misc.UseExisting,
+                  fragment=misc.UseExisting):
         """Create a copy of this instance replacing with specified parts."""
         attributes = zip(PARSED_COMPONENTS,
                          (scheme, userinfo, host, port, path, query, fragment))
         attrs_dict = {}
         for name, value in attributes:
-            if value is None:
+            if value is misc.UseExisting:
                 value = getattr(self, name)
             attrs_dict[name] = value
         authority = self._generate_authority(attrs_dict)
@@ -283,14 +286,16 @@ class ParseResultBytes(namedtuple('ParseResultBytes', PARSED_COMPONENTS),
         """Return the normalized authority."""
         return self.reference.authority.encode(self.encoding)
 
-    def copy_with(self, scheme=None, userinfo=None, host=None, port=None,
-                  path=None, query=None, fragment=None, lazy_normalize=True):
+    def copy_with(self, scheme=misc.UseExisting, userinfo=misc.UseExisting,
+                  host=misc.UseExisting, port=misc.UseExisting,
+                  path=misc.UseExisting, query=misc.UseExisting,
+                  fragment=misc.UseExisting, lazy_normalize=True):
         """Create a copy of this instance replacing with specified parts."""
         attributes = zip(PARSED_COMPONENTS,
                          (scheme, userinfo, host, port, path, query, fragment))
         attrs_dict = {}
         for name, value in attributes:
-            if value is None:
+            if value is misc.UseExisting:
                 value = getattr(self, name)
             if not isinstance(value, bytes) and hasattr(value, 'encode'):
                 value = value.encode(self.encoding)
