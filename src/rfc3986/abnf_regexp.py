@@ -31,6 +31,10 @@ NON_PCT_ENCODED_SET = RESERVED_CHARS_SET.union(UNRESERVED_CHARS_SET).union('%')
 # We need to escape the '-' in this case:
 UNRESERVED_RE = 'A-Za-z0-9._~\-'
 
+# Percent encoded character values
+PERCENT_ENCODED = PCT_ENCODED = '%[A-Fa-f0-9]{2}'
+PCHAR = '([' + UNRESERVED_RE + SUB_DELIMITERS_RE + ':@]|%s)' % PCT_ENCODED
+
 # NOTE(sigmavirus24): We're going to use more strict regular expressions
 # than appear in Appendix B for scheme. This will prevent over-eager
 # consuming of items that aren't schemes.
@@ -111,7 +115,16 @@ IPv_FUTURE_RE = 'v[0-9A-Fa-f]+.[%s]+' % (
     UNRESERVED_RE + SUB_DELIMITERS_RE + ':'
 )
 
-IP_LITERAL_RE = '\[({0}|{1})\]'.format(IPv6_RE, IPv_FUTURE_RE)
+
+# RFC 6874 Zone ID ABNF
+ZONE_ID = '(?:[' + UNRESERVED_RE + ']|' + PCT_ENCODED + ')+'
+IPv6_ADDRZ_RE = IPv6_RE + '%25' + ZONE_ID
+
+IP_LITERAL_RE = '\[({0}|(?:{1})|{2})\]'.format(
+    IPv6_RE,
+    IPv6_ADDRZ_RE,
+    IPv_FUTURE_RE,
+)
 
 # Pattern for matching the host piece of the authority
 HOST_RE = HOST_PATTERN = '({0}|{1}|{2})'.format(
@@ -128,10 +141,6 @@ PORT_RE = '[0-9]{1,5}'
 
 # See http://tools.ietf.org/html/rfc3986#section-3.3 for more information
 # about the path patterns defined below.
-
-# Percent encoded character values
-PERCENT_ENCODED = PCT_ENCODED = '%[A-Fa-f0-9]{2}'
-PCHAR = '([' + UNRESERVED_RE + SUB_DELIMITERS_RE + ':@]|%s)' % PCT_ENCODED
 segments = {
     'segment': PCHAR + '*',
     # Non-zero length segment

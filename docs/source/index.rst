@@ -3,7 +3,8 @@
 =========
 
 |rfc3986| is a Python implementation of :rfc:`3986` including validation and 
-authority parsing.
+authority parsing. This module also supports :rfc:`6874` which adds support
+for zone identifiers to IPv6 Addresses.
 
 The maintainers strongly suggest using `pip`_ to install |rfc3986|. For 
 example,

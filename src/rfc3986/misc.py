@@ -51,7 +51,7 @@ URI_MATCHER = re.compile(abnf_regexp.URL_PARSING_RE)
 
 SUBAUTHORITY_MATCHER = re.compile((
     '^(?:(?P<userinfo>{0})@)?'  # userinfo
-    '(?P<host>{1}?)'  # host
+    '(?P<host>{1})'  # host
     ':?(?P<port>{2})?$'  # port
     ).format(abnf_regexp.USERINFO_RE,
              abnf_regexp.HOST_PATTERN,
