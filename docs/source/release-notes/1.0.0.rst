@@ -1,0 +1,26 @@
+1.0.0 -- 2017-05-10
+-------------------
+
+- Add support for :rfc:`6874` - Zone Identifiers in IPv6 Addresses
+
+  See also `issue #2`_
+
+- Add a more flexible and usable validation framework. See our documentation
+  for more information.
+
+- Add an object to aid in building new URIs from scratch. See our
+  documentation for more information.
+
+- Add real documentation for the entire module.
+
+- Add separate submodule with documented regular expression strings for the
+  collected ABNF.
+
+- Allow ``None`` to be used to eliminate components via ``copy_with`` for URIs
+  and ParseResults.
+
+- Move release history into our documentation.
+
+.. links
+.. _issue #2:
+    https://github.com/sigmavirus24/rfc3986/issues/2

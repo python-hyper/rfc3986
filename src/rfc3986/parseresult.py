@@ -12,10 +12,12 @@
 # implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""Module containing the urlparse compatibility logic."""
 from collections import namedtuple
 
 from . import compat
 from . import exceptions
+from . import misc
 from . import normalizers
 from . import uri
 
@@ -44,31 +46,38 @@ class ParseResultMixin(object):
         return self.authority
 
     def geturl(self):
-        """Standard library shim to the unsplit method."""
+        """Shim to match the standard library method."""
         return self.unsplit()
 
     @property
     def hostname(self):
-        """Standard library shim for the host portion of the URI."""
+        """Shim to match the standard library."""
         return self.host
 
     @property
     def netloc(self):
-        """Standard library shim for the authority portion of the URI."""
+        """Shim to match the standard library."""
         return self.authority
 
     @property
     def params(self):
-        """Standard library shim for the query portion of the URI."""
+        """Shim to match the standard library."""
         return self.query
 
 
 class ParseResult(namedtuple('ParseResult', PARSED_COMPONENTS),
                   ParseResultMixin):
+    """Implementation of urlparse compatibility class.
+
+    This uses the URIReference logic to handle compatibility with the
+    urlparse.ParseResult class.
+    """
+
     slots = ()
 
     def __new__(cls, scheme, userinfo, host, port, path, query, fragment,
                 uri_ref, encoding='utf-8'):
+        """Create a new ParseResult."""
         parse_result = super(ParseResult, cls).__new__(
             cls,
             scheme or None,
@@ -139,16 +148,19 @@ class ParseResult(namedtuple('ParseResult', PARSED_COMPONENTS),
 
     @property
     def authority(self):
-        """Normalized authority generated from the subauthority parts."""
+        """Return the normalized authority."""
         return self.reference.authority
 
-    def copy_with(self, scheme=None, userinfo=None, host=None, port=None,
-                  path=None, query=None, fragment=None):
+    def copy_with(self, scheme=misc.UseExisting, userinfo=misc.UseExisting,
+                  host=misc.UseExisting, port=misc.UseExisting,
+                  path=misc.UseExisting, query=misc.UseExisting,
+                  fragment=misc.UseExisting):
+        """Create a copy of this instance replacing with specified parts."""
         attributes = zip(PARSED_COMPONENTS,
                          (scheme, userinfo, host, port, path, query, fragment))
         attrs_dict = {}
         for name, value in attributes:
-            if value is None:
+            if value is misc.UseExisting:
                 value = getattr(self, name)
             attrs_dict[name] = value
         authority = self._generate_authority(attrs_dict)
@@ -160,6 +172,7 @@ class ParseResult(namedtuple('ParseResult', PARSED_COMPONENTS),
         return ParseResult(uri_ref=ref, encoding=self.encoding, **attrs_dict)
 
     def encode(self, encoding=None):
+        """Convert to an instance of ParseResultBytes."""
         encoding = encoding or self.encoding
         attrs = dict(
             zip(PARSED_COMPONENTS,
@@ -187,8 +200,11 @@ class ParseResult(namedtuple('ParseResult', PARSED_COMPONENTS),
 
 class ParseResultBytes(namedtuple('ParseResultBytes', PARSED_COMPONENTS),
                        ParseResultMixin):
+    """Compatibility shim for the urlparse.ParseResultBytes object."""
+
     def __new__(cls, scheme, userinfo, host, port, path, query, fragment,
                 uri_ref, encoding='utf-8', lazy_normalize=True):
+        """Create a new ParseResultBytes instance."""
         parse_result = super(ParseResultBytes, cls).__new__(
             cls,
             scheme or None,
@@ -267,16 +283,19 @@ class ParseResultBytes(namedtuple('ParseResultBytes', PARSED_COMPONENTS),
 
     @property
     def authority(self):
-        """Normalized authority generated from the subauthority parts."""
+        """Return the normalized authority."""
         return self.reference.authority.encode(self.encoding)
 
-    def copy_with(self, scheme=None, userinfo=None, host=None, port=None,
-                  path=None, query=None, fragment=None, lazy_normalize=True):
+    def copy_with(self, scheme=misc.UseExisting, userinfo=misc.UseExisting,
+                  host=misc.UseExisting, port=misc.UseExisting,
+                  path=misc.UseExisting, query=misc.UseExisting,
+                  fragment=misc.UseExisting, lazy_normalize=True):
+        """Create a copy of this instance replacing with specified parts."""
         attributes = zip(PARSED_COMPONENTS,
                          (scheme, userinfo, host, port, path, query, fragment))
         attrs_dict = {}
         for name, value in attributes:
-            if value is None:
+            if value is misc.UseExisting:
                 value = getattr(self, name)
             if not isinstance(value, bytes) and hasattr(value, 'encode'):
                 value = value.encode(self.encoding)

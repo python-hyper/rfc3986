@@ -1,0 +1,8 @@
+0.4.0 -- 2016-08-20
+-------------------
+
+- Add ``ParseResult.from_parts`` and ``ParseResultBytes.from_parts`` class
+  methods to easily create a ParseResult
+
+- When using regular expressions, use ``[0-9]`` instead of ``\d`` to avoid
+  finding ports with "numerals" that are not valid in a port
