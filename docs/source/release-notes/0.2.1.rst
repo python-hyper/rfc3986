@@ -1,0 +1,9 @@
+0.2.1 -- 2015-03-20
+-------------------
+
+- Check that the bytes of an IPv4 Host Address are within the valid range.
+  Otherwise, URIs like "http://256.255.255.0/v1/resource" are considered
+  valid.
+
+- Add 6 to the list of unreserved characters. It was previously missing.
+  Closes bug #9

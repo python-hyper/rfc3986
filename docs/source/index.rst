@@ -21,6 +21,7 @@ example,
 
     narrative
     api-ref/index
+    release-notes/index
 
 
 .. links

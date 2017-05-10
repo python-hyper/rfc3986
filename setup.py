@@ -16,14 +16,11 @@ packages = [
 with io.open('README.rst', encoding='utf-8') as f:
     readme = f.read()
 
-with io.open('HISTORY.rst', encoding='utf-8') as f:
-    history = f.read()
-
 setuptools.setup(
     name='rfc3986',
     version=rfc3986.__version__,
     description='Validating URI References per RFC 3986',
-    long_description=readme + '\n\n' + history,
+    long_description=readme,
     author='Ian Cordasco',
     author_email='graffatcolmingov@gmail.com',
     url='http://rfc3986.readthedocs.io',
