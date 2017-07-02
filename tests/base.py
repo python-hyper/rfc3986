@@ -56,7 +56,7 @@ class BaseTestParsesURIs:
         assert uri.path is None
         assert uri.query is None
         assert uri.fragment is None
-        assert uri.userinfo == 'user:pass'
+        assert uri.userinfo == 'user%20!=:pass'
 
     def test_handles_basic_uri_with_path(self, basic_uri_with_path):
         """Test that self.test_class can handle a URI with a path."""
@@ -93,7 +93,7 @@ class BaseTestParsesURIs:
         assert uri.path == '/path/to/resource'
         assert uri.query == 'key=value'
         assert uri.fragment == 'fragment'
-        assert uri.userinfo == 'user:pass'
+        assert uri.userinfo == 'user%20!=:pass'
         assert str(uri.port) == '443'
 
     def test_handles_relative_uri(self, relative_uri):

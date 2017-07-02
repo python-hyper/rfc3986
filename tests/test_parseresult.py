@@ -113,7 +113,7 @@ class TestParseResultBytes:
         assert uri.path == b'/path/to/resource'
         assert uri.query == b'key=value'
         assert uri.fragment == b'fragment'
-        assert uri.userinfo == b'user:pass'
+        assert uri.userinfo == b'user%20!=:pass'
         assert uri.port == 443
         assert isinstance(uri.authority, bytes) is True
 
