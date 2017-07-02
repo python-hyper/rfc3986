@@ -132,7 +132,9 @@ HOST_RE = HOST_PATTERN = '({0}|{1}|{2})'.format(
     IPv4_RE,
     IP_LITERAL_RE,
 )
-USERINFO_RE = '^[A-Za-z0-9_.~\-%:]+'
+USERINFO_RE = '^([' + UNRESERVED_RE + SUB_DELIMITERS_RE + ':]|%s)+' % (
+    PCT_ENCODED
+)
 PORT_RE = '[0-9]{1,5}'
 
 # ####################
