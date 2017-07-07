@@ -56,6 +56,23 @@ class BaseTestParsesURIs:
         assert uri.path is None
         assert uri.query is None
         assert uri.fragment is None
+        assert uri.userinfo == 'user:pass'
+
+    def test_handles_tricky_userinfo(
+            self, uri_with_port_and_tricky_userinfo):
+        """
+        Test that self.test_class can handle a URI with unusual
+        (non a-z) chars in userinfo.
+        """
+        uri = self.test_class.from_string(uri_with_port_and_tricky_userinfo)
+        assert uri.scheme == 'ssh'
+        # 6 == len('ftp://')
+        assert uri.authority == uri_with_port_and_tricky_userinfo[6:]
+        assert uri.host != uri.authority
+        assert str(uri.port) == '22'
+        assert uri.path is None
+        assert uri.query is None
+        assert uri.fragment is None
         assert uri.userinfo == 'user%20!=:pass'
 
     def test_handles_basic_uri_with_path(self, basic_uri_with_path):
@@ -93,7 +110,7 @@ class BaseTestParsesURIs:
         assert uri.path == '/path/to/resource'
         assert uri.query == 'key=value'
         assert uri.fragment == 'fragment'
-        assert uri.userinfo == 'user%20!=:pass'
+        assert uri.userinfo == 'user:pass'
         assert str(uri.port) == '443'
 
     def test_handles_relative_uri(self, relative_uri):

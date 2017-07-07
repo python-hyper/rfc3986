@@ -77,6 +77,11 @@ def basic_uri_with_port(request):
 
 @pytest.fixture(params=valid_hosts)
 def uri_with_port_and_userinfo(request):
+    return 'ssh://user:pass@%s:22' % request.param
+
+
+@pytest.fixture(params=valid_hosts)
+def uri_with_port_and_tricky_userinfo(request):
     return 'ssh://%s@%s:22' % ('user%20!=:pass', request.param)
 
 
@@ -92,8 +97,8 @@ def uri_with_path_and_query(request):
 
 @pytest.fixture(params=valid_hosts)
 def uri_with_everything(request):
-    return 'https://%s@%s:443/path/to/resource?key=value#fragment' % (
-        'user%20!=:pass', request.param)
+    return 'https://user:pass@%s:443/path/to/resource?key=value#fragment' % (
+        request.param)
 
 
 @pytest.fixture(params=valid_hosts)
