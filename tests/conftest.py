@@ -81,6 +81,11 @@ def uri_with_port_and_userinfo(request):
 
 
 @pytest.fixture(params=valid_hosts)
+def uri_with_port_and_tricky_userinfo(request):
+    return 'ssh://%s@%s:22' % ('user%20!=:pass', request.param)
+
+
+@pytest.fixture(params=valid_hosts)
 def basic_uri_with_path(request):
     return 'http://%s/path/to/resource' % request.param
 
