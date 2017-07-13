@@ -21,6 +21,8 @@ from . import normalizers
 class Validator(object):
     """Object used to configure validation of all objects in rfc3986.
 
+    .. versionadded:: 1.0
+
     Example usage::
 
          >>> from rfc3986 import api, validators
@@ -72,6 +74,8 @@ class Validator(object):
     def allow_schemes(self, *schemes):
         """Require the scheme to be one of the provided schemes.
 
+        .. versionadded:: 1.0
+
         :param schemes:
             Schemes, without ``://`` that are allowed.
         :returns:
@@ -85,6 +89,8 @@ class Validator(object):
 
     def allow_hosts(self, *hosts):
         """Require the host to be one of the provided hosts.
+
+        .. versionadded:: 1.0
 
         :param hosts:
             Hosts that are allowed.
@@ -100,6 +106,8 @@ class Validator(object):
     def allow_ports(self, *ports):
         """Require the port to be one of the provided ports.
 
+        .. versionadded:: 1.0
+
         :param ports:
             Ports that are allowed.
         :returns:
@@ -114,17 +122,35 @@ class Validator(object):
         return self
 
     def allow_use_of_password(self):
-        """Allow passwords to be present in the URI."""
+        """Allow passwords to be present in the URI.
+
+        .. versionadded:: 1.0
+
+        :returns:
+            The validator instance.
+        :rtype:
+            Validator
+        """
         self.allow_password = True
         return self
 
     def forbid_use_of_password(self):
-        """Prevent passwords from being included in the URI."""
+        """Prevent passwords from being included in the URI.
+
+        .. versionadded:: 1.0
+
+        :returns:
+            The validator instance.
+        :rtype:
+            Validator
+        """
         self.allow_password = False
         return self
 
     def require_presence_of(self, *components):
         """Require the components provided.
+
+        .. versionadded:: 1.0
 
         :param components:
             Names of components from :attr:`Validator.COMPONENT_NAMES`.
@@ -146,6 +172,8 @@ class Validator(object):
 
     def validate(self, uri):
         """Check a URI for conditions specified on this validator.
+
+        .. versionadded:: 1.0
 
         :param uri:
             Parsed URI to validate.
