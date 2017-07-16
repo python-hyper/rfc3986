@@ -415,7 +415,10 @@ def ensure_components_are_valid(uri, validated_components):
         if component in _SUBAUTHORITY_VALIDATORS:
             if not subauthority_component_is_valid(uri, component):
                 invalid_components.add(component)
-            continue
+            # Python's peephole optimizer means that while this continue *is*
+            # actually executed, coverage.py cannot detect that. See also,
+            # https://bitbucket.org/ned/coveragepy/issues/198/continue-marked-as-not-covered
+            continue  # nocov: Python 2.7, 3.3, 3.4
 
         validator = _COMPONENT_VALIDATORS[component]
         if not validator(getattr(uri, component)):
