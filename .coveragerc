@@ -1,4 +1,5 @@
 [report]
 exclude_lines =
     .* # Python \d.*
+    .* # nocov: Python \d.*
 fail_under = 100

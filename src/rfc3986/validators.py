@@ -21,6 +21,8 @@ from . import normalizers
 class Validator(object):
     """Object used to configure validation of all objects in rfc3986.
 
+    .. versionadded:: 1.0
+
     Example usage::
 
          >>> from rfc3986 import api, validators
@@ -68,9 +70,12 @@ class Validator(object):
             'query': False,
             'fragment': False,
         }
+        self.validated_components = self.required_components.copy()
 
     def allow_schemes(self, *schemes):
         """Require the scheme to be one of the provided schemes.
+
+        .. versionadded:: 1.0
 
         :param schemes:
             Schemes, without ``://`` that are allowed.
@@ -86,6 +91,8 @@ class Validator(object):
     def allow_hosts(self, *hosts):
         """Require the host to be one of the provided hosts.
 
+        .. versionadded:: 1.0
+
         :param hosts:
             Hosts that are allowed.
         :returns:
@@ -99,6 +106,8 @@ class Validator(object):
 
     def allow_ports(self, *ports):
         """Require the port to be one of the provided ports.
+
+        .. versionadded:: 1.0
 
         :param ports:
             Ports that are allowed.
@@ -114,17 +123,62 @@ class Validator(object):
         return self
 
     def allow_use_of_password(self):
-        """Allow passwords to be present in the URI."""
+        """Allow passwords to be present in the URI.
+
+        .. versionadded:: 1.0
+
+        :returns:
+            The validator instance.
+        :rtype:
+            Validator
+        """
         self.allow_password = True
         return self
 
     def forbid_use_of_password(self):
-        """Prevent passwords from being included in the URI."""
+        """Prevent passwords from being included in the URI.
+
+        .. versionadded:: 1.0
+
+        :returns:
+            The validator instance.
+        :rtype:
+            Validator
+        """
         self.allow_password = False
+        return self
+
+    def check_validity_of(self, *components):
+        """Check the validity of the components provided.
+
+        This can be specified repeatedly.
+
+        .. versionadded:: 1.1
+
+        :param components:
+            Names of components from :attr:`Validator.COMPONENT_NAMES`.
+        :returns:
+            The validator instance.
+        :rtype:
+            Validator
+        """
+        components = [c.lower() for c in components]
+        for component in components:
+            if component not in self.COMPONENT_NAMES:
+                raise ValueError(
+                    '"{}" is not a valid component'.format(component)
+                )
+        self.validated_components.update({
+            component: True for component in components
+        })
         return self
 
     def require_presence_of(self, *components):
         """Require the components provided.
+
+        This can be specified repeatedly.
+
+        .. versionadded:: 1.0
 
         :param components:
             Names of components from :attr:`Validator.COMPONENT_NAMES`.
@@ -147,6 +201,8 @@ class Validator(object):
     def validate(self, uri):
         """Check a URI for conditions specified on this validator.
 
+        .. versionadded:: 1.0
+
         :param uri:
             Parsed URI to validate.
         :type uri:
@@ -158,6 +214,8 @@ class Validator(object):
         :raises PasswordForbidden:
             When a password is present in the userinfo component but is
             not permitted by configuration.
+        :raises InvalidComponentsError:
+            When a component was found to be invalid.
         """
         if not self.allow_password:
             check_password(uri)
@@ -167,8 +225,15 @@ class Validator(object):
             for component, required in self.required_components.items()
             if required
         ]
+        validated_components = [
+            component
+            for component, required in self.validated_components.items()
+            if required
+        ]
         if required_components:
             ensure_required_components_exist(uri, required_components)
+        if validated_components:
+            ensure_components_are_valid(uri, validated_components)
 
         ensure_one_of(self.allowed_schemes, uri, 'scheme')
         ensure_one_of(self.allowed_hosts, uri, 'host')
@@ -309,3 +374,55 @@ def valid_ipv4_host_address(host):
     # If the host exists, and it might be IPv4, check each byte in the
     # address.
     return all([0 <= int(byte, base=10) <= 255 for byte in host.split('.')])
+
+
+_COMPONENT_VALIDATORS = {
+    'scheme': scheme_is_valid,
+    'path': path_is_valid,
+    'query': query_is_valid,
+    'fragment': fragment_is_valid,
+}
+
+_SUBAUTHORITY_VALIDATORS = set(['userinfo', 'host', 'port'])
+
+
+def subauthority_component_is_valid(uri, component):
+    """Determine if the userinfo, host, and port are valid."""
+    try:
+        subauthority_dict = uri.authority_info()
+    except exceptions.InvalidAuthority:
+        return False
+
+    # If we can parse the authority into sub-components and we're not
+    # validating the port, we can assume it's valid.
+    if component != 'port':
+        return True
+
+    try:
+        port = int(subauthority_dict['port'])
+    except TypeError:
+        # If the port wasn't provided it'll be None and int(None) raises a
+        # TypeError
+        return True
+
+    return (0 <= port <= 65535)
+
+
+def ensure_components_are_valid(uri, validated_components):
+    """Assert that all components are valid in the URI."""
+    invalid_components = set([])
+    for component in validated_components:
+        if component in _SUBAUTHORITY_VALIDATORS:
+            if not subauthority_component_is_valid(uri, component):
+                invalid_components.add(component)
+            # Python's peephole optimizer means that while this continue *is*
+            # actually executed, coverage.py cannot detect that. See also,
+            # https://bitbucket.org/ned/coveragepy/issues/198/continue-marked-as-not-covered
+            continue  # nocov: Python 2.7, 3.3, 3.4
+
+        validator = _COMPONENT_VALIDATORS[component]
+        if not validator(getattr(uri, component)):
+            invalid_components.add(component)
+
+    if invalid_components:
+        raise exceptions.InvalidComponentsError(uri, *invalid_components)
