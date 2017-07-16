@@ -52,6 +52,12 @@ def test_requiring_invalid_component():
         validators.Validator().require_presence_of('frob')
 
 
+def test_checking_validity_of_component():
+    """Verify that we validate components we're validating."""
+    with pytest.raises(ValueError):
+        validators.Validator().check_validity_of('frob')
+
+
 def test_use_of_password():
     """Verify the behaviour of {forbid,allow}_use_of_password."""
     validator = validators.Validator()
@@ -182,6 +188,22 @@ def test_allowed_hosts_and_schemes(uri, failed_component):
     rfc3986.uri_reference('ssh://git.openstack.org/sigmavirus24'),
     rfc3986.uri_reference('ssh://ssh@git.openstack.org:22/sigmavirus24'),
     rfc3986.uri_reference('https://git.openstack.org:443/sigmavirus24'),
+    rfc3986.uri_reference(
+        'ssh://ssh@git.openstack.org:22/sigmavirus24?foo=bar#fragment'
+    ),
+    rfc3986.uri_reference(
+        'ssh://git.openstack.org:22/sigmavirus24?foo=bar#fragment'
+    ),
+    rfc3986.uri_reference('ssh://git.openstack.org:22/?foo=bar#fragment'),
+    rfc3986.uri_reference('ssh://git.openstack.org:22/sigmavirus24#fragment'),
+    rfc3986.uri_reference('ssh://git.openstack.org:22/#fragment'),
+    rfc3986.uri_reference('ssh://git.openstack.org:22/'),
+    rfc3986.uri_reference('ssh://ssh@git.openstack.org:22/?foo=bar#fragment'),
+    rfc3986.uri_reference(
+        'ssh://ssh@git.openstack.org:22/sigmavirus24#fragment'
+    ),
+    rfc3986.uri_reference('ssh://ssh@git.openstack.org:22/#fragment'),
+    rfc3986.uri_reference('ssh://ssh@git.openstack.org:22/'),
 ])
 def test_successful_complex_validation(uri):
     """Verify we do not raise ValidationErrors for good URIs."""
@@ -193,4 +215,23 @@ def test_successful_complex_validation(uri):
         '22', '443',
     ).require_presence_of(
         'scheme', 'host', 'path',
+    ).check_validity_of(
+        'scheme', 'userinfo', 'host', 'port', 'path', 'query', 'fragment',
     ).validate(uri)
+
+
+def test_invalid_uri_generates_error(invalid_uri):
+    """Verify we catch invalid URIs."""
+    uri = rfc3986.uri_reference(invalid_uri)
+    with pytest.raises(exceptions.InvalidComponentsError):
+        validators.Validator().check_validity_of('host').validate(uri)
+
+
+def test_invalid_uri_with_invalid_path(invalid_uri):
+    """Verify we catch multiple invalid components."""
+    uri = rfc3986.uri_reference(invalid_uri)
+    uri = uri.copy_with(path='#foobar')
+    with pytest.raises(exceptions.InvalidComponentsError):
+        validators.Validator().check_validity_of(
+            'host', 'path',
+        ).validate(uri)
