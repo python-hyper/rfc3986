@@ -34,7 +34,7 @@ __author__ = 'Ian Cordasco'
 __author_email__ = 'graffatcolmingov@gmail.com'
 __license__ = 'Apache v2.0'
 __copyright__ = 'Copyright 2014 Rackspace'
-__version__ = '1.0.0'
+__version__ = '1.1.0'
 
 __all__ = (
     'ParseResult',
