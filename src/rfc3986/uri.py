@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from collections import namedtuple
+import warnings
 
 from . import compat
 from . import exceptions as exc
@@ -210,6 +211,10 @@ class URIReference(namedtuple('URIReference', misc.URI_COMPONENTS)):
     def is_valid(self, **kwargs):
         """Determine if the URI is valid.
 
+        .. deprecated:: 1.1.0
+
+            Use the :class:`~rfc3986.validators.Validator` object instead.
+
         :param bool require_scheme: Set to ``True`` if you wish to require the
             presence of the scheme component.
         :param bool require_authority: Set to ``True`` if you wish to require
@@ -223,6 +228,9 @@ class URIReference(namedtuple('URIReference', misc.URI_COMPONENTS)):
         :returns: ``True`` if the URI is valid. ``False`` otherwise.
         :rtype: bool
         """
+        warnings.warn("Please use rfc3986.validators.Validator instead. "
+                      "This method will be eventually removed.",
+                      DeprecationWarning)
         validators = [
             (self.scheme_is_valid, kwargs.get('require_scheme', False)),
             (self.authority_is_valid, kwargs.get('require_authority', False)),
@@ -235,6 +243,10 @@ class URIReference(namedtuple('URIReference', misc.URI_COMPONENTS)):
     def authority_is_valid(self, require=False):
         """Determine if the authority component is valid.
 
+        .. deprecated:: 1.1.0
+
+            Use the :class:`~rfc3986.validators.Validator` object instead.
+
         :param bool require:
             Set to ``True`` to require the presence of this component.
         :returns:
@@ -242,6 +254,9 @@ class URIReference(namedtuple('URIReference', misc.URI_COMPONENTS)):
         :rtype:
             bool
         """
+        warnings.warn("Please use rfc3986.validators.Validator instead. "
+                      "This method will be eventually removed.",
+                      DeprecationWarning)
         try:
             self.authority_info()
         except exc.InvalidAuthority:
@@ -256,41 +271,69 @@ class URIReference(namedtuple('URIReference', misc.URI_COMPONENTS)):
     def scheme_is_valid(self, require=False):
         """Determine if the scheme component is valid.
 
+        .. deprecated:: 1.1.0
+
+            Use the :class:`~rfc3986.validators.Validator` object instead.
+
         :param str require: Set to ``True`` to require the presence of this
             component.
         :returns: ``True`` if the scheme is valid. ``False`` otherwise.
         :rtype: bool
         """
+        warnings.warn("Please use rfc3986.validators.Validator instead. "
+                      "This method will be eventually removed.",
+                      DeprecationWarning)
         return validators.scheme_is_valid(self.scheme, require)
 
     def path_is_valid(self, require=False):
         """Determine if the path component is valid.
+
+        .. deprecated:: 1.1.0
+
+            Use the :class:`~rfc3986.validators.Validator` object instead.
 
         :param str require: Set to ``True`` to require the presence of this
             component.
         :returns: ``True`` if the path is valid. ``False`` otherwise.
         :rtype: bool
         """
+        warnings.warn("Please use rfc3986.validators.Validator instead. "
+                      "This method will be eventually removed.",
+                      DeprecationWarning)
         return validators.path_is_valid(self.path, require)
 
     def query_is_valid(self, require=False):
         """Determine if the query component is valid.
+
+        .. deprecated:: 1.1.0
+
+            Use the :class:`~rfc3986.validators.Validator` object instead.
 
         :param str require: Set to ``True`` to require the presence of this
             component.
         :returns: ``True`` if the query is valid. ``False`` otherwise.
         :rtype: bool
         """
+        warnings.warn("Please use rfc3986.validators.Validator instead. "
+                      "This method will be eventually removed.",
+                      DeprecationWarning)
         return validators.query_is_valid(self.query, require)
 
     def fragment_is_valid(self, require=False):
         """Determine if the fragment component is valid.
+
+        .. deprecated:: 1.1.0
+
+            Use the Validator object instead.
 
         :param str require: Set to ``True`` to require the presence of this
             component.
         :returns: ``True`` if the fragment is valid. ``False`` otherwise.
         :rtype: bool
         """
+        warnings.warn("Please use rfc3986.validators.Validator instead. "
+                      "This method will be eventually removed.",
+                      DeprecationWarning)
         return validators.fragment_is_valid(self.fragment, require)
 
     def normalize(self):
