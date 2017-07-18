@@ -1,3 +1,5 @@
+.. _validating:
+
 =================
  Validating URIs
 =================

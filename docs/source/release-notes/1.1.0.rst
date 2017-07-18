@@ -1,0 +1,15 @@
+1.1.0 -- 2017-07-18
+-------------------
+
+- Correct the regular expression for the User Information sub-component of the 
+  Authority Component.
+
+  See also `GitHub #26`_
+
+- :meth:`~rfc3986.validators.Validator.check_validity_of` to the
+  :class:`~rfc3986.validators.Validator` class. See
+  :ref:`Validating URIs <validating>` documentation for more information.
+
+.. links
+.. _GitHub #26:
+    https://github.com/sigmavirus24/rfc3986/pull/26
