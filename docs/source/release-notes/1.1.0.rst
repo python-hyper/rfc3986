@@ -12,4 +12,4 @@
 
 .. links
 .. _GitHub #26:
-    https://github.com/sigmavirus24/rfc3986/pull/26
+    https://github.com/python-hyper/rfc3986/pull/26

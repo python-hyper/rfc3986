@@ -23,4 +23,4 @@
 
 .. links
 .. _issue #2:
-    https://github.com/sigmavirus24/rfc3986/issues/2
+    https://github.com/python-hyper/rfc3986/issues/2

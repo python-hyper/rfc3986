@@ -21,7 +21,7 @@ setuptools.setup(
     version=rfc3986.__version__,
     description='Validating URI References per RFC 3986',
     long_description=readme,
-    author='Ian Cordasco',
+    author='Ian Stapleton Cordasco',
     author_email='graffatcolmingov@gmail.com',
     url='http://rfc3986.readthedocs.io',
     packages=packages,
