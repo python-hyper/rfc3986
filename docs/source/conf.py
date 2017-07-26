@@ -55,8 +55,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'rfc3986'
-copyright = u'2017, Ian Cordasco'
-author = u'Ian Cordasco'
+copyright = u'2017, Ian Stapleton Cordasco'
+author = u'Ian Stapleton Cordasco'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -136,7 +136,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'rfc3986.tex', u'rfc3986 Documentation',
-     u'Ian Cordasco', 'manual'),
+     u'Ian Stapleton Cordasco', 'manual'),
 ]
 
 

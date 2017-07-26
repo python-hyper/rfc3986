@@ -1,9 +1,13 @@
 Development Lead
 ----------------
 
-- Ian Cordasco <ian.cordasco@rackspace.com>
+- Ian Stapleton Cordasco <graffatcolmingov@gmail.com>
 
 Contributors
 ------------
 
-None yet!
+- Thomas Weißschuh
+- Kostya Esmukov
+- Derek Higgins
+- Victor Stinner
+- Viktor Haag

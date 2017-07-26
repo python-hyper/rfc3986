@@ -30,7 +30,7 @@ from .api import urlparse
 from .parseresult import ParseResult
 
 __title__ = 'rfc3986'
-__author__ = 'Ian Cordasco'
+__author__ = 'Ian Stapleton Cordasco'
 __author_email__ = 'graffatcolmingov@gmail.com'
 __license__ = 'Apache v2.0'
 __copyright__ = 'Copyright 2014 Rackspace'

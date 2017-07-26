@@ -1,7 +1,7 @@
 """Module containing the implementation of the URIReference class."""
 # -*- coding: utf-8 -*-
 # Copyright (c) 2014 Rackspace
-# Copyright (c) 2015 Ian Cordasco
+# Copyright (c) 2015 Ian Stapleton Cordasco
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
