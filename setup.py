@@ -25,7 +25,7 @@ setuptools.setup(
     author_email='graffatcolmingov@gmail.com',
     url='http://rfc3986.readthedocs.io',
     packages=packages,
-    package_dir={'': 'src/'},
+    package_dir={'': 'src'},
     package_data={'': ['LICENSE']},
     include_package_data=True,
     license='Apache 2.0',
