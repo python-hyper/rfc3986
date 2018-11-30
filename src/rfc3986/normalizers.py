@@ -135,8 +135,7 @@ def encode_component(uri_component, encoding):
                             compat.to_str(uri_component, encoding)))
 
     uri_bytes = compat.to_bytes(uri_component, encoding)
-    is_percent_encoded = (percent_encodings > 0
-                          and percent_encodings == uri_bytes.count(b'%'))
+    is_percent_encoded = percent_encodings == uri_bytes.count(b'%')
 
     encoded_uri = bytearray()
 
