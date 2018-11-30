@@ -135,6 +135,7 @@ def test_add_path(path):
     ([('a', 'b+c')], 'a=b%2Bc'),
     ([('a', 'b'), ('c', 'd')], 'a=b&c=d'),
     ([('a', 'b'), ('username', '@d')], 'a=b&username=%40d'),
+    ([('percent', '%')], 'percent=%25'),
 ])
 def test_add_query_from(query_items, expected):
     """Verify the behaviour of add_query_from."""
