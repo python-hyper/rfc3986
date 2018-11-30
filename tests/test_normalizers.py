@@ -3,7 +3,8 @@ import pytest
 
 from rfc3986.uri import URIReference
 from rfc3986.normalizers import (
-    normalize_scheme, normalize_percent_characters, remove_dot_segments
+    normalize_scheme, normalize_percent_characters,
+    remove_dot_segments, encode_component,
     )
 
 
@@ -76,3 +77,19 @@ def test_fragment_normalization():
     uri = URIReference(
         None, 'example.com', None, None, 'fiz%DF').normalize()
     assert uri.fragment == 'fiz%DF'
+
+
+@pytest.mark.parametrize(
+    ["component", "encoded_component"],
+    [
+    ('/%', '/%25'),
+    ('/%a', '/%25a'),
+    ('/%ag', '/%25ag'),
+    ('/%af', '/%af'),
+    ('/%20/%', '/%2520/%25'),
+    ('/%20%25', '/%20%25'),
+    ('/%21%22%23%ah%12%ff', '/%2521%2522%2523%25ah%2512%25ff'),
+    ]
+)
+def test_detect_percent_encoded_component(component, encoded_component):
+    assert encode_component(component, 'utf-8') == encoded_component
