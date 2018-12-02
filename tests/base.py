@@ -119,6 +119,20 @@ class BaseTestParsesURIs:
         assert uri.scheme is None
         assert uri.authority == relative_uri[2:]
 
+    def test_handles_percent_in_path(self, uri_path_with_percent):
+        """Test that self.test_class encodes the % character properly."""
+        uri = self.test_class.from_string(uri_path_with_percent)
+        print(uri.path)
+        assert uri.path == '/%25%20'
+
+    def test_handles_percent_in_query(self, uri_query_with_percent):
+        uri = self.test_class.from_string(uri_query_with_percent)
+        assert uri.query == 'a=%25'
+
+    def test_handles_percent_in_fragment(self, uri_fragment_with_percent):
+        uri = self.test_class.from_string(uri_fragment_with_percent)
+        assert uri.fragment == 'perc%25ent'
+
 
 class BaseTestUnsplits:
     test_class = None

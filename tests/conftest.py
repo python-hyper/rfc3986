@@ -116,4 +116,20 @@ def absolute_path_uri():
 def invalid_uri(request):
     return 'https://%s' % request.param
 
+
+@pytest.fixture(params=valid_hosts)
+def uri_path_with_percent(request):
+    return 'https://%s/%% ' % request.param
+
+
+@pytest.fixture(params=valid_hosts)
+def uri_query_with_percent(request):
+    return 'https://%s?a=%%' % request.param
+
+
+@pytest.fixture(params=valid_hosts)
+def uri_fragment_with_percent(request):
+    return 'https://%s#perc%%ent' % request.param
+
+
 sys.path.insert(0, '.')
