@@ -23,6 +23,7 @@ valid_hosts = [
     'www.example.com',
     'localhost',
     'http-bin.org',
+    '%2Fvar%2Frun%2Fsocket'
     ]
 
 invalid_hosts = [

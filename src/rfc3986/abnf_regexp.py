@@ -71,7 +71,7 @@ URL_PARSING_RE = (
 
 # Host patterns, see: http://tools.ietf.org/html/rfc3986#section-3.2.2
 # The pattern for a regular name, e.g.,  www.google.com, api.github.com
-REGULAR_NAME_RE = REG_NAME = '(({0})*|[{1}]*)'.format(
+REGULAR_NAME_RE = REG_NAME = '((?:{0}|[{1}])*)'.format(
     '%[0-9A-Fa-f]{2}', SUB_DELIMITERS_RE + UNRESERVED_RE
 )
 # The pattern for an IPv4 address, e.g., 192.168.255.255, 127.0.0.1,
