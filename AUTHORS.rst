@@ -11,3 +11,4 @@ Contributors
 - Derek Higgins
 - Victor Stinner
 - Viktor Haag
+- Seth Michael Larson
