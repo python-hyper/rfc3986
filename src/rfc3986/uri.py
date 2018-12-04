@@ -98,7 +98,7 @@ class URIReference(namedtuple('URIReference', misc.URI_COMPONENTS)):
         return ref
 
     __hash__ = tuple.__hash__
-    
+
     def __eq__(self, other):
         """Compare this reference to another."""
         other_ref = other
