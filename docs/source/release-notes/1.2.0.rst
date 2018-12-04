@@ -1,0 +1,28 @@
+1.2.0 -- 2018-12-04
+-------------------
+
+- Attempt to detect percent-encoded URI components and
+  encode ``%`` characters if required.
+
+  See also `GitHub #38`_
+
+- Allow percent-encoded bytes within host.
+
+  See also `GitHub #39`_
+
+- Correct the IPv6 regular expression by adding a missing variation.
+
+- Fix hashing for URIReferences on Python 3.
+
+  See also `GitHub !35`_
+
+.. links
+
+.. _GitHub !35:
+    https://github.com/python-hyper/rfc3986/pull/35
+
+.. _GitHub #38:
+    https://github.com/python-hyper/rfc3986/pull/38
+
+.. _GitHub #39:
+    https://github.com/python-hyper/rfc3986/pull/39
