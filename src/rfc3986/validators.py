@@ -306,6 +306,8 @@ def authority_is_valid(authority, host=None, require=False):
     validated = is_valid(authority, misc.SUBAUTHORITY_MATCHER, require)
     if validated and host is not None and misc.IPv4_MATCHER.match(host):
         return valid_ipv4_host_address(host)
+    elif validated and host is not None and misc.IPv6_MATCHER.match(host):
+        return misc.IPv6_NO_RFC4007_MATCHER.match(host) is not None
     return validated
 
 

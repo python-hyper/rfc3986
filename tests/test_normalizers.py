@@ -4,7 +4,7 @@ import pytest
 from rfc3986.uri import URIReference
 from rfc3986.normalizers import (
     normalize_scheme, normalize_percent_characters,
-    remove_dot_segments, encode_component,
+    remove_dot_segments, encode_component, normalize_host
     )
 
 
@@ -93,3 +93,20 @@ def test_fragment_normalization():
 )
 def test_detect_percent_encoded_component(component, encoded_component):
     assert encode_component(component, 'utf-8') == encoded_component
+
+
+@pytest.mark.parametrize(
+    ["host", "normalized_host"],
+    [
+    ('LOCALHOST', 'localhost'),
+    ('[::1%eth0]', '[::1%25eth0]'),
+    ('[::1%25]', '[::1%2525]'),
+    ('[::1%%25]', '[::1%25%25]'),
+    ('[::1%25%25]', '[::1%25%25]'),
+    ('[::Af%Ff]', '[::af%25Ff]'),
+    ('[::Af%%Ff]', '[::af%25%Ff]'),
+    ('[::Af%25Ff]', '[::af%25Ff]'),
+    ]
+)
+def test_normalize_host(host, normalized_host):
+    assert normalize_host(host) == normalized_host
