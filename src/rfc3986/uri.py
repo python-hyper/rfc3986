@@ -171,12 +171,6 @@ class URIReference(namedtuple('URIReference', misc.URI_COMPONENTS)):
             # valid bytes, it is an InvalidAuthority.
             raise exc.InvalidAuthority(self.authority.encode(self.encoding))
 
-        if (host and misc.IPv6_MATCHER.match(host) and not
-                misc.IPv6_NO_RFC4007_MATCHER.match(host)):
-            # If it's an IPv6 address that has RFC 4007 IPv6
-            # Zone IDs then it's invalid.
-            raise exc.InvalidAuthority(self.authority.encode(self.encoding))
-
         return matches
 
     @property

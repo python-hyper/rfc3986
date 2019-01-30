@@ -67,16 +67,22 @@ def test_add_credentials_requires_username():
         builder.URIBuilder().add_credentials(None, None)
 
 
-@pytest.mark.parametrize('hostname', [
-    'google.com',
-    'GOOGLE.COM',
-    'gOOgLe.COM',
-    'goOgLE.com',
-])
-def test_add_host(hostname):
+@pytest.mark.parametrize(
+    ['hostname', 'expected_hostname'],
+    [
+    ('google.com', 'google.com'),
+    ('GOOGLE.COM', 'google.com'),
+    ('gOOgLe.COM', 'google.com'),
+    ('goOgLE.com', 'google.com'),
+    ('[::ff%etH0]', '[::ff%25etH0]'),
+    ('[::ff%25etH0]', '[::ff%25etH0]'),
+    ('[::FF%etH0]', '[::ff%25etH0]'),
+    ]
+)
+def test_add_host(hostname, expected_hostname):
     """Verify we normalize hostnames in add_host."""
     uribuilder = builder.URIBuilder().add_host(hostname)
-    assert uribuilder.host == 'google.com'
+    assert uribuilder.host == expected_hostname
 
 
 @pytest.mark.parametrize('port', [

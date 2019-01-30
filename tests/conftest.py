@@ -32,9 +32,7 @@ invalid_hosts = [
     '[FF02::3::5]',  # IPv6 can only have one ::
     '[FADF:01]',  # Not properly compacted (missing a :)
     '[FADF:01%en0]',  # Not properly compacted (missing a :), Invalid ZoneID
-    '[FADF::01%en0]',  # ZoneID is per RFC 4007
-    '[FADF::01%]',  # Invalid ZoneID separator and no ZoneID
-    '[FADF::01%25]',  # Missing ZoneID in RFC 6974, is 25 in RFC 4007
+    '[FADF::01%]',  # Empty Zone ID
     'localhost:80:80:80',  # Too many ports
     '256.256.256.256',  # Invalid IPv4 Address
     SNOWMAN.decode('utf-8')

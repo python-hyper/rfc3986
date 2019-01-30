@@ -67,10 +67,17 @@ def test_hostname_normalization():
             URIReference(None, 'example.com', None, None, None))
 
 
-def test_authority_normalization():
+@pytest.mark.parametrize(
+    ['authority', 'expected_authority'],
+    [
+    ('user%2aName@EXAMPLE.COM', 'user%2AName@example.com'),
+    ('[::1%eth0]', '[::1%25eth0]')
+    ]
+)
+def test_authority_normalization(authority, expected_authority):
     uri = URIReference(
-        None, 'user%2aName@EXAMPLE.COM', None, None, None).normalize()
-    assert uri.authority == 'user%2AName@example.com'
+        None, authority, None, None, None).normalize()
+    assert uri.authority == expected_authority
 
 
 def test_fragment_normalization():
