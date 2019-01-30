@@ -235,3 +235,12 @@ def test_invalid_uri_with_invalid_path(invalid_uri):
         validators.Validator().check_validity_of(
             'host', 'path',
         ).validate(uri)
+
+
+def test_rfc_4007_ipv6_zone_ids_invalid_host():
+    """Verify that RFC 4007 IPv6 Zone IDs are invalid host/authority"""
+    uri = rfc3986.uri_reference("http://[::1%eth0]")
+    with pytest.raises(exceptions.InvalidComponentsError):
+        validators.Validator().check_validity_of(
+            'host'
+        ).validate(uri)

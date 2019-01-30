@@ -73,6 +73,12 @@ def test_authority_normalization():
     assert uri.authority == 'user%2AName@example.com'
 
 
+def test_ipv6_zone_id_normalization():
+    uri = URIReference(
+        None, '[::1%eth0]', None, None, None, None).normalize()
+    assert uri.authority == '[::1%25eth0]'
+
+
 def test_fragment_normalization():
     uri = URIReference(
         None, 'example.com', None, None, 'fiz%DF').normalize()

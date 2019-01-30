@@ -79,6 +79,19 @@ def test_add_host(hostname):
     assert uribuilder.host == 'google.com'
 
 
+@pytest.mark.parametrize('host', [
+    '[::ff%etH0]',
+    '[::ff%25etH0]',
+    '[::FF%etH0]',
+])
+def test_add_host_ipv6_zone_ids(host):
+    """Verify we normalize IPv6 Zone IDs in add_host."""
+    uri = builder.URIBuilder().add_scheme('https').add_host(host).finalize(
+    ).unsplit()
+    expected = 'https://[::ff%25etH0]'
+    assert expected == uri
+
+
 @pytest.mark.parametrize('port', [
     -100,
     '-100',
