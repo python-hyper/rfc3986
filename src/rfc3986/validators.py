@@ -416,7 +416,7 @@ def subauthority_component_is_valid(uri, component):
     # If we can parse the authority into sub-components and we're not
     # validating the port, we can assume it's valid.
     if component == 'host':
-        return host_is_valid(subauthority_dict['host'], require=True)
+        return host_is_valid(subauthority_dict['host'])
     elif component != 'port':
         return True
 

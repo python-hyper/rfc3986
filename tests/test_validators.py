@@ -105,6 +105,8 @@ def test_passwordless_uris_pass_validation(uri):
 ])
 def test_missing_host_component(uri):
     """Verify that missing host components cause errors."""
+    validators.Validator().validate(uri)
+
     validator = validators.Validator().require_presence_of('host')
     with pytest.raises(exceptions.MissingComponentError):
         validator.validate(uri)
