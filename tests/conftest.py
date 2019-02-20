@@ -25,7 +25,8 @@ valid_hosts = [
     'www.example.com',
     'localhost',
     'http-bin.org',
-    '%2Fvar%2Frun%2Fsocket'
+    '%2Fvar%2Frun%2Fsocket',
+    '6g9m8V6',  # Issue #48
     ]
 
 invalid_hosts = [
