@@ -27,6 +27,8 @@ from .api import normalize_uri
 from .api import uri_reference
 from .api import URIReference
 from .api import urlparse
+from .api import iri_reference
+from .api import IRIReference
 from .parseresult import ParseResult
 
 __title__ = 'rfc3986'
@@ -39,9 +41,11 @@ __version__ = '1.2.0'
 __all__ = (
     'ParseResult',
     'URIReference',
+    'IRIReference',
     'is_valid_uri',
     'normalize_uri',
     'uri_reference',
+    'iri_reference',
     'urlparse',
     '__title__',
     '__author__',

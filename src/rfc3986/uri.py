@@ -24,116 +24,25 @@ from . import normalizers
 from . import validators
 
 
-class URIReference(namedtuple('URIReference', misc.URI_COMPONENTS)):
-    """Immutable object representing a parsed URI Reference.
-
-    .. note::
-
-        This class is not intended to be directly instantiated by the user.
-
-    This object exposes attributes for the following components of a
-    URI:
-
-    - scheme
-    - authority
-    - path
-    - query
-    - fragment
-
-    .. attribute:: scheme
-
-        The scheme that was parsed for the URI Reference. For example,
-        ``http``, ``https``, ``smtp``, ``imap``, etc.
-
-    .. attribute:: authority
-
-        Component of the URI that contains the user information, host,
-        and port sub-components. For example,
-        ``google.com``, ``127.0.0.1:5000``, ``username@[::1]``,
-        ``username:password@example.com:443``, etc.
-
-    .. attribute:: path
-
-        The path that was parsed for the given URI Reference. For example,
-        ``/``, ``/index.php``, etc.
-
-    .. attribute:: query
-
-        The query component for a given URI Reference. For example, ``a=b``,
-        ``a=b%20c``, ``a=b+c``, ``a=b,c=d,e=%20f``, etc.
-
-    .. attribute:: fragment
-
-        The fragment component of a URI. For example, ``section-3.1``.
-
-    This class also provides extra attributes for easier access to information
-    like the subcomponents of the authority component.
-
-    .. attribute:: userinfo
-
-        The user information parsed from the authority.
-
-    .. attribute:: host
-
-        The hostname, IPv4, or IPv6 adddres parsed from the authority.
-
-    .. attribute:: port
-
-        The port parsed from the authority.
-    """
-
-    slots = ()
-
-    def __new__(cls, scheme, authority, path, query, fragment,
-                encoding='utf-8'):
-        """Create a new URIReference."""
-        ref = super(URIReference, cls).__new__(
-            cls,
-            scheme or None,
-            authority or None,
-            path or None,
-            query,
-            fragment)
-        ref.encoding = encoding
-        return ref
-
+class URIMixin:
     __hash__ = tuple.__hash__
 
     def __eq__(self, other):
         """Compare this reference to another."""
         other_ref = other
         if isinstance(other, tuple):
-            other_ref = URIReference(*other)
-        elif not isinstance(other, URIReference):
+            other_ref = self.__class__(*other)
+        elif not isinstance(other, URIMixin):
             try:
-                other_ref = URIReference.from_string(other)
+                other_ref = self.__class__.from_string(other)
             except TypeError:
                 raise TypeError(
-                    'Unable to compare URIReference() to {0}()'.format(
-                        type(other).__name__))
+                    'Unable to compare {0}() to {1}()'.format(
+                        type(self).__name__, type(other).__name__))
 
         # See http://tools.ietf.org/html/rfc3986#section-6.2
         naive_equality = tuple(self) == tuple(other_ref)
         return naive_equality or self.normalized_equality(other_ref)
-
-    @classmethod
-    def from_string(cls, uri_string, encoding='utf-8'):
-        """Parse a URI reference from the given unicode URI string.
-
-        :param str uri_string: Unicode URI to be parsed into a reference.
-        :param str encoding: The encoding of the string provided
-        :returns: :class:`URIReference` or subclass thereof
-        """
-        uri_string = compat.to_str(uri_string, encoding)
-
-        split_uri = misc.URI_MATCHER.match(uri_string).groupdict()
-        return cls(
-            split_uri['scheme'], split_uri['authority'],
-            normalizers.encode_component(split_uri['path'], encoding),
-            normalizers.encode_component(split_uri['query'], encoding),
-            normalizers.encode_component(split_uri['fragment'], encoding),
-            encoding,
-        )
 
     def authority_info(self):
         """Return a dictionary with the ``userinfo``, ``host``, and ``port``.
@@ -151,7 +60,7 @@ class URIReference(namedtuple('URIReference', misc.URI_COMPONENTS)):
         if not self.authority:
             return {'userinfo': None, 'host': None, 'port': None}
 
-        match = misc.SUBAUTHORITY_MATCHER.match(self.authority)
+        match = self._match_subauthority()
 
         if match is None:
             # In this case, we have an authority that was parsed from the URI
@@ -172,6 +81,9 @@ class URIReference(namedtuple('URIReference', misc.URI_COMPONENTS)):
             raise exc.InvalidAuthority(self.authority.encode(self.encoding))
 
         return matches
+
+    def _match_subauthority(self):
+        return misc.SUBAUTHORITY_MATCHER.match(self.authority)
 
     @property
     def host(self):
@@ -490,3 +402,115 @@ class URIReference(namedtuple('URIReference', misc.URI_COMPONENTS)):
         uri = self._replace(**attributes)
         uri.encoding = self.encoding
         return uri
+
+
+class URIReference(namedtuple('URIReference', misc.URI_COMPONENTS), URIMixin):
+    """Immutable object representing a parsed URI Reference.
+
+    .. note::
+
+        This class is not intended to be directly instantiated by the user.
+
+    This object exposes attributes for the following components of a
+    URI:
+
+    - scheme
+    - authority
+    - path
+    - query
+    - fragment
+
+    .. attribute:: scheme
+
+        The scheme that was parsed for the URI Reference. For example,
+        ``http``, ``https``, ``smtp``, ``imap``, etc.
+
+    .. attribute:: authority
+
+        Component of the URI that contains the user information, host,
+        and port sub-components. For example,
+        ``google.com``, ``127.0.0.1:5000``, ``username@[::1]``,
+        ``username:password@example.com:443``, etc.
+
+    .. attribute:: path
+
+        The path that was parsed for the given URI Reference. For example,
+        ``/``, ``/index.php``, etc.
+
+    .. attribute:: query
+
+        The query component for a given URI Reference. For example, ``a=b``,
+        ``a=b%20c``, ``a=b+c``, ``a=b,c=d,e=%20f``, etc.
+
+    .. attribute:: fragment
+
+        The fragment component of a URI. For example, ``section-3.1``.
+
+    This class also provides extra attributes for easier access to information
+    like the subcomponents of the authority component.
+
+    .. attribute:: userinfo
+
+        The user information parsed from the authority.
+
+    .. attribute:: host
+
+        The hostname, IPv4, or IPv6 adddres parsed from the authority.
+
+    .. attribute:: port
+
+        The port parsed from the authority.
+    """
+
+    slots = ()
+
+    def __new__(cls, scheme, authority, path, query, fragment,
+                encoding='utf-8'):
+        """Create a new URIReference."""
+        ref = super(URIReference, cls).__new__(
+            cls,
+            scheme or None,
+            authority or None,
+            path or None,
+            query,
+            fragment)
+        ref.encoding = encoding
+        return ref
+
+    __hash__ = tuple.__hash__
+
+    def __eq__(self, other):
+        """Compare this reference to another."""
+        other_ref = other
+        if isinstance(other, tuple):
+            other_ref = URIReference(*other)
+        elif not isinstance(other, URIReference):
+            try:
+                other_ref = URIReference.from_string(other)
+            except TypeError:
+                raise TypeError(
+                    'Unable to compare URIReference() to {0}()'.format(
+                        type(other).__name__))
+
+        # See http://tools.ietf.org/html/rfc3986#section-6.2
+        naive_equality = tuple(self) == tuple(other_ref)
+        return naive_equality or self.normalized_equality(other_ref)
+
+    @classmethod
+    def from_string(cls, uri_string, encoding='utf-8'):
+        """Parse a URI reference from the given unicode URI string.
+
+        :param str uri_string: Unicode URI to be parsed into a reference.
+        :param str encoding: The encoding of the string provided
+        :returns: :class:`URIReference` or subclass thereof
+        """
+        uri_string = compat.to_str(uri_string, encoding)
+
+        split_uri = misc.URI_MATCHER.match(uri_string).groupdict()
+        return cls(
+            split_uri['scheme'], split_uri['authority'],
+            normalizers.encode_component(split_uri['path'], encoding),
+            normalizers.encode_component(split_uri['query'], encoding),
+            normalizers.encode_component(split_uri['fragment'], encoding),
+            encoding,
+        )
