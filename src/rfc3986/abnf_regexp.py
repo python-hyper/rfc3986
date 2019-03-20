@@ -27,7 +27,7 @@ RESERVED_CHARS_SET = GENERIC_DELIMITERS_SET.union(SUB_DELIMITERS_SET)
 ALPHA = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
 DIGIT = '0123456789'
 # https://tools.ietf.org/html/rfc3986#section-2.3
-UNRESERVED = UNRESERVED_CHARS = ALPHA + DIGIT + '._!-'
+UNRESERVED = UNRESERVED_CHARS = ALPHA + DIGIT + r'._!-'
 UNRESERVED_CHARS_SET = set(UNRESERVED_CHARS)
 NON_PCT_ENCODED_SET = RESERVED_CHARS_SET.union(UNRESERVED_CHARS_SET)
 # We need to escape the '-' in this case:
@@ -77,7 +77,7 @@ REGULAR_NAME_RE = REG_NAME = '((?:{0}|[{1}])*)'.format(
     '%[0-9A-Fa-f]{2}', SUB_DELIMITERS_RE + UNRESERVED_RE
 )
 # The pattern for an IPv4 address, e.g., 192.168.255.255, 127.0.0.1,
-IPv4_RE = '([0-9]{1,3}.){3}[0-9]{1,3}'
+IPv4_RE = r'([0-9]{1,3}\.){3}[0-9]{1,3}'
 # Hexadecimal characters used in each piece of an IPv6 address
 HEXDIG_RE = '[0-9A-Fa-f]{1,4}'
 # Least-significant 32 bits of an IPv6 address
@@ -113,7 +113,7 @@ IPv6_RE = '(({0})|({1})|({2})|({3})|({4})|({5})|({6})|({7})|({8}))'.format(
     *variations
 )
 
-IPv_FUTURE_RE = 'v[0-9A-Fa-f]+.[%s]+' % (
+IPv_FUTURE_RE = r'v[0-9A-Fa-f]+\.[%s]+' % (
     UNRESERVED_RE + SUB_DELIMITERS_RE + ':'
 )
 
@@ -209,7 +209,7 @@ else:
         u'\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF'
     )
 
-IUNRESERVED_RE = u'A-Za-z0-9._~\-' + UCSCHAR_RE
+IUNRESERVED_RE = u'A-Za-z0-9\._~\-' + UCSCHAR_RE
 IPCHAR = u'([' + IUNRESERVED_RE + SUB_DELIMITERS_RE + u':@]|%s)' % PCT_ENCODED
 
 isegments = {
