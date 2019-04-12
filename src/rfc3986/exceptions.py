@@ -2,6 +2,9 @@
 """Exceptions module for rfc3986."""
 
 
+from . import compat
+
+
 class RFC3986Exception(Exception):
     """Base class for all rfc3986 exception classes."""
 
@@ -109,3 +112,9 @@ class InvalidComponentsError(ValidationError):
             uri,
             self.components,
         )
+
+
+class MissingDependencyError(RFC3986Exception):
+    """Exception raised when an IRI is being encoded and the
+    hostname must be encoded but the 'idna' module is not installed
+    """

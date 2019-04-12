@@ -17,9 +17,16 @@
 from collections import namedtuple
 
 from . import compat
+from . import exceptions
 from . import misc
 from . import normalizers
 from . import uri
+
+
+try:
+    import idna
+except ImportError:
+    idna = None
 
 
 class IRIReference(namedtuple('IRIReference', misc.URI_COMPONENTS), uri.URIMixin):
@@ -38,6 +45,23 @@ class IRIReference(namedtuple('IRIReference', misc.URI_COMPONENTS), uri.URIMixin
             fragment)
         ref.encoding = encoding
         return ref
+
+    def __eq__(self, other):
+        """Compare this reference to another."""
+        other_ref = other
+        if isinstance(other, tuple):
+            other_ref = self.__class__(*other)
+        elif not isinstance(other, IRIReference):
+            try:
+                other_ref = self.__class__.from_string(other)
+            except TypeError:
+                raise TypeError(
+                    'Unable to compare {0}() to {1}()'.format(
+                        type(self).__name__, type(other).__name__))
+
+        # See http://tools.ietf.org/html/rfc3986#section-6.2
+        naive_equality = tuple(self) == tuple(other_ref)
+        return naive_equality or self.normalized_equality(other_ref)
 
     def _match_subauthority(self):
         return misc.ISUBAUTHORITY_MATCHER.match(self.authority)
@@ -69,8 +93,22 @@ class IRIReference(namedtuple('IRIReference', misc.URI_COMPONENTS), uri.URIMixin
         :returns: A URI reference
         """
         authority = self.authority
-        if idna_encoder is not None and self.authority:
-            authority = compat.to_str(idna_encoder(self.host))
+        if authority:
+            if idna_encoder is None:
+                if idna is None:
+                    raise exceptions.MissingDependencyError(
+                        "Could not import the 'idna' module and the IRI hostname requires encoding"
+                    )
+                else:
+                    def idna_encoder(x):
+                        try:
+                            return idna.encode(x, strict=True, std3_rules=True)
+                        except idna.IDNAError:
+                            raise exceptions.InvalidAuthority(self.authority)
+
+            authority = ""
+            if self.host:
+                authority = ".".join([compat.to_str(idna_encoder(part.lower())) for part in self.host.split(".")])
             if self.userinfo is not None:
                 authority = normalizers.encode_component(self.userinfo, self.encoding) + '@' + authority
             if self.port is not None:

@@ -203,7 +203,7 @@ if sys.maxunicode > 0xFFFF:
         u'\U00090000-\U0009FFFD\U000A0000-\U000AFFFD\U000B0000-\U000BFFFD\U000C0000-\U000CFFFD'
         u'\U000D0000-\U000DFFFD\U000E1000-\U000EFFFD'
     )
-else:
+else:  # pragma: no cover
     IPRIVATE = u'\uE000-\uF8FF'
     UCSCHAR_RE = (
         u'\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF'
