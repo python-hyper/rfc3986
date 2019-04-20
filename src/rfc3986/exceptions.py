@@ -16,7 +16,8 @@ class InvalidAuthority(RFC3986Exception):
     def __init__(self, authority):
         """Initialize the exception with the invalid authority."""
         super(InvalidAuthority, self).__init__(
-            u"The authority ({0}) is not valid.".format(compat.to_str(authority)))
+            u"The authority ({0}) is not valid.".format(
+                compat.to_str(authority)))
 
 
 class InvalidPort(RFC3986Exception):
