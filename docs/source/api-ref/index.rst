@@ -13,4 +13,5 @@ can be utilized, please see :ref:`narrative` instead.
     builder
     uri
     validators
+    iri
     miscellaneous

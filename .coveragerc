@@ -2,4 +2,5 @@
 exclude_lines =
     .* # Python \d.*
     .* # nocov: Python \d.*
+    .* # pragma: no cover.*
 fail_under = 100

@@ -194,7 +194,7 @@ HIER_PART_RE = '(//%s%s|%s|%s|%s)' % (
 # ###############
 
 # Only wide-unicode gets the high-ranges of UCSCHAR
-if sys.maxunicode > 0xFFFF:
+if sys.maxunicode > 0xFFFF:  # pragma: no cover
     IPRIVATE = u'\uE000-\uF8FF\U000F0000-\U000FFFFD\U00100000-\U0010FFFD'
     UCSCHAR_RE = (
         u'\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF'

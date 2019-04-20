@@ -1,4 +1,4 @@
-"""Module containing the implementation of the URIReference class."""
+"""Module containing the implementation of the IRIReference class."""
 # -*- coding: utf-8 -*-
 # Copyright (c) 2014 Rackspace
 # Copyright (c) 2015 Ian Stapleton Cordasco
@@ -25,17 +25,26 @@ from . import uri
 
 try:
     import idna
-except ImportError:
+except ImportError:  # pragma: no cover
     idna = None
 
 
 class IRIReference(namedtuple('IRIReference', misc.URI_COMPONENTS), uri.URIMixin):
+    """Immutable object representing a parsed IRI Reference.
+
+    Can be encoded into an URIReference object via the procedure
+    specified in RFC 3987 Section 3.1
+
+     .. note::
+        The IRI submodule is a new interface and may possibly change in
+        the future. Check for changes to the interface when upgrading.
+    """
 
     slots = ()
 
     def __new__(cls, scheme, authority, path, query, fragment,
                 encoding='utf-8'):
-        """Create a new URIReference."""
+        """Create a new IRIReference."""
         ref = super(IRIReference, cls).__new__(
             cls,
             scheme or None,
@@ -60,19 +69,18 @@ class IRIReference(namedtuple('IRIReference', misc.URI_COMPONENTS), uri.URIMixin
                         type(self).__name__, type(other).__name__))
 
         # See http://tools.ietf.org/html/rfc3986#section-6.2
-        naive_equality = tuple(self) == tuple(other_ref)
-        return naive_equality or self.normalized_equality(other_ref)
+        return tuple(self) == tuple(other_ref)
 
     def _match_subauthority(self):
         return misc.ISUBAUTHORITY_MATCHER.match(self.authority)
 
     @classmethod
     def from_string(cls, iri_string, encoding='utf-8'):
-        """Parse a URI reference from the given unicode URI string.
+        """Parse a IRI reference from the given unicode IRI string.
 
         :param str iri_string: Unicode IRI to be parsed into a reference.
         :param str encoding: The encoding of the string provided
-        :returns: :class:`URIReference` or subclass thereof
+        :returns: :class:`IRIReference` or subclass thereof
         """
         iri_string = compat.to_str(iri_string, encoding)
 
@@ -88,16 +96,24 @@ class IRIReference(namedtuple('IRIReference', misc.URI_COMPONENTS), uri.URIMixin
     def encode(self, idna_encoder=None):
         """
         Encodes an IRIReference into a URIReference instance
+        If the ``idna`` module is installed or the ``rfc3986[idna]``
+        extra is used then unicode characters in the IRI host
+        component will be encoded with IDNA2008
 
+        :param idna_encoder:
+            Function that encodes each part of the host component
+            If not given will raise an exception if the IRI
+            contains a host component.
         :rtype: uri.URIReference
         :returns: A URI reference
         """
         authority = self.authority
         if authority:
             if idna_encoder is None:
-                if idna is None:
+                if idna is None:  # pragma: no cover
                     raise exceptions.MissingDependencyError(
-                        "Could not import the 'idna' module and the IRI hostname requires encoding"
+                        "Could not import the 'idna' module "
+                        "and the IRI hostname requires encoding"
                     )
                 else:
                     def idna_encoder(x):
