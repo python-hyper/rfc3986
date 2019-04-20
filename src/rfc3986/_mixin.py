@@ -1,3 +1,4 @@
+"""Module containing the implementation of the URIMixin class."""
 import warnings
 
 from . import exceptions as exc
@@ -7,6 +8,8 @@ from . import validators
 
 
 class URIMixin(object):
+    """Mixin with all shared methods for URIs and IRIs."""
+
     __hash__ = tuple.__hash__
 
     def authority_info(self):

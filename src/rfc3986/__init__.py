@@ -22,13 +22,13 @@ See http://rfc3986.readthedocs.io/ for detailed documentation.
 :license: Apache v2.0, see LICENSE for details
 """
 
+from .api import iri_reference
+from .api import IRIReference
 from .api import is_valid_uri
 from .api import normalize_uri
 from .api import uri_reference
 from .api import URIReference
 from .api import urlparse
-from .api import iri_reference
-from .api import IRIReference
 from .parseresult import ParseResult
 
 __title__ = 'rfc3986'

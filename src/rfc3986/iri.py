@@ -29,7 +29,8 @@ except ImportError:  # pragma: no cover
     idna = None
 
 
-class IRIReference(namedtuple('IRIReference', misc.URI_COMPONENTS), uri.URIMixin):
+class IRIReference(namedtuple('IRIReference', misc.URI_COMPONENTS),
+                   uri.URIMixin):
     """Immutable object representing a parsed IRI Reference.
 
     Can be encoded into an URIReference object via the procedure
@@ -94,11 +95,11 @@ class IRIReference(namedtuple('IRIReference', misc.URI_COMPONENTS), uri.URIMixin
         )
 
     def encode(self, idna_encoder=None):
-        """
-        Encodes an IRIReference into a URIReference instance
+        """Encode an IRIReference into a URIReference instance.
+
         If the ``idna`` module is installed or the ``rfc3986[idna]``
         extra is used then unicode characters in the IRI host
-        component will be encoded with IDNA2008
+        component will be encoded with IDNA2008.
 
         :param idna_encoder:
             Function that encodes each part of the host component
@@ -124,9 +125,13 @@ class IRIReference(namedtuple('IRIReference', misc.URI_COMPONENTS), uri.URIMixin
 
             authority = ""
             if self.host:
-                authority = ".".join([compat.to_str(idna_encoder(part.lower())) for part in self.host.split(".")])
+                authority = ".".join([compat.to_str(idna_encoder(part.lower()))
+                                      for part in self.host.split(".")])
+
             if self.userinfo is not None:
-                authority = normalizers.encode_component(self.userinfo, self.encoding) + '@' + authority
+                authority = (normalizers.encode_component(
+                             self.userinfo, self.encoding) + '@' + authority)
+
             if self.port is not None:
                 authority += ":" + str(self.port)
 

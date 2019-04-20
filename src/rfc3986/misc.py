@@ -119,13 +119,13 @@ IQUERY_MATCHER = re.compile(abnf_regexp.IQUERY_RE, re.UNICODE)
 IFRAGMENT_MATCHER = re.compile(abnf_regexp.IFRAGMENT_RE, re.UNICODE)
 
 
-RELATIVE_IRI_MATCHER = re.compile(u'^%s(?:\?%s)?(?:%s)?$' % (
+RELATIVE_IRI_MATCHER = re.compile(u'^%s(?:\\?%s)?(?:%s)?$' % (
     abnf_regexp.IRELATIVE_PART_RE,
     abnf_regexp.IQUERY_RE,
     abnf_regexp.IFRAGMENT_RE
 ), re.UNICODE)
 
-ABSOLUTE_IRI_MATCHER = re.compile(u'^%s:%s(?:\?%s)?$' % (
+ABSOLUTE_IRI_MATCHER = re.compile(u'^%s:%s(?:\\?%s)?$' % (
     abnf_regexp.COMPONENT_PATTERN_DICT['scheme'],
     abnf_regexp.IHIER_PART_RE,
     abnf_regexp.IQUERY_RE[1:-1]
