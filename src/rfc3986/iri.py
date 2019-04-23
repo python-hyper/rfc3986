@@ -118,10 +118,12 @@ class IRIReference(namedtuple('IRIReference', misc.URI_COMPONENTS),
                     )
                 else:
                     def idna_encoder(x):
-                        try:
-                            return idna.encode(x.lower(), strict=True, std3_rules=True)
-                        except idna.IDNAError:
-                            raise exceptions.InvalidAuthority(self.authority)
+                        if any(ord(c) > 128 for c in x):
+                            try:
+                                return idna.encode(x.lower(), strict=True, std3_rules=True)
+                            except idna.IDNAError:
+                                raise exceptions.InvalidAuthority(self.authority)
+                        return x
 
             authority = ""
             if self.host:
