@@ -21,7 +21,8 @@ iri_to_uri = pytest.mark.parametrize(
         (u'http://نامه\u200cای.com', u'http://xn--mgba3gch31f060k.com'),
         (u'http://Bü:ẞ@gOoGle.com', u'http://B%C3%BC:%E1%BA%9E@google.com'),
         (u'http://ẞ.com:443', u'http://xn--zca.com:443'),
-        (u'http://ẞ.foo.com', u'http://xn--zca.foo.com')
+        (u'http://ẞ.foo.com', u'http://xn--zca.foo.com'),
+        (u'http+unix://%2Ftmp%2FTEST.sock/get', 'http+unix"//%2Ftmp%2FTEST.sock/get'),
     ]
 )
 
