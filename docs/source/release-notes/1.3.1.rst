@@ -1,0 +1,12 @@
+1.3.1 -- 2019-04-23
+-------------------
+
+- Only apply IDNA-encoding when there are characters
+  outside of the ASCII character set.
+
+  See also `GitHub #52`_
+
+.. links
+
+.. _GitHub #52:
+    https://github.com/python-hyper/rfc3986/pull/52

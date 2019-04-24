@@ -10,6 +10,7 @@ here with the newest releases first.
 
 .. toctree::
 
+    1.3.1
     1.3.0
     1.2.0
     1.1.0
