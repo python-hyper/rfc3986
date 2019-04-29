@@ -2,6 +2,7 @@
 
 import pytest
 import rfc3986
+import sys
 from rfc3986.exceptions import InvalidAuthority
 
 try:
@@ -51,7 +52,13 @@ def test_iri_equality_special_cases():
 @pytest.mark.parametrize("iri", [
     u'http://♥.net',
     u'http://\u0378.net',
-    u'http://㛼.com'
+    pytest.param(
+        u'http://㛼.com',
+        marks=pytest.mark.skipif(
+            sys.version_info < (3, 3) and sys.maxunicode <= 0xFFFF,
+            reason="Python configured without UCS-4 support"
+        )
+    ),
 ])
 def test_encode_invalid_iri(iri):
     iri_ref = rfc3986.iri_reference(iri)
