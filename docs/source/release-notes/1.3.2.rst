@@ -1,0 +1,12 @@
+1.3.2 -- 2019-05-13
+-------------------
+
+- Remove unnecessary IRI-flavored matchers from ``rfc3986.misc`` to
+  speed up import time on resource-constrained systems.
+
+  See also `GitHub #55`_
+
+.. links
+
+.. _GitHub #55:
+    https://github.com/python-hyper/rfc3986/pull/55
