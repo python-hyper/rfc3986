@@ -134,8 +134,8 @@ HOST_RE = HOST_PATTERN = '({0}|{1}|{2})'.format(
     IPv4_RE,
     IP_LITERAL_RE,
 )
-USERINFO_RE = '^([' + UNRESERVED_RE + SUB_DELIMITERS_RE + ':]|%s)+' % (
-    PCT_ENCODED
+USERINFO_RE = '^([%s%s:]|%s)+.*(?=@)' % (
+    UNRESERVED_RE, SUB_DELIMITERS_RE, PCT_ENCODED
 )
 PORT_RE = '[0-9]{1,5}'
 
@@ -241,8 +241,8 @@ IHOST_RE = IHOST_PATTERN = u'({0}|{1}|{2})'.format(
     IP_LITERAL_RE,
 )
 
-IUSERINFO_RE = u'^(?:[' + IUNRESERVED_RE + SUB_DELIMITERS_RE + u':]|%s)+' % (
-    PCT_ENCODED
+IUSERINFO_RE = u'^(?:[%s%s:]|%s)+.*(?=@)' % (
+    IUNRESERVED_RE, SUB_DELIMITERS_RE, PCT_ENCODED
 )
 
 IFRAGMENT_RE = (u'^(?:[/?:@' + IUNRESERVED_RE + SUB_DELIMITERS_RE

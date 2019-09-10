@@ -82,6 +82,10 @@ def basic_uri_with_port(request):
 def uri_with_port_and_userinfo(request):
     return 'ssh://user:pass@%s:22' % request.param
 
+@pytest.fixture(params=valid_hosts)
+def uri_with_email_userinfo(request):
+    return 'ssh://user@email.com:pass@%s' % request.param
+
 
 @pytest.fixture(params=valid_hosts)
 def uri_with_port_and_tricky_userinfo(request):

@@ -58,6 +58,21 @@ class BaseTestParsesURIs:
         assert uri.fragment is None
         assert uri.userinfo == 'user:pass'
 
+    def test_handles_uri_with_email_userinfo(
+            self, uri_with_email_userinfo):
+        """
+        Test that self.test_class can handle a URI with a port and userinfo.
+        """
+        uri = self.test_class.from_string(uri_with_email_userinfo)
+        assert uri.scheme == 'ssh'
+        # 6 == len('ftp://')
+        assert uri.authority == uri_with_email_userinfo[6:]
+        assert uri.host != uri.authority
+        assert uri.path is None
+        assert uri.query is None
+        assert uri.fragment is None
+        assert uri.userinfo == 'user@email.com:pass'
+
     def test_handles_tricky_userinfo(
             self, uri_with_port_and_tricky_userinfo):
         """
@@ -149,6 +164,11 @@ class BaseTestUnsplits:
                                                  uri_with_port_and_userinfo):
         uri = self.test_class.from_string(uri_with_port_and_userinfo)
         assert uri.unsplit() == uri_with_port_and_userinfo
+
+    def test_uri_with_email_userinfo_unsplits(self,
+                                                 uri_with_email_userinfo):
+        uri = self.test_class.from_string(uri_with_email_userinfo)
+        assert uri.unsplit() == uri_with_email_userinfo
 
     def test_basic_uri_with_path_unsplits(self, basic_uri_with_path):
         uri = self.test_class.from_string(basic_uri_with_path)

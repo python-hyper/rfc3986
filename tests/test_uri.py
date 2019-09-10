@@ -99,6 +99,11 @@ class TestURIValidation:
         uri = URIReference.from_string(uri_with_port_and_userinfo)
         assert uri.is_valid() is True
 
+    def test_uri_with_email_userinfo_is_valid(self,
+                                                 uri_with_email_userinfo):
+        uri = URIReference.from_string(uri_with_email_userinfo)
+        assert uri.is_valid() is True
+
     def test_basic_uri_with_path_is_valid(self, basic_uri_with_path):
         uri = URIReference.from_string(basic_uri_with_path)
         assert uri.is_valid() is True
@@ -166,6 +171,10 @@ class TestURIReferenceComparesToStrings:
         uri = URIReference.from_string(uri_with_port_and_userinfo)
         assert uri == uri_with_port_and_userinfo
 
+    def test_uri_with_email_userinfo(self, uri_with_email_userinfo):
+        uri = URIReference.from_string(uri_with_email_userinfo)
+        assert uri == uri_with_email_userinfo
+
     def test_basic_uri_with_path(self, basic_uri_with_path):
         uri = URIReference.from_string(basic_uri_with_path)
         assert uri == basic_uri_with_path
@@ -206,6 +215,10 @@ class TestURIReferenceComparesToTuples:
     def test_uri_with_port_and_userinfo(self, uri_with_port_and_userinfo):
         uri = URIReference.from_string(uri_with_port_and_userinfo)
         assert uri == self.to_tuple(uri_with_port_and_userinfo)
+
+    def test_uri_with_email_userinfo(self, uri_with_email_userinfo):
+        uri = URIReference.from_string(uri_with_email_userinfo)
+        assert uri == self.to_tuple(uri_with_email_userinfo)
 
     def test_basic_uri_with_path(self, basic_uri_with_path):
         uri = URIReference.from_string(basic_uri_with_path)
