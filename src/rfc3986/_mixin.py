@@ -51,7 +51,7 @@ class URIMixin(object):
         return matches
 
     def _match_subauthority(self):
-        # Follow the whatwg spec by urlencoding any '@' in the userinfo section.
+        # Follow the whatwg spec by urlencoding any '@' in the URL userinfo.
         # This is classed as a non-parser terminating validation error.
         ampersand_count = self.authority.count("@")
         authority = self.authority.replace("@", "%40", ampersand_count - 1)
