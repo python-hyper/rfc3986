@@ -353,7 +353,7 @@ def test_empty_querystrings_persist():
     assert ref.unsplit() == url
 
 
-def test_urlencoded_ampersand_in_userinfo():
+def test_urlencoded_at_sign_in_userinfo():
     url = 'https://user@gmail.com:password@example.com'
     ref = URIReference.from_string(url)
     assert ref.authority == 'user@gmail.com:password@example.com'
