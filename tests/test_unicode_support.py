@@ -53,7 +53,7 @@ def test_urlparse_an_invalid_authority_parses_port():
     url = 'http://foo:b@r@[::1]:80/get'
     parsed = urlparse(url)
     assert parsed.port == 80
-    assert parsed.userinfo == 'foo:b@r'
+    assert parsed.userinfo == 'foo:b%40r'
     assert parsed.hostname == '[::1]'
 
 
