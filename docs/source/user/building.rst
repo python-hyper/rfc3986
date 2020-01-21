@@ -42,6 +42,17 @@ a :class:`~rfc3986.uri.URIReference` and call
     ... ).finalize().unsplit())
     https://github.com
 
+It is possible to update an existing URI by constructing a builder from an
+instance of :class:`~rfc3986.uri.URIReference` or a textual representation:
+
+.. doctest::
+
+    >>> from rfc3986 import builder
+    >>> print(builder.URIBuilder.from_uri("http://github.com").add_scheme(
+    ...     'https'
+    ... ).finalize().unsplit())
+    https://github.com
+
 Each time you invoke a method, you get a new instance of a
 :class:`~rfc3986.builder.URIBuilder` class so you can build several different
 URLs from one base instance.
