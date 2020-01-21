@@ -74,9 +74,15 @@ class URIBuilder(object):
         """
         if not isinstance(reference, uri.URIReference):
             reference = uri_reference(reference)
-        return cls(scheme=reference.scheme, userinfo=reference.userinfo, host=reference.host,
-                   port=reference.port, path=reference.path, query=reference.query,
-                   fragment=reference.fragment)
+        return cls(
+            scheme=reference.scheme,
+            userinfo=reference.userinfo,
+            host=reference.host,
+            port=reference.port,
+            path=reference.path,
+            query=reference.query,
+            fragment=reference.fragment
+        )
 
     def add_scheme(self, scheme):
         """Add a scheme to our builder object.
