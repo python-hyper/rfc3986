@@ -15,7 +15,7 @@
 """Module containing the tests for the URIBuilder object."""
 import pytest
 
-from rfc3986 import builder
+from rfc3986 import builder, uri_reference
 
 
 def test_builder_default():
@@ -26,6 +26,29 @@ def test_builder_default():
     assert uribuilder.host is None
     assert uribuilder.port is None
     assert uribuilder.path is None
+    assert uribuilder.query is None
+    assert uribuilder.fragment is None
+
+
+def test_from_uri_reference():
+    uri = uri_reference("http://foo.bar:1234/baz")
+    uribuilder = builder.URIBuilder().from_uri(uri)
+    assert uribuilder.scheme == 'http'
+    assert uribuilder.userinfo is None
+    assert uribuilder.host == 'foo.bar'
+    assert uribuilder.port == '1234'
+    assert uribuilder.path == '/baz'
+    assert uribuilder.query is None
+    assert uribuilder.fragment is None
+
+
+def test_from_uri_string():
+    uribuilder = builder.URIBuilder().from_uri("https://bar.foo:4321/boom")
+    assert uribuilder.scheme == 'https'
+    assert uribuilder.userinfo is None
+    assert uribuilder.host == 'bar.foo'
+    assert uribuilder.port == '4321'
+    assert uribuilder.path == '/boom'
     assert uribuilder.query is None
     assert uribuilder.fragment is None
 

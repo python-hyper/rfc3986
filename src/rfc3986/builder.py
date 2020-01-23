@@ -16,6 +16,7 @@
 from . import compat
 from . import normalizers
 from . import uri
+from . import uri_reference
 
 
 class URIBuilder(object):
@@ -62,6 +63,26 @@ class URIBuilder(object):
                      'host={b.host}, port={b.port}, path={b.path}, '
                      'query={b.query}, fragment={b.fragment})')
         return formatstr.format(b=self)
+
+    @classmethod
+    def from_uri(cls, reference):
+        """Initialize the URI builder from another URI.
+
+        Takes the given URI reference and creates a new URI builder instance
+        populated with the values from the reference. If given a string it will
+        try to convert it to a reference before constructing the builder.
+        """
+        if not isinstance(reference, uri.URIReference):
+            reference = uri_reference(reference)
+        return cls(
+            scheme=reference.scheme,
+            userinfo=reference.userinfo,
+            host=reference.host,
+            port=reference.port,
+            path=reference.path,
+            query=reference.query,
+            fragment=reference.fragment
+        )
 
     def add_scheme(self, scheme):
         """Add a scheme to our builder object.
