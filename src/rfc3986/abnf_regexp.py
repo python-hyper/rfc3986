@@ -41,7 +41,7 @@ PCHAR = '([' + UNRESERVED_RE + SUB_DELIMITERS_RE + ':@]|%s)' % PCT_ENCODED
 # than appear in Appendix B for scheme. This will prevent over-eager
 # consuming of items that aren't schemes.
 SCHEME_RE = '[a-zA-Z][a-zA-Z0-9+.-]*'
-_AUTHORITY_RE = '[^/?#]*'
+_AUTHORITY_RE = '[^\\\\/?#]*'
 _PATH_RE = '[^?#]*'
 _QUERY_RE = '[^#]*'
 _FRAGMENT_RE = '.*'
