@@ -351,3 +351,15 @@ def test_empty_querystrings_persist():
     ref = URIReference.from_string(url)
     assert ref.query == ''
     assert ref.unsplit() == url
+
+
+def test_wide_domain_bypass_check():
+    """Verify we properly parse/handle the authority.
+
+    See also:
+    https://bugs.xdavidhu.me/google/2020/03/08/the-unexpected-google-wide-domain-check-bypass/
+    """
+    url = "https://user:pass@xdavidhu.me\\test.corp.google.com:8080/path/to/something?param=value#hash"
+    ref = URIReference.from_string(url)
+    assert ref.scheme == "https"
+    assert ref.host == "xdavidhu.me"
