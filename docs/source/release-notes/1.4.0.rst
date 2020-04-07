@@ -1,0 +1,39 @@
+1.3.0 -- 2020-04-07
+-------------------
+
+Security
+~~~~~~~~
+
+- Prevent users from receiving an invalid authority parsed from a malicious
+  URL. Previously we did not stop parsing the authority section at the first
+  backslash (``\\``) character. As a result, it was possible to trick our
+  parser into parsing up to the first forward-slash (``/``) and thus 
+  generating an invalid authority.
+
+  See also `GitHub pr-64`_ and `the blog post that sparked this change`_
+
+Bug Fixes and Features
+~~~~~~~~~~~~~~~~~~~~~~
+
+- Add ``from_uri`` to ``URIBuilder`` to allow creation of a ``URIBuilder``
+  from an existing URI.
+
+  See also `GitHub pr-63`_
+
+- Fix a typographical error in our documentation.
+
+  See also `GitHub pr-61`_
+
+.. links
+
+.. _GitHub pr-61:
+    https://github.com/python-hyper/rfc3986/pull/61
+
+.. _GitHub pr-63:
+    https://github.com/python-hyper/rfc3986/pull/63
+
+.. _GitHub pr-64:
+    https://github.com/python-hyper/rfc3986/pull/64
+
+.. _the blog post that sparked this change:
+    https://bugs.xdavidhu.me/google/2020/03/08/the-unexpected-google-wide-domain-check-bypass/
