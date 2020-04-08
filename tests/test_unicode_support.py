@@ -49,6 +49,14 @@ def test_urlparse_a_unicode_hostname_with_auth():
     assert parsed.userinfo == 'userinfo'
 
 
+def test_urlparse_idna_encoding_with_geturl():
+    """https://github.com/python-hyper/rfc3986/issues/57"""
+    parsed = urlparse("https://i❤.ws")
+    encoded = parsed.encode('idna')
+    assert encoded.encoding == 'idna'
+    assert encoded.geturl() == b'https://xn--i-7iq.ws'
+
+
 def test_urlparse_an_invalid_authority_parses_port():
     url = 'http://foo:b@r@[::1]:80/get'
     parsed = urlparse(url)

@@ -43,6 +43,8 @@ class ParseResultMixin(object):
                  compat.to_str(host, self.encoding),
                  port)
             )
+        if isinstance(self.authority, bytes):
+            return self.authority.decode('utf-8')
         return self.authority
 
     def geturl(self):
