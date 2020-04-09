@@ -20,37 +20,47 @@ import pytest
 
 from . import base
 
-INVALID_PORTS = ['443:80', '443:80:443', 'abcdef', 'port', '43port']
+INVALID_PORTS = ["443:80", "443:80:443", "abcdef", "port", "43port"]
 
-SNOWMAN = b'\xe2\x98\x83'
-SNOWMAN_IDNA_HOST = 'http://xn--n3h.com'
+SNOWMAN = b"\xe2\x98\x83"
+SNOWMAN_IDNA_HOST = "http://xn--n3h.com"
 
 
-@pytest.mark.parametrize('port', INVALID_PORTS)
+@pytest.mark.parametrize("port", INVALID_PORTS)
 def test_port_parsing(port):
     with pytest.raises(exceptions.InvalidPort):
-        rfc3986.urlparse('https://httpbin.org:{0}/get'.format(port))
+        rfc3986.urlparse("https://httpbin.org:{0}/get".format(port))
 
 
-@pytest.mark.parametrize('parts, unsplit', [
-    (('https', None, 'httpbin.org'), u'https://httpbin.org'),
-    (('https', 'user', 'httpbin.org'), u'https://user@httpbin.org'),
-    (('https', None, 'httpbin.org', 443, '/get'),
-        u'https://httpbin.org:443/get'),
-    (('HTTPS', None, 'HTTPBIN.ORG'), u'https://httpbin.org'),
-])
+@pytest.mark.parametrize(
+    "parts, unsplit",
+    [
+        (("https", None, "httpbin.org"), u"https://httpbin.org"),
+        (("https", "user", "httpbin.org"), u"https://user@httpbin.org"),
+        (
+            ("https", None, "httpbin.org", 443, "/get"),
+            u"https://httpbin.org:443/get",
+        ),
+        (("HTTPS", None, "HTTPBIN.ORG"), u"https://httpbin.org"),
+    ],
+)
 def test_from_parts(parts, unsplit):
     uri = pr.ParseResult.from_parts(*parts)
     assert uri.unsplit() == unsplit
 
 
-@pytest.mark.parametrize('parts, unsplit', [
-    (('https', None, 'httpbin.org'), b'https://httpbin.org'),
-    (('https', 'user', 'httpbin.org'), b'https://user@httpbin.org'),
-    (('https', None, 'httpbin.org', 443, '/get'),
-        b'https://httpbin.org:443/get'),
-    (('HTTPS', None, 'HTTPBIN.ORG'), b'https://httpbin.org'),
-])
+@pytest.mark.parametrize(
+    "parts, unsplit",
+    [
+        (("https", None, "httpbin.org"), b"https://httpbin.org"),
+        (("https", "user", "httpbin.org"), b"https://user@httpbin.org"),
+        (
+            ("https", None, "httpbin.org", 443, "/get"),
+            b"https://httpbin.org:443/get",
+        ),
+        (("HTTPS", None, "HTTPBIN.ORG"), b"https://httpbin.org"),
+    ],
+)
 def test_bytes_from_parts(parts, unsplit):
     uri = pr.ParseResultBytes.from_parts(*parts)
     assert uri.unsplit() == unsplit
@@ -66,10 +76,11 @@ class TestParseResultUnsplits(base.BaseTestUnsplits):
 
 def test_normalizes_uris_when_using_from_string(uri_to_normalize):
     """Verify we always get the same thing out as we expect."""
-    result = pr.ParseResult.from_string(uri_to_normalize,
-                                        lazy_normalize=False)
-    assert result.scheme == 'https'
-    assert result.host == 'example.com'
+    result = pr.ParseResult.from_string(
+        uri_to_normalize, lazy_normalize=False
+    )
+    assert result.scheme == "https"
+    assert result.host == "example.com"
 
 
 class TestStdlibShims:
@@ -83,8 +94,8 @@ class TestStdlibShims:
 
 def test_creates_a_copy_with_a_new_path(uri_with_everything):
     uri = pr.ParseResult.from_string(uri_with_everything)
-    new_uri = uri.copy_with(path='/parse/result/tests/are/fun')
-    assert new_uri.path == '/parse/result/tests/are/fun'
+    new_uri = uri.copy_with(path="/parse/result/tests/are/fun")
+    assert new_uri.path == "/parse/result/tests/are/fun"
 
 
 def test_creates_a_copy_with_a_new_port(basic_uri):
@@ -109,11 +120,11 @@ def test_parse_result_encodes_itself(uri_with_everything):
 class TestParseResultBytes:
     def test_handles_uri_with_everything(self, uri_with_everything):
         uri = pr.ParseResultBytes.from_string(uri_with_everything)
-        assert uri.scheme == b'https'
-        assert uri.path == b'/path/to/resource'
-        assert uri.query == b'key=value'
-        assert uri.fragment == b'fragment'
-        assert uri.userinfo == b'user:pass'
+        assert uri.scheme == b"https"
+        assert uri.path == b"/path/to/resource"
+        assert uri.query == b"key=value"
+        assert uri.fragment == b"fragment"
+        assert uri.userinfo == b"user:pass"
         assert uri.port == 443
         assert isinstance(uri.authority, bytes) is True
 
@@ -121,44 +132,44 @@ class TestParseResultBytes:
         with pytest.raises(exceptions.InvalidAuthority):
             pr.ParseResultBytes.from_string(invalid_uri)
 
-    @pytest.mark.parametrize('port', INVALID_PORTS)
+    @pytest.mark.parametrize("port", INVALID_PORTS)
     def test_raises_invalid_port_non_strict_parse(self, port):
         with pytest.raises(exceptions.InvalidPort):
             pr.ParseResultBytes.from_string(
-                'https://httpbin.org:{0}/get'.format(port),
-                strict=False
+                "https://httpbin.org:{0}/get".format(port), strict=False
             )
 
     def test_copy_with_a_new_path(self, uri_with_everything):
         uri = pr.ParseResultBytes.from_string(uri_with_everything)
-        new_uri = uri.copy_with(path=b'/parse/result/tests/are/fun')
-        assert new_uri.path == b'/parse/result/tests/are/fun'
+        new_uri = uri.copy_with(path=b"/parse/result/tests/are/fun")
+        assert new_uri.path == b"/parse/result/tests/are/fun"
 
     def test_copy_with_a_new_unicode_path(self, uri_with_everything):
         uri = pr.ParseResultBytes.from_string(uri_with_everything)
-        pathbytes = b'/parse/result/tests/are/fun' + SNOWMAN
-        new_uri = uri.copy_with(path=pathbytes.decode('utf-8'))
-        assert new_uri.path == (b'/parse/result/tests/are/fun' + SNOWMAN)
+        pathbytes = b"/parse/result/tests/are/fun" + SNOWMAN
+        new_uri = uri.copy_with(path=pathbytes.decode("utf-8"))
+        assert new_uri.path == (b"/parse/result/tests/are/fun" + SNOWMAN)
 
     def test_unsplit(self):
         uri = pr.ParseResultBytes.from_string(
-            b'http://' + SNOWMAN + b'.com/path',
-            strict=False
+            b"http://" + SNOWMAN + b".com/path", strict=False
         )
-        idna_encoded = SNOWMAN_IDNA_HOST.encode('utf-8') + b'/path'
+        idna_encoded = SNOWMAN_IDNA_HOST.encode("utf-8") + b"/path"
         assert uri.unsplit(use_idna=True) == idna_encoded
 
     def test_eager_normalization_from_string(self):
         uri = pr.ParseResultBytes.from_string(
-            b'http://' + SNOWMAN + b'.com/path',
+            b"http://" + SNOWMAN + b".com/path",
             strict=False,
             lazy_normalize=False,
         )
-        assert uri.unsplit() == b'http:/path'
+        assert uri.unsplit() == b"http:/path"
 
     def test_eager_normalization_from_parts(self):
         uri = pr.ParseResultBytes.from_parts(
-            scheme='http', host=SNOWMAN.decode('utf-8'), path='/path',
+            scheme="http",
+            host=SNOWMAN.decode("utf-8"),
+            path="/path",
             lazy_normalize=False,
         )
-        assert uri.unsplit() == b'http:/path'
+        assert uri.unsplit() == b"http:/path"

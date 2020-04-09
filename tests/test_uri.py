@@ -10,11 +10,12 @@ from . import base
 
 @pytest.fixture
 def scheme_and_path_uri():
-    return 'mailto:user@example.com'
+    return "mailto:user@example.com"
 
 
 class TestURIReferenceParsesURIs(base.BaseTestParsesURIs):
     """Tests for URIReference handling of URIs."""
+
     test_class = URIReference
 
     def test_authority_info_raises_InvalidAuthority(self, invalid_uri):
@@ -35,10 +36,10 @@ class TestURIReferenceParsesURIs(base.BaseTestParsesURIs):
         uri = URIReference.from_string(absolute_path_uri)
         assert uri.path == absolute_path_uri
         assert uri.authority_info() == {
-            'userinfo': None,
-            'host': None,
-            'port': None,
-            }
+            "userinfo": None,
+            "host": None,
+            "port": None,
+        }
 
     def test_scheme_and_path_uri_is_valid(self, scheme_and_path_uri):
         uri = self.test_class.from_string(scheme_and_path_uri)
@@ -47,8 +48,8 @@ class TestURIReferenceParsesURIs(base.BaseTestParsesURIs):
     def test_handles_scheme_and_path_uri(self, scheme_and_path_uri):
         """Test that self.test_class can handle a `scheme:path` URI."""
         uri = self.test_class.from_string(scheme_and_path_uri)
-        assert uri.path == 'user@example.com'
-        assert uri.scheme == 'mailto'
+        assert uri.path == "user@example.com"
+        assert uri.scheme == "mailto"
         assert uri.query is None
         assert uri.host is None
         assert uri.port is None
@@ -57,10 +58,10 @@ class TestURIReferenceParsesURIs(base.BaseTestParsesURIs):
 
     def test_parses_ipv6_to_path(self):
         """Verify that we don't parse [ as a scheme."""
-        uri = self.test_class.from_string('[::1]')
+        uri = self.test_class.from_string("[::1]")
         assert uri.scheme is None
         assert uri.authority is None
-        assert uri.path == '[::1]'
+        assert uri.path == "[::1]"
 
 
 class TestURIValidation:
@@ -85,8 +86,9 @@ class TestURIValidation:
         uri = URIReference.from_string(uri_with_everything)
         assert uri.is_valid(require_query=True) is True
 
-    def test_uri_with_everything_requiring_fragment(self,
-                                                    uri_with_everything):
+    def test_uri_with_everything_requiring_fragment(
+        self, uri_with_everything
+    ):
         uri = URIReference.from_string(uri_with_everything)
         assert uri.is_valid(require_fragment=True) is True
 
@@ -94,8 +96,9 @@ class TestURIValidation:
         uri = URIReference.from_string(basic_uri_with_port)
         assert uri.is_valid() is True
 
-    def test_uri_with_port_and_userinfo_is_valid(self,
-                                                 uri_with_port_and_userinfo):
+    def test_uri_with_port_and_userinfo_is_valid(
+        self, uri_with_port_and_userinfo
+    ):
         uri = URIReference.from_string(uri_with_port_and_userinfo)
         assert uri.is_valid() is True
 
@@ -129,19 +132,19 @@ class TestURIValidation:
         assert uri.is_valid() is False
 
     def test_invalid_scheme(self):
-        uri = URIReference('123', None, None, None, None)
+        uri = URIReference("123", None, None, None, None)
         assert uri.is_valid() is False
 
     def test_invalid_path(self):
-        uri = URIReference(None, None, 'foo#bar', None, None)
+        uri = URIReference(None, None, "foo#bar", None, None)
         assert uri.is_valid() is False
 
     def test_invalid_query_component(self):
-        uri = URIReference(None, None, None, 'foo#bar', None)
+        uri = URIReference(None, None, None, "foo#bar", None)
         assert uri.is_valid() is False
 
     def test_invalid_fragment_component(self):
-        uri = URIReference(None, None, None, None, 'foo#bar')
+        uri = URIReference(None, None, None, None, "foo#bar")
         assert uri.is_valid() is False
 
 
@@ -286,8 +289,9 @@ class TestURIReferencesResolve:
         assert T.host == R.host
         assert T.path == R.path
 
-    def test_with_basic_and_absolute_path_uris(self, basic_uri,
-                                               absolute_path_uri):
+    def test_with_basic_and_absolute_path_uris(
+        self, basic_uri, absolute_path_uri
+    ):
         R = URIReference.from_string(absolute_path_uri)
         B = URIReference.from_string(basic_uri).normalize()
         T = R.resolve_with(B)
@@ -296,25 +300,25 @@ class TestURIReferencesResolve:
         assert T.path == R.path
 
     def test_with_basic_uri_and_relative_path(self, basic_uri):
-        R = URIReference.from_string('foo/bar/bogus')
+        R = URIReference.from_string("foo/bar/bogus")
         B = URIReference.from_string(basic_uri).normalize()
         T = R.resolve_with(B)
         assert T.scheme == B.scheme
         assert T.host == B.host
-        assert T.path == '/' + R.path
+        assert T.path == "/" + R.path
 
     def test_basic_uri_with_path_and_relative_path(self, basic_uri_with_path):
-        R = URIReference.from_string('foo/bar/bogus')
+        R = URIReference.from_string("foo/bar/bogus")
         B = URIReference.from_string(basic_uri_with_path).normalize()
         T = R.resolve_with(B)
         assert T.scheme == B.scheme
         assert T.host == B.host
 
-        index = B.path.rfind('/')
-        assert T.path == B.path[:index] + '/' + R.path
+        index = B.path.rfind("/")
+        assert T.path == B.path[:index] + "/" + R.path
 
     def test_uri_with_everything_raises_exception(self, uri_with_everything):
-        R = URIReference.from_string('foo/bar/bogus')
+        R = URIReference.from_string("foo/bar/bogus")
         B = URIReference.from_string(uri_with_everything)
         with pytest.raises(ResolutionError):
             R.resolve_with(B)
@@ -326,30 +330,30 @@ class TestURIReferencesResolve:
         assert T == B
 
     def test_differing_schemes(self, basic_uri):
-        R = URIReference.from_string('https://example.com/path')
+        R = URIReference.from_string("https://example.com/path")
         B = URIReference.from_string(basic_uri)
         T = R.resolve_with(B)
         assert T.scheme == R.scheme
 
     def test_resolve_pathless_fragment(self, basic_uri):
-        R = URIReference.from_string('#fragment')
+        R = URIReference.from_string("#fragment")
         B = URIReference.from_string(basic_uri)
         T = R.resolve_with(B)
         assert T.path is None
-        assert T.fragment == 'fragment'
+        assert T.fragment == "fragment"
 
     def test_resolve_pathless_query(self, basic_uri):
-        R = URIReference.from_string('?query')
+        R = URIReference.from_string("?query")
         B = URIReference.from_string(basic_uri)
         T = R.resolve_with(B)
         assert T.path is None
-        assert T.query == 'query'
+        assert T.query == "query"
 
 
 def test_empty_querystrings_persist():
-    url = 'https://httpbin.org/get?'
+    url = "https://httpbin.org/get?"
     ref = URIReference.from_string(url)
-    assert ref.query == ''
+    assert ref.query == ""
     assert ref.unsplit() == url
 
 

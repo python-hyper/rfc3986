@@ -24,27 +24,25 @@ Let's assume that we're building something that takes user input for a URL and
 we want to ensure that URL is only ever using a specific domain with https. In
 that case, our code would look like this:
 
-.. doctest::
-
-    >>> from rfc3986 import validators, uri_reference
-    >>> user_url = 'https://github.com/sigmavirus24/rfc3986'
-    >>> validator = validators.Validator().allow_schemes(
-    ...     'https',
-    ... ).allow_hosts(
-    ...     'github.com',
-    ... )
-    >>> validator.validate(uri_reference(
-    ...     'https://github.com/sigmavirus24/rfc3986'
-    ... ))
-    >>> validator.validate(uri_reference(
-    ...     'https://github.com/'
-    ... ))
-    >>> validator.validate(uri_reference(
-    ...     'http://example.com'
-    ... ))
-    Traceback (most recent call last):
-    ...
-    rfc3986.exceptions.UnpermittedComponentError
+>>> from rfc3986 import validators, uri_reference
+>>> user_url = 'https://github.com/sigmavirus24/rfc3986'
+>>> validator = validators.Validator().allow_schemes(
+...     'https',
+... ).allow_hosts(
+...     'github.com',
+... )
+>>> validator.validate(uri_reference(
+...     'https://github.com/sigmavirus24/rfc3986'
+... ))
+>>> validator.validate(uri_reference(
+...     'https://github.com/'
+... ))
+>>> validator.validate(uri_reference(
+...     'http://example.com'
+... ))
+Traceback (most recent call last):
+   ...
+rfc3986.exceptions.UnpermittedComponentError
 
 First notice that we can easily reuse our validator object for each URL.
 This allows users to not have to constantly reconstruct Validators for each
@@ -65,36 +63,34 @@ Next, let's imagine that we want to prevent leaking user credentials. In that
 case, we want to ensure that there is no password in the user information
 portion of the authority. In that case, our new validator would look like this:
 
-.. doctest::
-
-    >>> from rfc3986 import validators, uri_reference
-    >>> user_url = 'https://github.com/sigmavirus24/rfc3986'
-    >>> validator = validators.Validator().allow_schemes(
-    ...     'https',
-    ... ).allow_hosts(
-    ...     'github.com',
-    ... ).forbid_use_of_password()
-    >>> validator.validate(uri_reference(
-    ...     'https://github.com/sigmavirus24/rfc3986'
-    ... ))
-    >>> validator.validate(uri_reference(
-    ...     'https://github.com/'
-    ... ))
-    >>> validator.validate(uri_reference(
-    ...     'http://example.com'
-    ... ))
-    Traceback (most recent call last):
-    ...
-    rfc3986.exceptions.UnpermittedComponentError
-    >>> validator.validate(uri_reference(
-    ...     'https://sigmavirus24@github.com'
-    ... ))
-    >>> validator.validate(uri_reference(
-    ...     'https://sigmavirus24:not-my-real-password@github.com'
-    ... ))
-    Traceback (most recent call last):
-    ...
-    rfc3986.exceptions.PasswordForbidden
+>>> from rfc3986 import validators, uri_reference
+>>> user_url = 'https://github.com/sigmavirus24/rfc3986'
+>>> validator = validators.Validator().allow_schemes(
+...     'https',
+... ).allow_hosts(
+...     'github.com',
+... ).forbid_use_of_password()
+>>> validator.validate(uri_reference(
+...     'https://github.com/sigmavirus24/rfc3986'
+... ))
+>>> validator.validate(uri_reference(
+...     'https://github.com/'
+... ))
+>>> validator.validate(uri_reference(
+...     'http://example.com'
+... ))
+Traceback (most recent call last):
+   ...
+rfc3986.exceptions.UnpermittedComponentError
+>>> validator.validate(uri_reference(
+...     'https://sigmavirus24@github.com'
+... ))
+>>> validator.validate(uri_reference(
+...     'https://sigmavirus24:not-my-real-password@github.com'
+... ))
+Traceback (most recent call last):
+   ...
+rfc3986.exceptions.PasswordForbidden
 
 Requiring the Presence of Components
 ------------------------------------
@@ -104,47 +100,43 @@ components for validation. For example, we assume that we will have a URL that
 has a scheme and hostname. However, our current validation doesn't require
 those items exist.
 
-.. doctest::
-
-    >>> from rfc3986 import validators, uri_reference
-    >>> user_url = 'https://github.com/sigmavirus24/rfc3986'
-    >>> validator = validators.Validator().allow_schemes(
-    ...     'https',
-    ... ).allow_hosts(
-    ...     'github.com',
-    ... ).forbid_use_of_password()
-    >>> validator.validate(uri_reference('//github.com'))
-    >>> validator.validate(uri_reference('https:/'))
+>>> from rfc3986 import validators, uri_reference
+>>> user_url = 'https://github.com/sigmavirus24/rfc3986'
+>>> validator = validators.Validator().allow_schemes(
+...     'https',
+... ).allow_hosts(
+...     'github.com',
+... ).forbid_use_of_password()
+>>> validator.validate(uri_reference('//github.com'))
+>>> validator.validate(uri_reference('https:/'))
 
 In the first case, we have a host name but no scheme and in the second we have
 a scheme and a path but no host. If we want to ensure that those components
 are there and that they are *always* what we allow, then we must add one last
 item to our validator:
 
-.. doctest::
-
-    >>> from rfc3986 import validators, uri_reference
-    >>> user_url = 'https://github.com/sigmavirus24/rfc3986'
-    >>> validator = validators.Validator().allow_schemes(
-    ...     'https',
-    ... ).allow_hosts(
-    ...     'github.com',
-    ... ).forbid_use_of_password(
-    ... ).require_presence_of(
-    ...     'scheme', 'host',
-    ... )
-    >>> validator.validate(uri_reference('//github.com'))
-    Traceback (most recent call last):
-    ...
-    rfc3986.exceptions.MissingComponentError
-    >>> validator.validate(uri_reference('https:/'))
-    Traceback (most recent call last):
-    ...
-    rfc3986.exceptions.MissingComponentError
-    >>> validator.validate(uri_reference('https://github.com'))
-    >>> validator.validate(uri_reference(
-    ...     'https://github.com/sigmavirus24/rfc3986'
-    ... ))
+>>> from rfc3986 import validators, uri_reference
+>>> user_url = 'https://github.com/sigmavirus24/rfc3986'
+>>> validator = validators.Validator().allow_schemes(
+...     'https',
+... ).allow_hosts(
+...     'github.com',
+... ).forbid_use_of_password(
+... ).require_presence_of(
+...     'scheme', 'host',
+... )
+>>> validator.validate(uri_reference('//github.com'))
+Traceback (most recent call last):
+   ...
+rfc3986.exceptions.MissingComponentError
+>>> validator.validate(uri_reference('https:/'))
+Traceback (most recent call last):
+   ...
+rfc3986.exceptions.MissingComponentError
+>>> validator.validate(uri_reference('https://github.com'))
+>>> validator.validate(uri_reference(
+...     'https://github.com/sigmavirus24/rfc3986'
+... ))
 
 
 Checking the Validity of Components
@@ -156,26 +148,24 @@ examples we can also check that a URI is valid per :rfc:`3986`. The validation
 of the components is pre-determined so all we need to do is specify which 
 components we want to validate:
 
-.. doctest::
-
-    >>> from rfc3986 import validators, uri_reference
-    >>> valid_uri = uri_reference('https://github.com/')
-    >>> validator = validators.Validator().allow_schemes(
-    ...     'https',
-    ... ).allow_hosts(
-    ...     'github.com',
-    ... ).forbid_use_of_password(
-    ... ).require_presence_of(
-    ...     'scheme', 'host',
-    ... ).check_validity_of(
-    ...     'scheme', 'host', 'path',
-    ... )
-    >>> validator.validate(valid_uri)
-    >>> invalid_uri = valid_uri.copy_with(path='/#invalid/path')
-    >>> validator.validate(invalid_uri)
-    Traceback (most recent call last):
-    ...
-    rfc3986.exceptions.InvalidComponentsError
+>>> from rfc3986 import validators, uri_reference
+>>> valid_uri = uri_reference('https://github.com/')
+>>> validator = validators.Validator().allow_schemes(
+...     'https',
+... ).allow_hosts(
+...     'github.com',
+... ).forbid_use_of_password(
+... ).require_presence_of(
+...     'scheme', 'host',
+... ).check_validity_of(
+...     'scheme', 'host', 'path',
+... )
+>>> validator.validate(valid_uri)
+>>> invalid_uri = valid_uri.copy_with(path='/#invalid/path')
+>>> validator.validate(invalid_uri)
+Traceback (most recent call last):
+   ...
+rfc3986.exceptions.InvalidComponentsError
 
 Paths are not allowed to contain a ``#`` character unless it's
 percent-encoded. This is why our ``invalid_uri`` raises an exception when we
