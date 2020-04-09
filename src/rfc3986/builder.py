@@ -234,6 +234,35 @@ class URIBuilder(object):
             fragment=self.fragment,
         )
 
+    def extend_path(self, path):
+        """Extend the existing path value with the provided value.
+
+        .. versionadded:: 1.5.0
+
+        .. code-block:: python
+
+            >>> URIBuilder(path="/users").extend_path("/sigmavirus24")
+            URIBuilder(scheme=None, userinfo=None, host=None, port=None,
+                    path='/users/sigmavirus24', query=None, fragment=None)
+
+            >>> URIBuilder(path="/users/").extend_path("/sigmavirus24")
+            URIBuilder(scheme=None, userinfo=None, host=None, port=None,
+                    path='/users/sigmavirus24', query=None, fragment=None)
+
+            >>> URIBuilder(path="/users/").extend_path("sigmavirus24")
+            URIBuilder(scheme=None, userinfo=None, host=None, port=None,
+                    path='/users/sigmavirus24', query=None, fragment=None)
+
+            >>> URIBuilder(path="/users").extend_path("sigmavirus24")
+            URIBuilder(scheme=None, userinfo=None, host=None, port=None,
+                    path='/users/sigmavirus24', query=None, fragment=None)
+
+        """
+        existing_path = self.path or ""
+        path = "{}/{}".format(existing_path.rstrip("/"), path.lstrip("/"))
+
+        return self.add_path(path)
+
     def add_query_from(self, query_items):
         """Generate and add a query a dictionary or list of tuples.
 
@@ -259,6 +288,27 @@ class URIBuilder(object):
             query=query,
             fragment=self.fragment,
         )
+
+    def extend_query_with(self, query_items):
+        """Extend the existing query string with the new query items.
+
+        .. versionadded:: 1.5.0
+
+        .. code-block:: python
+
+            >>> URIBuilder(query='a=b+c').extend_query_with({'a': 'b c'})
+            URIBuilder(scheme=None, userinfo=None, host=None, port=None,
+                    path=None, query='a=b+c&a=b+c', fragment=None)
+
+            >>> URIBuilder(query='a=b+c').extend_query_with([('a', 'b c')])
+            URIBuilder(scheme=None, userinfo=None, host=None, port=None,
+                    path=None, query='a=b+c&a=b+c', fragment=None)
+        """
+        original_query_items = compat.parse_qsl(self.query or "")
+        if not isinstance(query_items, list):
+            query_items = list(query_items.items())
+
+        return self.add_query_from(original_query_items + query_items)
 
     def add_query(self, query):
         """Add a pre-formated query string to the URI.
@@ -324,3 +374,13 @@ class URIBuilder(object):
             self.query,
             self.fragment,
         )
+
+    def geturl(self):
+        """Generate the URL from this builder.
+
+        .. versionadded:: 1.5.0
+
+        This is an alternative to calling :meth:`finalize` and keeping the
+        :class:`rfc3986.uri.URIReference` around.
+        """
+        return self.finalize().unsplit()
