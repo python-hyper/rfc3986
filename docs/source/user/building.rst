@@ -22,7 +22,12 @@ Example Usage
 .. note::
 
     All of the methods on a :class:`~rfc3986.builder.URIBuilder` are
-    chainable (except :meth:`~rfc3986.builder.URIBuilder.finalize`).
+    chainable (except :meth:`~rfc3986.builder.URIBuilder.finalize` and
+    :meth:`~rfc3986.builder.URIBuilder.geturl` as neither returns a
+    :class:`~rfc3986.builder.URIBuilder`).
+
+Building From Scratch
+---------------------
 
 Let's build a basic URL with just a scheme and host. First we create an
 instance of :class:`~rfc3986.builder.URIBuilder`. Then we call
@@ -42,6 +47,10 @@ a :class:`~rfc3986.uri.URIReference` and call
     ... ).finalize().unsplit())
     https://github.com
 
+
+Replacing Components of a URI
+-----------------------------
+
 It is possible to update an existing URI by constructing a builder from an
 instance of :class:`~rfc3986.uri.URIReference` or a textual representation:
 
@@ -52,6 +61,9 @@ instance of :class:`~rfc3986.uri.URIReference` or a textual representation:
     ...     'https'
     ... ).finalize().unsplit())
     https://github.com
+
+The Builder is Immutable
+------------------------
 
 Each time you invoke a method, you get a new instance of a
 :class:`~rfc3986.builder.URIBuilder` class so you can build several different
@@ -74,6 +86,32 @@ URLs from one base instance.
     ... ).finalize().unsplit())
     https://api.github.com/repos/sigmavirus24/rfc3986
 
+Convenient Path Management
+--------------------------
+
+Because our builder is immutable, one could use the
+:class:`~rfc3986.builder.URIBuilder` class to build a class to make HTTP
+Requests that used the provided path to extend the original one.
+
+.. doctest::
+
+    >>> from rfc3986 import builder
+    >>> github_builder = builder.URIBuilder().add_scheme(
+    ...     'https'
+    ... ).add_host(
+    ...     'api.github.com'
+    ... ).add_path(
+    ...     '/users'
+    ... )
+    >>> print(github_builder.extend_path("sigmavirus24").geturl())
+    https://api.github.com/users/sigmavirus24
+    >>> print(github_builder.extend_path("lukasa").geturl())
+    https://api.github.com/users/lukasa
+
+
+Convenient Credential Handling
+------------------------------
+
 |rfc3986| makes adding authentication credentials convenient. It takes care of
 making the credentials URL safe. There are some characters someone might want
 to include in a URL that are not safe for the authority component of a URL.
@@ -90,6 +128,9 @@ to include in a URL that are not safe for the authority component of a URL.
     ...     password='p@ssw0rd',
     ... ).finalize().unsplit())
     https://us3r:p%40ssw0rd@api.github.com
+
+Managing Query String Parameters
+--------------------------------
 
 Further, |rfc3986| attempts to simplify the process of adding query parameters
 to a URL. For example, if we were using Elasticsearch, we might do something
@@ -108,6 +149,22 @@ like:
     ...     [('q', 'repo:sigmavirus24/rfc3986'), ('sort', 'created_at:asc')]
     ... ).finalize().unsplit())
     https://search.example.com/_search?q=repo%3Asigmavirus24%2Frfc3986&sort=created_at%3Aasc
+
+If one also had an existing URL with query string that we merely wanted to
+append to, we can also do that with |rfc3986|.
+
+.. doctest::
+
+    >>> from rfc3986 import builder
+    >>> print(builder.URIBuilder().from_uri(
+    ...    'https://search.example.com/_search?q=repo%3Asigmavirus24%2Frfc3986'
+    ... ).extend_query_with(
+    ...     [('sort', 'created_at:asc')]
+    ... ).finalize().unsplit())
+    https://search.example.com/_search?q=repo%3Asigmavirus24%2Frfc3986&sort=created_at%3Aasc
+
+Adding Fragments
+----------------
 
 Finally, we provide a way to add a fragment to a URL. Let's build up a URL to
 view the section of the RFC that refers to fragments:

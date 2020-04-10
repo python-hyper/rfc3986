@@ -13,6 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Module containing the tests for the URIBuilder object."""
+try:
+    from urllib.parse import parse_qs
+except ImportError:
+    from urlparse import parse_qs
+
 import pytest
 
 from rfc3986 import builder, uri_reference
@@ -191,6 +196,88 @@ def test_add_fragment():
     assert uribuilder.fragment == "section-2.5.1"
 
 
+@pytest.mark.parametrize(
+    "uri, extend_with, expected_path",
+    [
+        ("https://api.github.com", "/users", "/users"),
+        ("https://api.github.com", "/users/", "/users/"),
+        ("https://api.github.com", "users", "/users"),
+        ("https://api.github.com", "users/", "/users/"),
+        ("", "users/", "/users/"),
+        ("", "users", "/users"),
+        ("?foo=bar", "users", "/users"),
+        (
+            "https://api.github.com/users/",
+            "sigmavirus24",
+            "/users/sigmavirus24",
+        ),
+        (
+            "https://api.github.com/users",
+            "sigmavirus24",
+            "/users/sigmavirus24",
+        ),
+        (
+            "https://api.github.com/users",
+            "/sigmavirus24",
+            "/users/sigmavirus24",
+        ),
+    ],
+)
+def test_extend_path(uri, extend_with, expected_path):
+    """Verify the behaviour of extend_path."""
+    uribuilder = (
+        builder.URIBuilder()
+        .from_uri(uri_reference(uri))
+        .extend_path(extend_with)
+    )
+    assert uribuilder.path == expected_path
+
+
+@pytest.mark.parametrize(
+    "uri, extend_with, expected_query",
+    [
+        (
+            "https://github.com",
+            [("a", "b c"), ("d", "e&f")],
+            {"a": ["b c"], "d": ["e&f"]},
+        ),
+        (
+            "https://github.com?a=0",
+            [("a", "b c"), ("d", "e&f")],
+            {"a": ["0", "b c"], "d": ["e&f"]},
+        ),
+        (
+            "https://github.com?a=0&e=f",
+            [("a", "b c"), ("d", "e&f")],
+            {"a": ["0", "b c"], "e": ["f"], "d": ["e&f"]},
+        ),
+        (
+            "https://github.com",
+            {"a": "b c", "d": "e&f"},
+            {"a": ["b c"], "d": ["e&f"]},
+        ),
+        (
+            "https://github.com?a=0",
+            {"a": "b c", "d": "e&f"},
+            {"a": ["0", "b c"], "d": ["e&f"]},
+        ),
+        (
+            "https://github.com?a=0&e=f",
+            {"a": "b c", "d": "e&f"},
+            {"a": ["0", "b c"], "e": ["f"], "d": ["e&f"]},
+        ),
+    ],
+)
+def test_extend_query_with(uri, extend_with, expected_query):
+    """Verify the behaviour of extend_query_with."""
+    uribuilder = (
+        builder.URIBuilder()
+        .from_uri(uri_reference(uri))
+        .extend_query_with(extend_with)
+    )
+    assert parse_qs(uribuilder.query) == expected_query
+
+
 def test_finalize():
     """Verify the whole thing."""
     uri = (
@@ -201,6 +288,23 @@ def test_finalize():
         .add_path("sigmavirus24/rfc3986")
         .finalize()
         .unsplit()
+    )
+    expected = (
+        "https://sigmavirus24:not-my-re%40l-password@github.com/"
+        "sigmavirus24/rfc3986"
+    )
+    assert expected == uri
+
+
+def test_geturl():
+    """Verify the short-cut to the URL."""
+    uri = (
+        builder.URIBuilder()
+        .add_scheme("https")
+        .add_credentials("sigmavirus24", "not-my-re@l-password")
+        .add_host("github.com")
+        .add_path("sigmavirus24/rfc3986")
+        .geturl()
     )
     expected = (
         "https://sigmavirus24:not-my-re%40l-password@github.com/"

@@ -21,6 +21,11 @@ except ImportError:  # Python 2.x
     from urllib import quote as urlquote
 
 try:
+    from urllib.parse import parse_qsl
+except ImportError:  # Python 2.x
+    from urlparse import parse_qsl
+
+try:
     from urllib.parse import urlencode
 except ImportError:  # Python 2.x
     from urllib import urlencode
@@ -30,6 +35,7 @@ __all__ = (
     "to_str",
     "urlquote",
     "urlencode",
+    "parse_qsl",
 )
 
 PY3 = (3, 0) <= sys.version_info < (4, 0)
