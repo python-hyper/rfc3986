@@ -1,4 +1,5 @@
-*.pyc
+/src/rfc3986/version.py
+*.py[co]
 .coverage
 .tox
 *.egg-info

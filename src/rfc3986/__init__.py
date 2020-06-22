@@ -30,13 +30,14 @@ from .api import uri_reference
 from .api import URIReference
 from .api import urlparse
 from .parseresult import ParseResult
+from .version import version
 
 __title__ = "rfc3986"
 __author__ = "Ian Stapleton Cordasco"
 __author_email__ = "graffatcolmingov@gmail.com"
 __license__ = "Apache v2.0"
 __copyright__ = "Copyright 2014 Rackspace; 2016 Ian Stapleton Cordasco"
-__version__ = "1.4.0"
+
 
 __all__ = (
     "ParseResult",
