@@ -29,7 +29,7 @@ setuptools.setup(
     package_data={'': ['LICENSE']},
     include_package_data=True,
     license='Apache 2.0',
-    classifiers=(
+    classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'Natural Language :: English',
@@ -41,7 +41,7 @@ setuptools.setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
-    ),
+    ],
     extras_require={
         'idna2008':  ['idna']
     }
