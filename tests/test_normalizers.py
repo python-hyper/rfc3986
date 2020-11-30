@@ -97,6 +97,7 @@ def test_fragment_normalization():
     ["component", "encoded_component"],
     [
         ("/%", "/%25"),
+        ("/~", "/~"),
         ("/%a", "/%25a"),
         ("/%ag", "/%25ag"),
         ("/%af", "/%af"),
