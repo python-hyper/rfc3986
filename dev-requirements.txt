@@ -1,2 +1,3 @@
 pytest
 pytest-cov>=2.0
+attrs==20.1.0
