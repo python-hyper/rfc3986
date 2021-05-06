@@ -65,7 +65,14 @@ def test_repr():
 
 
 @pytest.mark.parametrize(
-    "scheme", ["https", "hTTps", "Https", "HtTpS", "HTTPS",]
+    "scheme",
+    [
+        "https",
+        "hTTps",
+        "Https",
+        "HtTpS",
+        "HTTPS",
+    ],
 )
 def test_add_scheme(scheme):
     """Verify schemes are normalized when added."""
@@ -158,7 +165,11 @@ def test_add_port(port, expected):
 
 
 @pytest.mark.parametrize(
-    "path", ["sigmavirus24/rfc3986", "/sigmavirus24/rfc3986",]
+    "path",
+    [
+        "sigmavirus24/rfc3986",
+        "/sigmavirus24/rfc3986",
+    ],
 )
 def test_add_path(path):
     """Verify we normalize our path value."""

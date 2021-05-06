@@ -58,7 +58,10 @@ equivalent_schemes = [
     "HtTpS",
 ]
 equivalent_schemes_and_hostnames = list(
-    itertools.product(equivalent_schemes, equivalent_hostnames,)
+    itertools.product(
+        equivalent_schemes,
+        equivalent_hostnames,
+    )
 )
 
 
