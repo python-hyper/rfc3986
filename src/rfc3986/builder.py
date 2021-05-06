@@ -137,7 +137,8 @@ class URIBuilder(object):
 
         if password is not None:
             userinfo = "{}:{}".format(
-                userinfo, normalizers.normalize_password(password),
+                userinfo,
+                normalizers.normalize_password(password),
             )
 
         return URIBuilder(
@@ -194,7 +195,9 @@ class URIBuilder(object):
         if port_int > 65535:
             raise ValueError(
                 "ports are not allowed to be larger than 65535. "
-                "You provided {}".format(port_int,)
+                "You provided {}".format(
+                    port_int,
+                )
             )
 
         return URIBuilder(

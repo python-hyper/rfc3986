@@ -152,7 +152,9 @@ class URIMixin(object):
             return False
 
         return validators.authority_is_valid(
-            self.authority, host=self.host, require=require,
+            self.authority,
+            host=self.host,
+            require=require,
         )
 
     def scheme_is_valid(self, require=False):

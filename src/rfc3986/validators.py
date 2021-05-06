@@ -250,7 +250,9 @@ def ensure_one_of(allowed_values, uri, attribute):
     value = getattr(uri, attribute)
     if value is not None and allowed_values and value not in allowed_values:
         raise exceptions.UnpermittedComponentError(
-            attribute, value, allowed_values,
+            attribute,
+            value,
+            allowed_values,
         )
 
 

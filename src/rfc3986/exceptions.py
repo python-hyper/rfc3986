@@ -74,7 +74,9 @@ class UnpermittedComponentError(ValidationError):
         """Initialize the error with the unpermitted component."""
         super(UnpermittedComponentError, self).__init__(
             "{} was required to be one of {!r} but was {!r}".format(
-                component_name, list(sorted(allowed_values)), component_value,
+                component_name,
+                list(sorted(allowed_values)),
+                component_value,
             ),
             component_name,
             component_value,

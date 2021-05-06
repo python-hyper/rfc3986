@@ -27,7 +27,7 @@ RESERVED_CHARS_SET = GENERIC_DELIMITERS_SET.union(SUB_DELIMITERS_SET)
 ALPHA = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 DIGIT = "0123456789"
 # https://tools.ietf.org/html/rfc3986#section-2.3
-UNRESERVED = UNRESERVED_CHARS = ALPHA + DIGIT + r'._!-~'
+UNRESERVED = UNRESERVED_CHARS = ALPHA + DIGIT + r"._!-~"
 UNRESERVED_CHARS_SET = set(UNRESERVED_CHARS)
 NON_PCT_ENCODED_SET = RESERVED_CHARS_SET.union(UNRESERVED_CHARS_SET)
 # We need to escape the '-' in this case:
@@ -123,11 +123,16 @@ ZONE_ID = "(?:[" + UNRESERVED_RE + "]|" + PCT_ENCODED + ")+"
 IPv6_ADDRZ_RFC4007_RE = IPv6_RE + "(?:(?:%25|%)" + ZONE_ID + ")?"
 IPv6_ADDRZ_RE = IPv6_RE + "(?:%25" + ZONE_ID + ")?"
 
-IP_LITERAL_RE = r"\[({0}|{1})\]".format(IPv6_ADDRZ_RFC4007_RE, IPv_FUTURE_RE,)
+IP_LITERAL_RE = r"\[({0}|{1})\]".format(
+    IPv6_ADDRZ_RFC4007_RE,
+    IPv_FUTURE_RE,
+)
 
 # Pattern for matching the host piece of the authority
 HOST_RE = HOST_PATTERN = "({0}|{1}|{2})".format(
-    REG_NAME, IPv4_RE, IP_LITERAL_RE,
+    REG_NAME,
+    IPv4_RE,
+    IP_LITERAL_RE,
 )
 USERINFO_RE = (
     "^([" + UNRESERVED_RE + SUB_DELIMITERS_RE + ":]|%s)+" % (PCT_ENCODED)
@@ -237,7 +242,9 @@ IREGULAR_NAME_RE = IREG_NAME = u"(?:{0}|[{1}])*".format(
 )
 
 IHOST_RE = IHOST_PATTERN = u"({0}|{1}|{2})".format(
-    IREG_NAME, IPv4_RE, IP_LITERAL_RE,
+    IREG_NAME,
+    IPv4_RE,
+    IP_LITERAL_RE,
 )
 
 IUSERINFO_RE = (

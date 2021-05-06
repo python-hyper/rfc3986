@@ -31,7 +31,8 @@ def test_allowing_schemes():
 def test_allowing_hosts():
     """Verify the ability to select hosts to be allowed."""
     validator = validators.Validator().allow_hosts(
-        "pypi.python.org", "pypi.org",
+        "pypi.python.org",
+        "pypi.org",
     )
 
     assert "pypi.python.org" in validator.allowed_hosts
@@ -161,7 +162,10 @@ def test_multiple_missing_components(uri):
 
 @pytest.mark.parametrize(
     "uri",
-    [rfc3986.uri_reference("smtp://"), rfc3986.uri_reference("telnet://"),],
+    [
+        rfc3986.uri_reference("smtp://"),
+        rfc3986.uri_reference("telnet://"),
+    ],
 )
 def test_ensure_uri_has_a_scheme(uri):
     """Verify validation with allowed schemes."""
@@ -183,8 +187,14 @@ def test_allowed_hosts_and_schemes(uri, failed_component):
     """Verify each of these fails."""
     validator = (
         validators.Validator()
-        .allow_schemes("https", "ssh",)
-        .allow_hosts("github.com", "git.openstack.org",)
+        .allow_schemes(
+            "https",
+            "ssh",
+        )
+        .allow_hosts(
+            "github.com",
+            "git.openstack.org",
+        )
     )
     with pytest.raises(exceptions.UnpermittedComponentError) as caught_exc:
         validator.validate(uri)
@@ -237,11 +247,22 @@ def test_allowed_hosts_and_schemes(uri, failed_component):
 def test_successful_complex_validation(uri):
     """Verify we do not raise ValidationErrors for good URIs."""
     validators.Validator().allow_schemes("https", "ssh",).allow_hosts(
-        "github.com", "bitbucket.org", "gitlab.com", "git.openstack.org",
+        "github.com",
+        "bitbucket.org",
+        "gitlab.com",
+        "git.openstack.org",
     ).allow_ports("22", "443",).require_presence_of(
-        "scheme", "host", "path",
+        "scheme",
+        "host",
+        "path",
     ).check_validity_of(
-        "scheme", "userinfo", "host", "port", "path", "query", "fragment",
+        "scheme",
+        "userinfo",
+        "host",
+        "port",
+        "path",
+        "query",
+        "fragment",
     ).validate(
         uri
     )
@@ -259,9 +280,10 @@ def test_invalid_uri_with_invalid_path(invalid_uri):
     uri = rfc3986.uri_reference(invalid_uri)
     uri = uri.copy_with(path="#foobar")
     with pytest.raises(exceptions.InvalidComponentsError):
-        validators.Validator().check_validity_of("host", "path",).validate(
-            uri
-        )
+        validators.Validator().check_validity_of(
+            "host",
+            "path",
+        ).validate(uri)
 
 
 def test_validating_rfc_4007_ipv6_zone_ids():
