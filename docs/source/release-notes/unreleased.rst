@@ -1,22 +1,4 @@
 1.x.y - 202z-aa-bb
 ------------------
 
-- Fix bug where a valid IRI is mishandled by ``urlparse`` and
-  ``ParseResultBytes``.
-
-  See also `GitHub #57`_
-
-- Add :meth:`~rfc3986.builder.URIBuilder.extend_path`,
-  :meth:`~rfc3986.builder.URIBuilder.extend_query_with`,
-  :meth:`~rfc3986.builder.URIBuilder.geturl` to
-  :class:`~rfc3986.builder.URIBuilder`.
-
-  See also `GitHub #29`_
-
-.. links
-
-.. _GitHub #29:
-    https://github.com/python-hyper/rfc3986/issues/29
-
-.. _GitHub #57:
-    https://github.com/python-hyper/rfc3986/issues/57
+.. links below here

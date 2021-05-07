@@ -11,6 +11,7 @@ here with the newest releases first.
 .. toctree::
 
     unreleased
+    1.5.0
     1.4.0
     1.3.2
     1.3.1
