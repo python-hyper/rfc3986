@@ -13,6 +13,10 @@
 
   See also `GitHub #29`_
 
+- Include ``~`` as unreserved character in URL paths.
+
+  See also `GitHub #74`_
+
 .. links
 
 .. _GitHub #29:
@@ -20,3 +24,6 @@
 
 .. _GitHub #57:
     https://github.com/python-hyper/rfc3986/issues/57
+
+.. _GitHub #74:
+    https://github.com/python-hyper/rfc3986/pull/74
