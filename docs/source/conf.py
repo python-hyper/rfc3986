@@ -19,7 +19,6 @@
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
-from datetime import datetime
 import rfc3986
 
 
@@ -57,7 +56,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'rfc3986'
-copyright = u'{}, Ian Stapleton Cordasco'.format(datetime.now().year)
+copyright = u'2017, Ian Stapleton Cordasco'
 author = u'Ian Stapleton Cordasco'
 
 # The version info for the project you're documenting, acts as replacement for
