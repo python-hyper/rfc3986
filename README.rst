@@ -201,5 +201,5 @@ free to email Ian and find out how you can help.
 The git repository for this project is maintained at
 https://github.com/python-hyper/rfc3986
 
-.. _RFC 3986: http://tools.ietf.org/html/rfc3986
+.. _RFC 3986: https://datatracker.ietf.org/doc/html/rfc3986/
 .. _Apache License Version 2.0: https://www.apache.org/licenses/LICENSE-2.0
