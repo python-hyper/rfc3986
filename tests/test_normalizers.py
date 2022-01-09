@@ -1,14 +1,11 @@
-# -*- coding: utf-8 -*-
 import pytest
 
+from rfc3986.normalizers import encode_component
+from rfc3986.normalizers import normalize_host
+from rfc3986.normalizers import normalize_percent_characters
+from rfc3986.normalizers import normalize_scheme
+from rfc3986.normalizers import remove_dot_segments
 from rfc3986.uri import URIReference
-from rfc3986.normalizers import (
-    normalize_scheme,
-    normalize_percent_characters,
-    remove_dot_segments,
-    encode_component,
-    normalize_host,
-)
 
 
 def test_normalize_scheme():
@@ -71,9 +68,9 @@ def test_normalized_equality(uris):
 
 
 def test_hostname_normalization():
-    assert URIReference(
-        None, "EXAMPLE.COM", None, None, None
-    ) == URIReference(None, "example.com", None, None, None)
+    assert URIReference(None, "EXAMPLE.COM", None, None, None) == URIReference(
+        None, "example.com", None, None, None
+    )
 
 
 @pytest.mark.parametrize(

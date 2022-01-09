@@ -1,10 +1,7 @@
-# -*- coding: utf-8 -*-
-from rfc3986.api import (
-    uri_reference,
-    is_valid_uri,
-    normalize_uri,
-    URIReference,
-)
+from rfc3986.api import is_valid_uri
+from rfc3986.api import normalize_uri
+from rfc3986.api import uri_reference
+from rfc3986.api import URIReference
 
 
 def test_uri_reference():

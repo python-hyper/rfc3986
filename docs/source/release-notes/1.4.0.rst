@@ -7,7 +7,7 @@ Security
 - Prevent users from receiving an invalid authority parsed from a malicious
   URL. Previously we did not stop parsing the authority section at the first
   backslash (``\\``) character. As a result, it was possible to trick our
-  parser into parsing up to the first forward-slash (``/``) and thus 
+  parser into parsing up to the first forward-slash (``/``) and thus
   generating an invalid authority.
 
   See also `GitHub pr-64`_ and `the blog post that sparked this change`_

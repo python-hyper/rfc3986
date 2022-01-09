@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2015 Ian Stapleton Cordasco
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,13 +11,12 @@
 # implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import rfc3986
-from rfc3986 import exceptions
-from rfc3986 import parseresult as pr
-
 import pytest
 
+import rfc3986
 from . import base
+from rfc3986 import exceptions
+from rfc3986 import parseresult as pr
 
 INVALID_PORTS = ["443:80", "443:80:443", "abcdef", "port", "43port"]
 
@@ -29,19 +27,19 @@ SNOWMAN_IDNA_HOST = "http://xn--n3h.com"
 @pytest.mark.parametrize("port", INVALID_PORTS)
 def test_port_parsing(port):
     with pytest.raises(exceptions.InvalidPort):
-        rfc3986.urlparse("https://httpbin.org:{0}/get".format(port))
+        rfc3986.urlparse(f"https://httpbin.org:{port}/get")
 
 
 @pytest.mark.parametrize(
     "parts, unsplit",
     [
-        (("https", None, "httpbin.org"), u"https://httpbin.org"),
-        (("https", "user", "httpbin.org"), u"https://user@httpbin.org"),
+        (("https", None, "httpbin.org"), "https://httpbin.org"),
+        (("https", "user", "httpbin.org"), "https://user@httpbin.org"),
         (
             ("https", None, "httpbin.org", 443, "/get"),
-            u"https://httpbin.org:443/get",
+            "https://httpbin.org:443/get",
         ),
-        (("HTTPS", None, "HTTPBIN.ORG"), u"https://httpbin.org"),
+        (("HTTPS", None, "HTTPBIN.ORG"), "https://httpbin.org"),
     ],
 )
 def test_from_parts(parts, unsplit):
@@ -76,9 +74,7 @@ class TestParseResultUnsplits(base.BaseTestUnsplits):
 
 def test_normalizes_uris_when_using_from_string(uri_to_normalize):
     """Verify we always get the same thing out as we expect."""
-    result = pr.ParseResult.from_string(
-        uri_to_normalize, lazy_normalize=False
-    )
+    result = pr.ParseResult.from_string(uri_to_normalize, lazy_normalize=False)
     assert result.scheme == "https"
     assert result.host == "example.com"
 
@@ -136,7 +132,7 @@ class TestParseResultBytes:
     def test_raises_invalid_port_non_strict_parse(self, port):
         with pytest.raises(exceptions.InvalidPort):
             pr.ParseResultBytes.from_string(
-                "https://httpbin.org:{0}/get".format(port), strict=False
+                f"https://httpbin.org:{port}/get", strict=False
             )
 
     def test_copy_with_a_new_path(self, uri_with_everything):

@@ -143,9 +143,9 @@ Checking the Validity of Components
 -----------------------------------
 
 As of version 1.1.0, |rfc3986| allows users to check the validity of a URI
-Reference using a :class:`~rfc3986.validators.Validator`. Along with the above 
+Reference using a :class:`~rfc3986.validators.Validator`. Along with the above
 examples we can also check that a URI is valid per :rfc:`3986`. The validation
-of the components is pre-determined so all we need to do is specify which 
+of the components is pre-determined so all we need to do is specify which
 components we want to validate:
 
 >>> from rfc3986 import validators, uri_reference

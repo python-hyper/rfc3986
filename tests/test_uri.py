@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
 import pytest
 
-from rfc3986.exceptions import InvalidAuthority, ResolutionError
+from . import base
+from rfc3986.exceptions import InvalidAuthority
+from rfc3986.exceptions import ResolutionError
 from rfc3986.misc import URI_MATCHER
 from rfc3986.uri import URIReference
-
-from . import base
 
 
 @pytest.fixture
@@ -86,9 +85,7 @@ class TestURIValidation:
         uri = URIReference.from_string(uri_with_everything)
         assert uri.is_valid(require_query=True) is True
 
-    def test_uri_with_everything_requiring_fragment(
-        self, uri_with_everything
-    ):
+    def test_uri_with_everything_requiring_fragment(self, uri_with_everything):
         uri = URIReference.from_string(uri_with_everything)
         assert uri.is_valid(require_fragment=True) is True
 
@@ -317,11 +314,28 @@ class TestURIReferencesResolve:
         index = B.path.rfind("/")
         assert T.path == B.path[:index] + "/" + R.path
 
-    def test_uri_with_everything_raises_exception(self, uri_with_everything):
+    def test_resolving_with_schemeless_uri_fails(self, relative_uri):
         R = URIReference.from_string("foo/bar/bogus")
-        B = URIReference.from_string(uri_with_everything)
+        B = URIReference.from_string(relative_uri)
         with pytest.raises(ResolutionError):
             R.resolve_with(B)
+
+    def test_uri_with_everything_resolves(self, uri_with_everything):
+        R = URIReference.from_string("foo/bar/bogus")
+        B = URIReference.from_string(uri_with_everything)
+        try:
+            R.resolve_with(B)
+        except ResolutionError:
+            pytest.fail(
+                "Should not raise ResolutionError with URL with scheme and other components"
+            )
+
+    def test_uri_with_just_scheme_resolves(self, scheme_only):
+        R = URIReference.from_string("foo/bar/bogus")
+        B = URIReference.from_string(scheme_only)
+        T = R.resolve_with(B)
+        assert T.scheme == B.scheme.lower()
+        assert T.path == ("/" + R.path)
 
     def test_basic_uri_resolves_itself(self, basic_uri):
         R = URIReference.from_string(basic_uri)

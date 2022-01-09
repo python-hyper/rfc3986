@@ -1,7 +1,7 @@
 rfc3986
 =======
 
-A Python implementation of `RFC 3986`_ including validation and authority 
+A Python implementation of `RFC 3986`_ including validation and authority
 parsing.
 
 Installation
