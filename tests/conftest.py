@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import itertools
 import sys
 
@@ -87,7 +86,7 @@ def uri_with_port_and_userinfo(request):
 
 @pytest.fixture(params=valid_hosts)
 def uri_with_port_and_tricky_userinfo(request):
-    return "ssh://%s@%s:22" % ("user%20!=:pass", request.param)
+    return "ssh://{}@{}:22".format("user%20!=:pass", request.param)
 
 
 @pytest.fixture(params=valid_hosts)
@@ -135,6 +134,11 @@ def uri_query_with_percent(request):
 @pytest.fixture(params=valid_hosts)
 def uri_fragment_with_percent(request):
     return "https://%s#perc%%ent" % request.param
+
+
+@pytest.fixture(params=equivalent_schemes)
+def scheme_only(request):
+    return "%s:" % request.param
 
 
 sys.path.insert(0, ".")

@@ -1,8 +1,8 @@
-# coding: utf-8
+import sys
 
 import pytest
+
 import rfc3986
-import sys
 from rfc3986.exceptions import InvalidAuthority
 
 try:
@@ -17,20 +17,20 @@ requires_idna = pytest.mark.skipif(
 iri_to_uri = pytest.mark.parametrize(
     ["iri", "uri"],
     [
-        (u"http://Bücher.de", u"http://xn--bcher-kva.de"),
-        (u"http://faß.de", u"http://xn--fa-hia.de"),
+        ("http://Bücher.de", "http://xn--bcher-kva.de"),
+        ("http://faß.de", "http://xn--fa-hia.de"),
         (
-            u"http://βόλος.com/β/ό?λ#ος",
-            u"http://xn--nxasmm1c.com/%CE%B2/%CF%8C?%CE%BB#%CE%BF%CF%82",
+            "http://βόλος.com/β/ό?λ#ος",
+            "http://xn--nxasmm1c.com/%CE%B2/%CF%8C?%CE%BB#%CE%BF%CF%82",
         ),
-        (u"http://ශ්\u200dරී.com", u"http://xn--10cl1a0b660p.com"),
-        (u"http://نامه\u200cای.com", u"http://xn--mgba3gch31f060k.com"),
-        (u"http://Bü:ẞ@gOoGle.com", u"http://B%C3%BC:%E1%BA%9E@gOoGle.com"),
-        (u"http://ẞ.com:443", u"http://xn--zca.com:443"),
-        (u"http://ẞ.foo.com", u"http://xn--zca.foo.com"),
-        (u"http://Bẞ.com", u"http://xn--b-qfa.com"),
+        ("http://ශ්\u200dරී.com", "http://xn--10cl1a0b660p.com"),
+        ("http://نامه\u200cای.com", "http://xn--mgba3gch31f060k.com"),
+        ("http://Bü:ẞ@gOoGle.com", "http://B%C3%BC:%E1%BA%9E@gOoGle.com"),
+        ("http://ẞ.com:443", "http://xn--zca.com:443"),
+        ("http://ẞ.foo.com", "http://xn--zca.foo.com"),
+        ("http://Bẞ.com", "http://xn--b-qfa.com"),
         (
-            u"http+unix://%2Ftmp%2FTEST.sock/get",
+            "http+unix://%2Ftmp%2FTEST.sock/get",
             "http+unix://%2Ftmp%2FTEST.sock/get",
         ),
     ],
@@ -49,26 +49,26 @@ def test_iri_equality(iri, uri):
 
 
 def test_iri_equality_special_cases():
-    assert rfc3986.iri_reference(u"http://Bü:ẞ@βόλος.com/β/ό?λ#ος") == (
-        u"http",
-        u"Bü:ẞ@βόλος.com",
-        u"/%CE%B2/%CF%8C",
-        u"%CE%BB",
-        u"%CE%BF%CF%82",
+    assert rfc3986.iri_reference("http://Bü:ẞ@βόλος.com/β/ό?λ#ος") == (
+        "http",
+        "Bü:ẞ@βόλος.com",
+        "/%CE%B2/%CF%8C",
+        "%CE%BB",
+        "%CE%BF%CF%82",
     )
 
     with pytest.raises(TypeError):
-        rfc3986.iri_reference(u"http://ẞ.com") == 1
+        rfc3986.iri_reference("http://ẞ.com") == 1
 
 
 @requires_idna
 @pytest.mark.parametrize(
     "iri",
     [
-        u"http://♥.net",
-        u"http://\u0378.net",
+        "http://♥.net",
+        "http://\u0378.net",
         pytest.param(
-            u"http://㛼.com",
+            "http://㛼.com",
             marks=pytest.mark.skipif(
                 sys.version_info < (3, 3) and sys.maxunicode <= 0xFFFF,
                 reason="Python configured without UCS-4 support",

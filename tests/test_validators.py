@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
 """Tests for the validators module."""
+import pytest
+
 import rfc3986
 from rfc3986 import exceptions
 from rfc3986 import validators
-
-import pytest
 
 
 def test_defaults():

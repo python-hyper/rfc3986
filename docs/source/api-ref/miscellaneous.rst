@@ -2,7 +2,7 @@
  Miscellaneous Submodules
 ==========================
 
-There are several submodules in |rfc3986| that are not meant to be exposed to 
+There are several submodules in |rfc3986| that are not meant to be exposed to
 users directly but which are valuable to document, regardless.
 
 .. data:: rfc3986.misc.UseExisting

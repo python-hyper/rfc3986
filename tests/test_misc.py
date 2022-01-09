@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-from rfc3986.uri import URIReference
 from rfc3986.misc import merge_paths
+from rfc3986.uri import URIReference
 
 
 def test_merge_paths_with_base_path_without_base_authority():

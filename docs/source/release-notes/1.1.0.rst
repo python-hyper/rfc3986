@@ -1,7 +1,7 @@
 1.1.0 -- 2017-07-18
 -------------------
 
-- Correct the regular expression for the User Information sub-component of the 
+- Correct the regular expression for the User Information sub-component of the
   Authority Component.
 
   See also `GitHub #26`_
