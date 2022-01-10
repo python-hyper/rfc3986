@@ -5,12 +5,19 @@
 All of the release notes that have been recorded for |rfc3986| are organized
 here with the newest releases first.
 
-1.x Release Series
+2.x Release Series
 ==================
 
 .. toctree::
 
     unreleased
+    2.0.0
+
+1.x Release Series
+==================
+
+.. toctree::
+
     1.5.0
     1.4.0
     1.3.2
