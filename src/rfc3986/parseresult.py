@@ -467,7 +467,7 @@ def authority_from(reference, strict):
         )
 
     if port:
-        if port.isascii() and port.isdigit()
+        if port.isascii() and port.isdigit():
             port = int(port)
         else:
             raise exceptions.InvalidPort(port)
