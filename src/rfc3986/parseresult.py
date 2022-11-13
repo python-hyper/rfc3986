@@ -467,8 +467,8 @@ def authority_from(reference, strict):
         )
 
     if port:
-        try:
+        if port.isascii() and port.isdigit():
             port = int(port)
-        except ValueError:
+        else:
             raise exceptions.InvalidPort(port)
     return userinfo, host, port
