@@ -245,12 +245,12 @@ def test_allowed_hosts_and_schemes(uri, failed_component):
 )
 def test_successful_complex_validation(uri):
     """Verify we do not raise ValidationErrors for good URIs."""
-    validators.Validator().allow_schemes("https", "ssh",).allow_hosts(
+    validators.Validator().allow_schemes("https", "ssh").allow_hosts(
         "github.com",
         "bitbucket.org",
         "gitlab.com",
         "git.openstack.org",
-    ).allow_ports("22", "443",).require_presence_of(
+    ).allow_ports("22", "443").require_presence_of(
         "scheme",
         "host",
         "path",
