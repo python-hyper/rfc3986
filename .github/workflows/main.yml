@@ -9,6 +9,7 @@ on:
 jobs:
   main:
     strategy:
+      fail-fast: false
       matrix:
         include:
         # linux
