@@ -58,7 +58,7 @@ def test_iri_equality_special_cases():
     )
 
     with pytest.raises(TypeError):
-        rfc3986.iri_reference("http://ẞ.com") == 1
+        assert rfc3986.iri_reference("http://ẞ.com") == 1
 
 
 @requires_idna
