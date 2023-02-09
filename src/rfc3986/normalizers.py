@@ -13,6 +13,7 @@
 # limitations under the License.
 """Module with functions to normalize components."""
 import re
+from urllib.parse import quote as urlquote
 
 from . import compat
 from . import misc
@@ -38,12 +39,12 @@ def normalize_authority(authority):
 
 def normalize_username(username):
     """Normalize a username to make it safe to include in userinfo."""
-    return compat.urlquote(username)
+    return urlquote(username)
 
 
 def normalize_password(password):
     """Normalize a password to make safe for userinfo."""
-    return compat.urlquote(password)
+    return urlquote(password)
 
 
 def normalize_host(host):

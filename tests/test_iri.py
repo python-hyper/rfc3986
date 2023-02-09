@@ -67,13 +67,7 @@ def test_iri_equality_special_cases():
     [
         "http://♥.net",
         "http://\u0378.net",
-        pytest.param(
-            "http://㛼.com",
-            marks=pytest.mark.skipif(
-                sys.version_info < (3, 3) and sys.maxunicode <= 0xFFFF,
-                reason="Python configured without UCS-4 support",
-            ),
-        ),
+        "http://㛼.com",
     ],
 )
 def test_encode_invalid_iri(iri):

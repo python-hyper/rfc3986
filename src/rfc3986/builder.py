@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Module containing the logic for the URIBuilder object."""
-from . import compat
+from urllib.parse import parse_qsl
+from urllib.parse import urlencode
+
 from . import normalizers
 from . import uri
 from . import uri_reference
@@ -279,7 +281,7 @@ class URIBuilder:
                     path=None, query='a=b+c', fragment=None)
 
         """
-        query = normalizers.normalize_query(compat.urlencode(query_items))
+        query = normalizers.normalize_query(urlencode(query_items))
 
         return URIBuilder(
             scheme=self.scheme,
@@ -306,7 +308,7 @@ class URIBuilder:
             URIBuilder(scheme=None, userinfo=None, host=None, port=None,
                     path=None, query='a=b+c&a=b+c', fragment=None)
         """
-        original_query_items = compat.parse_qsl(self.query or "")
+        original_query_items = parse_qsl(self.query or "")
         if not isinstance(query_items, list):
             query_items = list(query_items.items())
 

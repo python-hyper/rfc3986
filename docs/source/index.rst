@@ -13,7 +13,7 @@ example,
 
     pip install rfc3986
     python -m pip install rfc3986
-    python3.6 -m pip install rfc3986
+    python3.11 -m pip install rfc3986
 
 .. toctree::
     :maxdepth: 2
