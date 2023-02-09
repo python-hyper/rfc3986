@@ -18,7 +18,19 @@ from . import base
 from rfc3986 import exceptions
 from rfc3986 import parseresult as pr
 
-INVALID_PORTS = ["443:80", "443:80:443", "abcdef", "port", "43port", " 1", "1 ", "𖭖", "-1", "　1", "1_1"]
+INVALID_PORTS = [
+    "443:80",
+    "443:80:443",
+    "abcdef",
+    "port",
+    "43port",
+    " 1",
+    "1 ",
+    "𖭖",
+    "-1",
+    "　1",
+    "1_1",
+]
 
 SNOWMAN = b"\xe2\x98\x83"
 SNOWMAN_IDNA_HOST = "http://xn--n3h.com"

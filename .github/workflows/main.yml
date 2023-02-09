@@ -27,6 +27,12 @@ jobs:
         - os: ubuntu-latest
           python: '3.10'
           toxenv: py
+        - os: ubuntu-latest
+          python: 3.11
+          toxenv: py
+        - os: ubuntu-latest
+          python: 3.12-dev
+          toxenv: py
         # windows
         - os: windows-latest
           python: 3.7
@@ -40,8 +46,8 @@ jobs:
           toxenv: pre-commit
     runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python }}
     - run: python -mpip install --upgrade setuptools pip tox virtualenv
