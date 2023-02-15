@@ -12,42 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Compatibility module for Python 2 and 3 support."""
-import sys
-
-try:
-    from urllib.parse import quote as urlquote
-except ImportError:  # Python 2.x
-    from urllib import quote as urlquote
-
-try:
-    from urllib.parse import parse_qsl
-except ImportError:  # Python 2.x
-    from urlparse import parse_qsl
-
-try:
-    from urllib.parse import urlencode
-except ImportError:  # Python 2.x
-    from urllib import urlencode
 
 __all__ = (
     "to_bytes",
     "to_str",
-    "urlquote",
-    "urlencode",
-    "parse_qsl",
 )
-
-PY3 = (3, 0) <= sys.version_info < (4, 0)
-PY2 = (2, 6) <= sys.version_info < (2, 8)
-
-
-if PY3:
-    unicode = str  # Python 3.x
 
 
 def to_str(b, encoding="utf-8"):
     """Ensure that b is text in the specified encoding."""
-    if hasattr(b, "decode") and not isinstance(b, unicode):
+    if hasattr(b, "decode") and not isinstance(b, str):
         b = b.decode(encoding)
     return b
 
