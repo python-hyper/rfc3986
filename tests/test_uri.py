@@ -269,6 +269,19 @@ class TestURIReferenceIsAbsolute:
         uri = URIReference.from_string(absolute_path_uri)
         assert uri.is_absolute() is False
 
+    def test_uris_with_no_authority_with_empty_path_are_absolute(
+        self,
+        uri_without_authority_with_empty_path,
+    ):
+        uri = URIReference.from_string(uri_without_authority_with_empty_path)
+
+    def test_uris_with_no_authority_with_query_only_are_absolute(
+        self,
+        uri_without_authority_with_query_only,
+    ):
+        uri = URIReference.from_string(uri_without_authority_with_query_only)
+        assert uri.is_absolute() is True
+
 
 # @pytest.fixture(params=[
 #     basic_uri, basic_uri_with_port, basic_uri_with_path,

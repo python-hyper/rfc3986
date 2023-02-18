@@ -150,7 +150,7 @@ segments = {
 }
 
 # Path types taken from Section 3.3 (linked above)
-PATH_EMPTY = "^$"
+PATH_EMPTY = "(?:)"
 PATH_ROOTLESS = "%(segment-nz)s(/%(segment)s)*" % segments
 PATH_NOSCHEME = "%(segment-nz-nc)s(/%(segment)s)*" % segments
 PATH_ABSOLUTE = "/(%s)?" % PATH_ROOTLESS
