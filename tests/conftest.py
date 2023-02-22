@@ -106,6 +106,16 @@ def uri_with_everything(request):
     )
 
 
+@pytest.fixture
+def uri_without_authority_with_empty_path():
+    return "about:"
+
+
+@pytest.fixture
+def uri_without_authority_with_query_only():
+    return "about:?foo=bar"
+
+
 @pytest.fixture(params=valid_hosts)
 def relative_uri(request):
     return "//%s" % request.param
