@@ -376,6 +376,14 @@ class TestURIReferencesResolve:
         assert T.path is None
         assert T.query == "query"
 
+    def test_resolve_twice_for_cached_validator(self, basic_uri):
+        R = URIReference.from_string("")
+        B = URIReference.from_string(basic_uri)
+        T1 = R.resolve_with(B)
+        T2 = R.resolve_with(B)
+        assert T1 == T2
+        assert T1 == B
+
 
 def test_empty_querystrings_persist():
     url = "https://httpbin.org/get?"

@@ -57,6 +57,16 @@ class URIMixin:
         return misc.SUBAUTHORITY_MATCHER.match(self.authority)
 
     @property
+    def _validator(self):
+        v = getattr(self, "_cached_validator", None)
+        if v is not None:
+            return v
+        self._cached_validator = validators.Validator().require_presence_of(
+            "scheme"
+        )
+        return self._cached_validator
+
+    @property
     def host(self):
         """If present, a string representing the host."""
         try:
@@ -262,7 +272,9 @@ class URIMixin:
         if not isinstance(base_uri, URIMixin):
             base_uri = type(self).from_string(base_uri)
 
-        if not base_uri.is_valid(require_scheme=True):
+        try:
+            self._validator.validate(base_uri)
+        except exc.ValidationError:
             raise exc.ResolutionError(base_uri)
 
         # This is optional per
