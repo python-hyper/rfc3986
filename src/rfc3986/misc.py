@@ -51,7 +51,7 @@ SUBAUTHORITY_MATCHER = re.compile(
     (
         "^(?:(?P<userinfo>{})@)?"  # userinfo
         "(?P<host>{})"  # host
-        ":?(?P<port>{})?$"  # port
+        "(?::(?P<port>{}))?$"  # port
     ).format(
         abnf_regexp.USERINFO_RE, abnf_regexp.HOST_PATTERN, abnf_regexp.PORT_RE
     )
