@@ -42,7 +42,7 @@ SCHEME_RE = "[a-zA-Z][a-zA-Z0-9+.-]*"
 _AUTHORITY_RE = "[^\\\\/?#]*"
 _PATH_RE = "[^?#]*"
 _QUERY_RE = "[^#]*"
-_FRAGMENT_RE = ".*"
+_FRAGMENT_RE = "(?s:.*)"
 
 # Extracted from http://tools.ietf.org/html/rfc3986#appendix-B
 COMPONENT_PATTERN_DICT = {
