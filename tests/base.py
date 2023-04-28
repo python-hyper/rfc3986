@@ -11,8 +11,8 @@
 # implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 from rfc3986 import exceptions as exc
+
 
 class BaseTestParsesURIs:
     test_class = None
@@ -142,7 +142,9 @@ class BaseTestParsesURIs:
             assert isinstance(e, exc.InvalidAuthority)
         else:
             if uri.port is not None:
-                raise AssertionError("No error thrown from URI with colon but no port")
+                raise AssertionError(
+                    "No error thrown from URI with colon but no port"
+                )
 
     def test_handles_port_but_no_colon(self, uri_with_port_but_no_colon):
         try:
@@ -151,7 +153,9 @@ class BaseTestParsesURIs:
             assert isinstance(e, exc.InvalidAuthority)
         else:
             if uri.port is not None:
-                raise AssertionError("No error thrown from URI with port but no colon")
+                raise AssertionError(
+                    "No error thrown from URI with port but no colon"
+                )
 
 
 class BaseTestUnsplits:
