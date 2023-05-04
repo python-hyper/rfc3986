@@ -13,6 +13,7 @@
 # limitations under the License.
 """Module containing the urlparse compatibility logic."""
 from collections import namedtuple
+from typing import Optional
 
 from . import compat
 from . import exceptions
@@ -82,6 +83,14 @@ class ParseResult(
     This uses the URIReference logic to handle compatibility with the
     urlparse.ParseResult class.
     """
+
+    scheme: Optional[str]
+    userinfo: Optional[str]
+    host: Optional[str]
+    port: Optional[int]
+    path: Optional[str]
+    query: Optional[str]
+    fragment: Optional[str]
 
     slots = ()
 
@@ -252,6 +261,14 @@ class ParseResultBytes(
     namedtuple("ParseResultBytes", PARSED_COMPONENTS), ParseResultMixin
 ):
     """Compatibility shim for the urlparse.ParseResultBytes object."""
+
+    scheme: Optional[bytes]
+    userinfo: Optional[bytes]
+    host: Optional[bytes]
+    port: Optional[int]
+    path: Optional[bytes]
+    query: Optional[bytes]
+    fragment: Optional[bytes]
 
     def __new__(
         cls,

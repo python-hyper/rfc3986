@@ -91,7 +91,7 @@ def normalize_uri(uri, encoding="utf-8"):
     return normalized_reference.unsplit()
 
 
-def urlparse(uri, encoding="utf-8"):
+def urlparse(uri, encoding="utf-8") -> ParseResult:
     """Parse a given URI and return a ParseResult.
 
     This is a partial replacement of the standard library's urlparse function.
