@@ -206,7 +206,7 @@ class ParseResult(
         path=misc.UseExisting,
         query=misc.UseExisting,
         fragment=misc.UseExisting,
-    ):
+    ) -> "ParseResult":
         """Create a copy of this instance replacing with specified parts."""
         attributes = zip(
             PARSED_COMPONENTS,
@@ -243,7 +243,7 @@ class ParseResult(
             uri_ref=self.reference, encoding=encoding, **attrs
         )
 
-    def unsplit(self, use_idna=False):
+    def unsplit(self, use_idna=False) -> str:
         """Create a URI string from the components.
 
         :returns: The parsed URI reconstituted as a string.
