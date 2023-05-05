@@ -8,5 +8,3 @@ build/
 doc/_build/
 dist/
 t.py
-.idea/
-.vscode/

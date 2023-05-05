@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Module containing the urlparse compatibility logic."""
-from collections import namedtuple
-from typing import Optional
+import typing as t
 
 from . import compat
 from . import exceptions
@@ -75,22 +74,20 @@ class ParseResultMixin:
         return self.query
 
 
-class ParseResult(
-    namedtuple("ParseResult", PARSED_COMPONENTS), ParseResultMixin
-):
+class ParseResult(t.NamedTuple, ParseResultMixin):
     """Implementation of urlparse compatibility class.
 
     This uses the URIReference logic to handle compatibility with the
     urlparse.ParseResult class.
     """
 
-    scheme: Optional[str]
-    userinfo: Optional[str]
-    host: Optional[str]
-    port: Optional[int]
-    path: Optional[str]
-    query: Optional[str]
-    fragment: Optional[str]
+    scheme: t.Optional[str]
+    userinfo: t.Optional[str]
+    host: t.Optional[str]
+    port: t.Optional[int]
+    path: t.Optional[str]
+    query: t.Optional[str]
+    fragment: t.Optional[str]
 
     slots = ()
 
@@ -257,18 +254,16 @@ class ParseResult(
         return parse_result.reference.unsplit()
 
 
-class ParseResultBytes(
-    namedtuple("ParseResultBytes", PARSED_COMPONENTS), ParseResultMixin
-):
+class ParseResultBytes(t.NamedTuple, ParseResultMixin):
     """Compatibility shim for the urlparse.ParseResultBytes object."""
 
-    scheme: Optional[bytes]
-    userinfo: Optional[bytes]
-    host: Optional[bytes]
-    port: Optional[int]
-    path: Optional[bytes]
-    query: Optional[bytes]
-    fragment: Optional[bytes]
+    scheme: t.Optional[bytes]
+    userinfo: t.Optional[bytes]
+    host: t.Optional[bytes]
+    port: t.Optional[int]
+    path: t.Optional[bytes]
+    query: t.Optional[bytes]
+    fragment: t.Optional[bytes]
 
     def __new__(
         cls,
