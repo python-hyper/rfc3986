@@ -28,7 +28,6 @@ repos:
     exclude: ^(tests/|docs/|setup.py)
     additional_dependencies:
     - flake8-docstrings
-    - flake8-import-order
 - repo: https://github.com/asottile/setup-cfg-fmt
   rev: v2.2.0
   hooks:
