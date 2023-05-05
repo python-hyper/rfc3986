@@ -13,6 +13,7 @@
 # limitations under the License.
 """Module containing the urlparse compatibility logic."""
 import typing as t
+from collections import namedtuple
 
 from . import compat
 from . import exceptions
@@ -74,7 +75,9 @@ class ParseResultMixin:
         return self.query
 
 
-class ParseResult(t.NamedTuple, ParseResultMixin):
+class ParseResult(
+    namedtuple("ParseResult", PARSED_COMPONENTS), ParseResultMixin
+):
     """Implementation of urlparse compatibility class.
 
     This uses the URIReference logic to handle compatibility with the
@@ -254,7 +257,9 @@ class ParseResult(t.NamedTuple, ParseResultMixin):
         return parse_result.reference.unsplit()
 
 
-class ParseResultBytes(t.NamedTuple, ParseResultMixin):
+class ParseResultBytes(
+    namedtuple("ParseResultBytes", PARSED_COMPONENTS), ParseResultMixin
+):
     """Compatibility shim for the urlparse.ParseResultBytes object."""
 
     scheme: t.Optional[bytes]
