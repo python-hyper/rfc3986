@@ -146,6 +146,11 @@ def uri_fragment_with_percent(request):
     return "https://%s#perc%%ent" % request.param
 
 
+@pytest.fixture(params=valid_hosts)
+def uri_fragment_with_line_terminators(request):
+    return "https://%s#\nfrag\nment\n" % request.param
+
+
 @pytest.fixture(params=equivalent_schemes)
 def scheme_only(request):
     return "%s:" % request.param
