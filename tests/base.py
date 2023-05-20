@@ -156,7 +156,16 @@ class BaseTestParsesURIs:
                 raise AssertionError(
                     "No error thrown from URI with port but no colon"
                 )
-
+                
+    def test_handles_line_terminators_in_fragment(
+        self, uri_fragment_with_line_terminators
+    ):
+        """Test that self.test_class encodes line terminators in the fragment properly"""
+        ref = self.test_class.from_string(
+            uri_fragment_with_line_terminators, "utf-8"
+        )
+        assert ref.fragment == "%0Afrag%0Ament%0A"
+        
 
 class BaseTestUnsplits:
     test_class = None
