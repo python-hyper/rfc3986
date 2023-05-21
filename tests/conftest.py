@@ -116,6 +116,16 @@ def uri_without_authority_with_query_only():
     return "about:?foo=bar"
 
 
+@pytest.fixture
+def uri_with_colon_but_no_port():
+    return "scheme://user@[v12.ip]:/path"
+
+
+@pytest.fixture
+def uri_with_port_but_no_colon():
+    return "scheme://user@[v12.ip]8000/path"
+
+
 @pytest.fixture(params=valid_hosts)
 def relative_uri(request):
     return "//%s" % request.param

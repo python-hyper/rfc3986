@@ -11,6 +11,7 @@
 # implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from rfc3986 import exceptions as exc
 
 
 class BaseTestParsesURIs:
@@ -133,6 +134,28 @@ class BaseTestParsesURIs:
     def test_handles_percent_in_fragment(self, uri_fragment_with_percent):
         uri = self.test_class.from_string(uri_fragment_with_percent)
         assert uri.fragment == "perc%25ent"
+
+    def test_handles_colon_but_no_port(self, uri_with_colon_but_no_port):
+        try:
+            uri = self.test_class.from_string(uri_with_colon_but_no_port)
+        except Exception as e:
+            assert isinstance(e, exc.InvalidAuthority)
+        else:
+            if uri.port is not None:
+                raise AssertionError(
+                    "No error thrown from URI with colon but no port"
+                )
+
+    def test_handles_port_but_no_colon(self, uri_with_port_but_no_colon):
+        try:
+            uri = self.test_class.from_string(uri_with_port_but_no_colon)
+        except Exception as e:
+            assert isinstance(e, exc.InvalidAuthority)
+        else:
+            if uri.port is not None:
+                raise AssertionError(
+                    "No error thrown from URI with port but no colon"
+                )
 
     def test_handles_line_terminators_in_fragment(
         self, uri_fragment_with_line_terminators
