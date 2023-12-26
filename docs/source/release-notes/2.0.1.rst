@@ -1,0 +1,25 @@
+2.0.1 - 2022-06-01
+------------------
+
+- Fix bug where the non-deprecated method ``resolve_with()`` was
+  calling the deprecated method ``.is_valid()`` and causing warnings
+  to be emitted - `bug 86`_
+
+- Fix bug where an empty path was not being matched by the PATH_EMPTY
+  regex - `bug 88`_
+
+- Fix bug where a newline character embedded in a fragment would
+  cause regex parsing to halt - `bug 99`
+
+- Fix bug where the ':' between the host and port in the authority
+  could be improperly omitted - `bug 102`_
+
+.. links below here
+.. _bug 86:
+   https://github.com/python-hyper/rfc3986/issues/86
+.. _bug 88:
+   https://github.com/python-hyper/rfc3986/issues/88
+.. _bug 99:
+   https://github.com/python-hyper/rfc3986/issues/102
+.. _bug 102:
+   https://github.com/python-hyper/rfc3986/issues/102
