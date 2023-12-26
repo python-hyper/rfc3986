@@ -12,24 +12,24 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        python: [pypy3.7, 3.7, 3.9, "3.10", 3.11, 3.12-dev]
+        python: ['pypy3.9', '3.8', '3.9', '3.10', '3.11', '3.12']
         toxenv: [py]
         include:
         # windows
         - os: windows-latest
-          python: 3.7
+          python: '3.12'
           toxenv: py
         # misc
         - os: ubuntu-latest
-          python: 3.9
+          python: '3.12'
           toxenv: docs
         - os: ubuntu-latest
-          python: 3.9
+          python: '3.12'
           toxenv: pre-commit
     runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v4
+    - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4
+    - uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c # v5
       with:
         python-version: ${{ matrix.python }}
     - run: python -mpip install --upgrade setuptools pip tox virtualenv
