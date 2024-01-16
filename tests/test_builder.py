@@ -231,6 +231,16 @@ def test_add_fragment():
             "/sigmavirus24",
             "/users/sigmavirus24",
         ),
+        (
+            "https://api.github.com/user s",
+            "/sigmavirus24",
+            "/user%20s/sigmavirus24",
+        ),
+        (
+            "https://api.github.com/users",
+            "/sigmavirus 24",
+            "/users/sigmavirus%2024",
+        ),
     ],
 )
 def test_extend_path(uri, extend_with, expected_path):
