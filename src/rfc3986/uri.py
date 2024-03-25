@@ -1,4 +1,5 @@
 """Module containing the implementation of the URIReference class."""
+
 # Copyright (c) 2014 Rackspace
 # Copyright (c) 2015 Ian Stapleton Cordasco
 # Licensed under the Apache License, Version 2.0 (the "License");
