@@ -211,7 +211,7 @@ class URIBuilder:
             fragment=self.fragment,
         )
 
-    def add_path(self, path):
+    def add_path(self, path, encoding="utf-8"):
         """Add a path to the URI.
 
         .. code-block:: python
@@ -233,15 +233,19 @@ class URIBuilder:
             userinfo=self.userinfo,
             host=self.host,
             port=self.port,
-            path=normalizers.normalize_path(path),
+            path=normalizers.normalize_path(
+                normalizers.encode_component(path, encoding)
+            ),
             query=self.query,
             fragment=self.fragment,
         )
 
-    def extend_path(self, path):
+    def extend_path(self, path, encoding="utf-8"):
         """Extend the existing path value with the provided value.
 
         .. versionadded:: 1.5.0
+        .. versionchanged:: 2.0.0
+           Added encoding (see Github issue 104)
 
         .. code-block:: python
 
@@ -265,7 +269,7 @@ class URIBuilder:
         existing_path = self.path or ""
         path = "{}/{}".format(existing_path.rstrip("/"), path.lstrip("/"))
 
-        return self.add_path(path)
+        return self.add_path(path, encoding)
 
     def add_query_from(self, query_items):
         """Generate and add a query a dictionary or list of tuples.
