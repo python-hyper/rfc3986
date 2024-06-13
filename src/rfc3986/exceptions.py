@@ -5,8 +5,6 @@ from . import compat
 class RFC3986Exception(Exception):
     """Base class for all rfc3986 exception classes."""
 
-    pass
-
 
 class InvalidAuthority(RFC3986Exception):
     """Exception when the authority string is invalid."""
@@ -21,7 +19,7 @@ class InvalidAuthority(RFC3986Exception):
 class InvalidPort(RFC3986Exception):
     """Exception when the port is invalid."""
 
-    def __init__(self, port):
+    def __init__(self, port: str):
         """Initialize the exception with the invalid port."""
         super().__init__(f'The port ("{port}") is not valid.')
 
@@ -32,16 +30,12 @@ class ResolutionError(RFC3986Exception):
     def __init__(self, uri):
         """Initialize the error with the failed URI."""
         super().__init__(
-            "{} does not meet the requirements for resolution.".format(
-                uri.unsplit()
-            )
+            f"{uri.unsplit()} does not meet the requirements for resolution."
         )
 
 
 class ValidationError(RFC3986Exception):
     """Exception raised during Validation of a URI."""
-
-    pass
 
 
 class MissingComponentError(ValidationError):
@@ -69,11 +63,8 @@ class UnpermittedComponentError(ValidationError):
     def __init__(self, component_name, component_value, allowed_values):
         """Initialize the error with the unpermitted component."""
         super().__init__(
-            "{} was required to be one of {!r} but was {!r}".format(
-                component_name,
-                list(sorted(allowed_values)),
-                component_value,
-            ),
+            f"{component_name} was required to be one of "
+            f"{sorted(allowed_values)!r} but was {component_value!r}",
             component_name,
             component_value,
             allowed_values,
@@ -90,9 +81,7 @@ class PasswordForbidden(ValidationError):
         """Initialize the error with the URI that failed validation."""
         unsplit = getattr(uri, "unsplit", lambda: uri)
         super().__init__(
-            '"{}" contained a password when validation forbade it'.format(
-                unsplit()
-            )
+            f'"{unsplit()}" contained a password when validation forbade it'
         )
         self.uri = uri
 

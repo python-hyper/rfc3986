@@ -12,12 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Module containing the logic for the URIBuilder object."""
+import typing
 from urllib.parse import parse_qsl
 from urllib.parse import urlencode
 
+from . import compat
 from . import normalizers
 from . import uri
 from . import uri_reference
+
+# Copied from urllib.parse in typeshed.
+_QueryType = typing.Union[
+    typing.Mapping[typing.Any, typing.Any],
+    typing.Mapping[typing.Any, typing.Sequence[typing.Any]],
+    typing.Sequence[typing.Tuple[typing.Any, typing.Any]],
+    typing.Sequence[typing.Tuple[typing.Any, typing.Sequence[typing.Any]]],
+]
 
 
 class URIBuilder:
@@ -33,13 +43,13 @@ class URIBuilder:
 
     def __init__(
         self,
-        scheme=None,
-        userinfo=None,
-        host=None,
-        port=None,
-        path=None,
-        query=None,
-        fragment=None,
+        scheme: typing.Optional[str] = None,
+        userinfo: typing.Optional[str] = None,
+        host: typing.Optional[str] = None,
+        port: typing.Optional[str] = None,
+        path: typing.Optional[str] = None,
+        query: typing.Optional[str] = None,
+        fragment: typing.Optional[str] = None,
     ):
         """Initialize our URI builder.
 
@@ -68,15 +78,16 @@ class URIBuilder:
 
     def __repr__(self):
         """Provide a convenient view of our builder object."""
-        formatstr = (
-            "URIBuilder(scheme={b.scheme}, userinfo={b.userinfo}, "
-            "host={b.host}, port={b.port}, path={b.path}, "
-            "query={b.query}, fragment={b.fragment})"
+        return (
+            f"URIBuilder(scheme={self.scheme}, userinfo={self.userinfo}, "
+            f"host={self.host}, port={self.port}, path={self.path}, "
+            f"query={self.query}, fragment={self.fragment})"
         )
-        return formatstr.format(b=self)
 
     @classmethod
-    def from_uri(cls, reference):
+    def from_uri(
+        cls, reference: typing.Union[uri.URIReference, str]
+    ) -> compat.Self:
         """Initialize the URI builder from another URI.
 
         Takes the given URI reference and creates a new URI builder instance
@@ -95,7 +106,7 @@ class URIBuilder:
             fragment=reference.fragment,
         )
 
-    def add_scheme(self, scheme):
+    def add_scheme(self, scheme: str) -> compat.Self:
         """Add a scheme to our builder object.
 
         After normalizing, this will generate a new URIBuilder instance with
@@ -109,7 +120,7 @@ class URIBuilder:
 
         """
         scheme = normalizers.normalize_scheme(scheme)
-        return URIBuilder(
+        return type(self)(
             scheme=scheme,
             userinfo=self.userinfo,
             host=self.host,
@@ -119,7 +130,11 @@ class URIBuilder:
             fragment=self.fragment,
         )
 
-    def add_credentials(self, username, password):
+    def add_credentials(
+        self,
+        username: str,
+        password: typing.Optional[str],
+    ) -> compat.Self:
         """Add credentials as the userinfo portion of the URI.
 
         .. code-block:: python
@@ -137,12 +152,9 @@ class URIBuilder:
         userinfo = normalizers.normalize_username(username)
 
         if password is not None:
-            userinfo = "{}:{}".format(
-                userinfo,
-                normalizers.normalize_password(password),
-            )
+            userinfo = f"{userinfo}:{normalizers.normalize_password(password)}"
 
-        return URIBuilder(
+        return type(self)(
             scheme=self.scheme,
             userinfo=userinfo,
             host=self.host,
@@ -152,7 +164,7 @@ class URIBuilder:
             fragment=self.fragment,
         )
 
-    def add_host(self, host):
+    def add_host(self, host: str) -> compat.Self:
         """Add hostname to the URI.
 
         .. code-block:: python
@@ -162,7 +174,7 @@ class URIBuilder:
                     port=None, path=None, query=None, fragment=None)
 
         """
-        return URIBuilder(
+        return type(self)(
             scheme=self.scheme,
             userinfo=self.userinfo,
             host=normalizers.normalize_host(host),
@@ -172,7 +184,7 @@ class URIBuilder:
             fragment=self.fragment,
         )
 
-    def add_port(self, port):
+    def add_port(self, port: compat.ConvertibleToInt) -> compat.Self:
         """Add port to the URI.
 
         .. code-block:: python
@@ -189,19 +201,15 @@ class URIBuilder:
         port_int = int(port)
         if port_int < 0:
             raise ValueError(
-                "ports are not allowed to be negative. You provided {}".format(
-                    port_int,
-                )
+                f"ports are not allowed to be negative. You provided {port_int}"
             )
         if port_int > 65535:
             raise ValueError(
                 "ports are not allowed to be larger than 65535. "
-                "You provided {}".format(
-                    port_int,
-                )
+                f"You provided {port_int}"
             )
 
-        return URIBuilder(
+        return type(self)(
             scheme=self.scheme,
             userinfo=self.userinfo,
             host=self.host,
@@ -211,7 +219,7 @@ class URIBuilder:
             fragment=self.fragment,
         )
 
-    def add_path(self, path):
+    def add_path(self, path: str) -> compat.Self:
         """Add a path to the URI.
 
         .. code-block:: python
@@ -228,7 +236,7 @@ class URIBuilder:
         if not path.startswith("/"):
             path = f"/{path}"
 
-        return URIBuilder(
+        return type(self)(
             scheme=self.scheme,
             userinfo=self.userinfo,
             host=self.host,
@@ -238,7 +246,7 @@ class URIBuilder:
             fragment=self.fragment,
         )
 
-    def extend_path(self, path):
+    def extend_path(self, path: str) -> compat.Self:
         """Extend the existing path value with the provided value.
 
         .. versionadded:: 1.5.0
@@ -267,7 +275,7 @@ class URIBuilder:
 
         return self.add_path(path)
 
-    def add_query_from(self, query_items):
+    def add_query_from(self, query_items: _QueryType) -> compat.Self:
         """Generate and add a query a dictionary or list of tuples.
 
         .. code-block:: python
@@ -283,7 +291,7 @@ class URIBuilder:
         """
         query = normalizers.normalize_query(urlencode(query_items))
 
-        return URIBuilder(
+        return type(self)(
             scheme=self.scheme,
             userinfo=self.userinfo,
             host=self.host,
@@ -293,7 +301,7 @@ class URIBuilder:
             fragment=self.fragment,
         )
 
-    def extend_query_with(self, query_items):
+    def extend_query_with(self, query_items: _QueryType) -> compat.Self:
         """Extend the existing query string with the new query items.
 
         .. versionadded:: 1.5.0
@@ -309,12 +317,12 @@ class URIBuilder:
                     path=None, query='a=b+c&a=b+c', fragment=None)
         """
         original_query_items = parse_qsl(self.query or "")
-        if not isinstance(query_items, list):
+        if not isinstance(query_items, typing.Sequence):
             query_items = list(query_items.items())
 
-        return self.add_query_from(original_query_items + query_items)
+        return self.add_query_from([*original_query_items, *query_items])
 
-    def add_query(self, query):
+    def add_query(self, query: str) -> compat.Self:
         """Add a pre-formated query string to the URI.
 
         .. code-block:: python
@@ -324,7 +332,7 @@ class URIBuilder:
                     path=None, query='a=b&c=d', fragment=None)
 
         """
-        return URIBuilder(
+        return type(self)(
             scheme=self.scheme,
             userinfo=self.userinfo,
             host=self.host,
@@ -334,7 +342,7 @@ class URIBuilder:
             fragment=self.fragment,
         )
 
-    def add_fragment(self, fragment):
+    def add_fragment(self, fragment: str) -> compat.Self:
         """Add a fragment to the URI.
 
         .. code-block:: python
@@ -344,7 +352,7 @@ class URIBuilder:
                     path=None, query=None, fragment='section-2.6.1')
 
         """
-        return URIBuilder(
+        return type(self)(
             scheme=self.scheme,
             userinfo=self.userinfo,
             host=self.host,
@@ -354,7 +362,7 @@ class URIBuilder:
             fragment=normalizers.normalize_fragment(fragment),
         )
 
-    def finalize(self):
+    def finalize(self) -> uri.URIReference:
         """Create a URIReference from our builder.
 
         .. code-block:: python
@@ -379,7 +387,7 @@ class URIBuilder:
             self.fragment,
         )
 
-    def geturl(self):
+    def geturl(self) -> str:
         """Generate the URL from this builder.
 
         .. versionadded:: 1.5.0

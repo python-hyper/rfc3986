@@ -13,6 +13,8 @@
 # implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import sys
+import typing
 from collections import namedtuple
 
 from . import compat
@@ -21,12 +23,28 @@ from . import misc
 from . import normalizers
 from . import uri
 
-
 try:
     import idna
 except ImportError:  # pragma: no cover
     idna = None
 
+if sys.version_info >= (3, 11):
+    from typing import Self
+elif typing.TYPE_CHECKING:
+    from typing_extensions import Self
+else:
+
+    class Self:
+        pass
+
+
+class IRIReference2(typing.NamedTuple):
+    scheme: typing.Optional[str]
+    authority: typing.Optional[str]
+    path: typing.Optional[str]
+    query: str
+    fragment: str
+    encoding: str = "utf-8"
 
 class IRIReference(
     namedtuple("IRIReference", misc.URI_COMPONENTS), uri.URIMixin
@@ -58,7 +76,7 @@ class IRIReference(
         ref.encoding = encoding
         return ref
 
-    def __eq__(self, other):
+    def __eq__(self, other: object):
         """Compare this reference to another."""
         other_ref = other
         if isinstance(other, tuple):
@@ -68,19 +86,17 @@ class IRIReference(
                 other_ref = self.__class__.from_string(other)
             except TypeError:
                 raise TypeError(
-                    "Unable to compare {}() to {}()".format(
-                        type(self).__name__, type(other).__name__
-                    )
+                    f"Unable to compare {type(self).__name__}() to {type(other).__name__}()"
                 )
 
         # See http://tools.ietf.org/html/rfc3986#section-6.2
         return tuple(self) == tuple(other_ref)
 
-    def _match_subauthority(self):
+    def _match_subauthority(self) -> typing.Optional[typing.Match[str]]:
         return misc.ISUBAUTHORITY_MATCHER.match(self.authority)
 
     @classmethod
-    def from_string(cls, iri_string, encoding="utf-8"):
+    def from_string(cls, iri_string: str, encoding: str = "utf-8") -> Self:
         """Parse a IRI reference from the given unicode IRI string.
 
         :param str iri_string: Unicode IRI to be parsed into a reference.
@@ -99,7 +115,7 @@ class IRIReference(
             encoding,
         )
 
-    def encode(self, idna_encoder=None):  # noqa: C901
+    def encode(self, idna_encoder=None) -> uri.URIReference:  # noqa: C901
         """Encode an IRIReference into a URIReference instance.
 
         If the ``idna`` module is installed or the ``rfc3986[idna]``

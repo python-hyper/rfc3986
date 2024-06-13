@@ -1,4 +1,3 @@
-"""Module containing the implementation of the URIReference class."""
 # Copyright (c) 2014 Rackspace
 # Copyright (c) 2015 Ian Stapleton Cordasco
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +12,7 @@
 # implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""Module containing the implementation of the URIReference class."""
 from collections import namedtuple
 
 from . import compat
@@ -98,26 +98,24 @@ class URIReference(namedtuple("URIReference", misc.URI_COMPONENTS), URIMixin):
 
     __hash__ = tuple.__hash__
 
-    def __eq__(self, other):
+    def __eq__(self, other: object):
         """Compare this reference to another."""
         other_ref = other
         if isinstance(other, tuple):
-            other_ref = URIReference(*other)
-        elif not isinstance(other, URIReference):
+            other_ref = type(self)(*other)
+        elif not isinstance(other, type(self)):
             try:
-                other_ref = URIReference.from_string(other)
+                other_ref = self.from_string(other)
             except TypeError:
                 raise TypeError(
-                    "Unable to compare URIReference() to {}()".format(
-                        type(other).__name__
-                    )
-                )
+                    f"Unable to compare URIReference() to {type(other).__name__}()"
+                ) from None
 
         # See http://tools.ietf.org/html/rfc3986#section-6.2
         naive_equality = tuple(self) == tuple(other_ref)
         return naive_equality or self.normalized_equality(other_ref)
 
-    def normalize(self):
+    def normalize(self) -> compat.Self:
         """Normalize this reference as described in Section 6.2.2.
 
         This is not an in-place normalization. Instead this creates a new
@@ -128,7 +126,7 @@ class URIReference(namedtuple("URIReference", misc.URI_COMPONENTS), URIMixin):
         """
         # See http://tools.ietf.org/html/rfc3986#section-6.2.2 for logic in
         # this method.
-        return URIReference(
+        return type(self)(
             normalizers.normalize_scheme(self.scheme or ""),
             normalizers.normalize_authority(
                 (self.userinfo, self.host, self.port)
@@ -140,7 +138,7 @@ class URIReference(namedtuple("URIReference", misc.URI_COMPONENTS), URIMixin):
         )
 
     @classmethod
-    def from_string(cls, uri_string, encoding="utf-8"):
+    def from_string(cls, uri_string: str, encoding: str = "utf-8") -> compat.Self:
         """Parse a URI reference from the given unicode URI string.
 
         :param str uri_string: Unicode URI to be parsed into a reference.

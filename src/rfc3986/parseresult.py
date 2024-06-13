@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Module containing the urlparse compatibility logic."""
-from collections import namedtuple
+
+import typing as t
 
 from . import compat
 from . import exceptions
@@ -31,6 +32,16 @@ PARSED_COMPONENTS = (
     "query",
     "fragment",
 )
+
+
+class _ParseResultBase(t.NamedTuple, t.Generic[t.AnyStr]):
+    scheme: t.Optional[t.AnyStr]
+    userinfo: t.Optional[t.AnyStr]
+    host: t.AnyStr
+    port: t.Optional[t.AnyStr]
+    path: t.Optional[t.AnyStr]
+    query: t.Optional[t.AnyStr]
+    fragment: t.Optional[t.AnyStr]
 
 
 class ParseResultMixin:
@@ -74,30 +85,29 @@ class ParseResultMixin:
         return self.query
 
 
-class ParseResult(
-    namedtuple("ParseResult", PARSED_COMPONENTS), ParseResultMixin
-):
+class ParseResult(_ParseResultBase[str], ParseResultMixin):
     """Implementation of urlparse compatibility class.
 
     This uses the URIReference logic to handle compatibility with the
     urlparse.ParseResult class.
     """
 
-    slots = ()
+    encoding: str
+    reference: "uri.URIReference"
 
     def __new__(
         cls,
-        scheme,
-        userinfo,
-        host,
-        port,
-        path,
-        query,
-        fragment,
-        uri_ref,
-        encoding="utf-8",
+        scheme: t.Optional[str],
+        userinfo: t.Optional[str],
+        host: t.Optional[str],
+        port: t.Optional[str],
+        path: t.Optional[str],
+        query: str,
+        fragment: str,
+        uri_ref: "uri.URIReference",
+        encoding: str = "utf-8",
     ):
-        """Create a new ParseResult."""
+        """Create a new ParseResult instance."""
         parse_result = super().__new__(
             cls,
             scheme or None,
@@ -115,15 +125,15 @@ class ParseResult(
     @classmethod
     def from_parts(
         cls,
-        scheme=None,
-        userinfo=None,
-        host=None,
-        port=None,
-        path=None,
-        query=None,
-        fragment=None,
-        encoding="utf-8",
-    ):
+        scheme: t.Optional[str] = None,
+        userinfo: t.Optional[str] = None,
+        host: t.Optional[str] = None,
+        port: t.Optional[str] = None,
+        path: t.Optional[str] = None,
+        query: t.Optional[str] = None,
+        fragment: t.Optional[str] = None,
+        encoding: str = "utf-8",
+    ) -> compat.Self:
         """Create a ParseResult instance from its parts."""
         authority = ""
         if userinfo is not None:
@@ -155,8 +165,12 @@ class ParseResult(
 
     @classmethod
     def from_string(
-        cls, uri_string, encoding="utf-8", strict=True, lazy_normalize=True
-    ):
+        cls,
+        uri_string: str,
+        encoding: str = "utf-8",
+        strict: bool = True,
+        lazy_normalize: bool = True,
+    ) -> compat.Self:
         """Parse a URI from the given unicode URI string.
 
         :param str uri_string: Unicode URI to be parsed into a reference.
@@ -218,7 +232,7 @@ class ParseResult(
         )
         return ParseResult(uri_ref=ref, encoding=self.encoding, **attrs_dict)
 
-    def encode(self, encoding=None):
+    def encode(self, encoding: t.Optional[str] = None) -> "ParseResultBytes":
         """Convert to an instance of ParseResultBytes."""
         encoding = encoding or self.encoding
         attrs = dict(
@@ -234,7 +248,7 @@ class ParseResult(
             uri_ref=self.reference, encoding=encoding, **attrs
         )
 
-    def unsplit(self, use_idna=False):
+    def unsplit(self, use_idna: bool = False) -> str:
         """Create a URI string from the components.
 
         :returns: The parsed URI reconstituted as a string.
@@ -248,23 +262,25 @@ class ParseResult(
         return parse_result.reference.unsplit()
 
 
-class ParseResultBytes(
-    namedtuple("ParseResultBytes", PARSED_COMPONENTS), ParseResultMixin
-):
+class ParseResultBytes(_ParseResultBase[bytes], ParseResultMixin):
     """Compatibility shim for the urlparse.ParseResultBytes object."""
+
+    encoding: str
+    reference: "uri.URIReference"
+    lazy_normalize: bool
 
     def __new__(
         cls,
-        scheme,
-        userinfo,
-        host,
-        port,
-        path,
-        query,
-        fragment,
-        uri_ref,
-        encoding="utf-8",
-        lazy_normalize=True,
+        scheme: t.Optional[bytes],
+        userinfo: t.Optional[bytes],
+        host: bytes,
+        port: t.Optional[bytes],
+        path: t.Optional[bytes],
+        query: t.Optional[bytes],
+        fragment: t.Optional[bytes],
+        uri_ref: uri.URIReference,
+        encoding: str = "utf-8",
+        lazy_normalize: bool = True,
     ):
         """Create a new ParseResultBytes instance."""
         parse_result = super().__new__(
@@ -285,16 +301,16 @@ class ParseResultBytes(
     @classmethod
     def from_parts(
         cls,
-        scheme=None,
-        userinfo=None,
-        host=None,
-        port=None,
-        path=None,
-        query=None,
-        fragment=None,
-        encoding="utf-8",
-        lazy_normalize=True,
-    ):
+        scheme: t.Optional[str] = None,
+        userinfo: t.Optional[str] = None,
+        host: t.Optional[str] = None,
+        port: t.Optional[str] = None,
+        path: t.Optional[str] = None,
+        query: t.Optional[str] = None,
+        fragment: t.Optional[str] = None,
+        encoding: str = "utf-8",
+        lazy_normalize: bool = True,
+    ) -> compat.Self:
         """Create a ParseResult instance from its parts."""
         authority = ""
         if userinfo is not None:
@@ -330,8 +346,12 @@ class ParseResultBytes(
 
     @classmethod
     def from_string(
-        cls, uri_string, encoding="utf-8", strict=True, lazy_normalize=True
-    ):
+        cls,
+        uri_string: str,
+        encoding: str = "utf-8",
+        strict: bool = True,
+        lazy_normalize: bool = True,
+    ) -> compat.Self:
         """Parse a URI from the given unicode URI string.
 
         :param str uri_string: Unicode URI to be parsed into a reference.
@@ -425,7 +445,9 @@ class ParseResultBytes(
         return uri.encode(self.encoding)
 
 
-def split_authority(authority):
+def split_authority(
+    authority: str,
+) -> t.Tuple[t.Optional[str], t.Optional[str], t.Optional[str]]:
     # Initialize our expected return values
     userinfo = host = port = None
     # Initialize an extra var we may need to use
@@ -452,7 +474,13 @@ def split_authority(authority):
     return userinfo, host, port
 
 
-def authority_from(reference, strict):
+def authority_from(
+    reference: "uri.URIReference", strict: bool
+) -> t.Tuple[
+    t.Optional[str],
+    t.Optional[str],
+    t.Optional[t.Union[int, t.Literal[""]]],
+]:
     try:
         subauthority = reference.authority_info()
     except exceptions.InvalidAuthority:
@@ -462,9 +490,9 @@ def authority_from(reference, strict):
     else:
         # Thanks to Richard Barrell for this idea:
         # https://twitter.com/0x2ba22e11/status/617338811975139328
-        userinfo, host, port = (
-            subauthority.get(p) for p in ("userinfo", "host", "port")
-        )
+        userinfo = subauthority.get("userinfo")
+        host = subauthority.get("host")
+        port = subauthority.get("port")
 
     if port:
         if port.isascii() and port.isdigit():

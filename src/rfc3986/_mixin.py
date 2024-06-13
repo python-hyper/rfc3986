@@ -1,4 +1,5 @@
 """Module containing the implementation of the URIMixin class."""
+import typing as t
 import warnings
 
 from . import exceptions as exc
@@ -7,12 +8,18 @@ from . import normalizers
 from . import validators
 
 
+class _AuthorityInfo(t.TypedDict):
+    userinfo: t.Optional[str]
+    host: t.Optional[str]
+    port: t.Optional[str]
+
+
 class URIMixin:
     """Mixin with all shared methods for URIs and IRIs."""
 
     __hash__ = tuple.__hash__
 
-    def authority_info(self):
+    def authority_info(self) -> _AuthorityInfo:
         """Return a dictionary with the ``userinfo``, ``host``, and ``port``.
 
         If the authority is not valid, it will raise a
@@ -53,7 +60,7 @@ class URIMixin:
 
         return matches
 
-    def _match_subauthority(self):
+    def _match_subauthority(self) -> t.Optional[t.Match[str]]:
         return misc.SUBAUTHORITY_MATCHER.match(self.authority)
 
     @property
@@ -67,7 +74,7 @@ class URIMixin:
         return self._cached_validator
 
     @property
-    def host(self):
+    def host(self) -> t.Optional[str]:
         """If present, a string representing the host."""
         try:
             authority = self.authority_info()
@@ -76,7 +83,7 @@ class URIMixin:
         return authority["host"]
 
     @property
-    def port(self):
+    def port(self) -> t.Optional[str]:
         """If present, the port extracted from the authority."""
         try:
             authority = self.authority_info()
@@ -85,7 +92,7 @@ class URIMixin:
         return authority["port"]
 
     @property
-    def userinfo(self):
+    def userinfo(self) -> t.Optional[str]:
         """If present, the userinfo extracted from the authority."""
         try:
             authority = self.authority_info()
@@ -93,7 +100,7 @@ class URIMixin:
             return None
         return authority["userinfo"]
 
-    def is_absolute(self):
+    def is_absolute(self) -> bool:
         """Determine if this URI Reference is an absolute URI.
 
         See http://tools.ietf.org/html/rfc3986#section-4.3 for explanation.
@@ -103,7 +110,15 @@ class URIMixin:
         """
         return bool(misc.ABSOLUTE_URI_MATCHER.match(self.unsplit()))
 
-    def is_valid(self, **kwargs):
+    def is_valid(
+        self,
+        *,
+        require_scheme: bool = False,
+        require_authority: bool = False,
+        require_path: bool = False,
+        require_query: bool = False,
+        require_fragment: bool = False,
+    ) -> bool:
         """Determine if the URI is valid.
 
         .. deprecated:: 1.1.0
@@ -127,17 +142,18 @@ class URIMixin:
             "Please use rfc3986.validators.Validator instead. "
             "This method will be eventually removed.",
             DeprecationWarning,
+            stacklevel=2,
         )
         validators = [
-            (self.scheme_is_valid, kwargs.get("require_scheme", False)),
-            (self.authority_is_valid, kwargs.get("require_authority", False)),
-            (self.path_is_valid, kwargs.get("require_path", False)),
-            (self.query_is_valid, kwargs.get("require_query", False)),
-            (self.fragment_is_valid, kwargs.get("require_fragment", False)),
+            (self.scheme_is_valid, require_scheme),
+            (self.authority_is_valid, require_authority),
+            (self.path_is_valid, require_path),
+            (self.query_is_valid, require_query),
+            (self.fragment_is_valid, require_fragment),
         ]
         return all(v(r) for v, r in validators)
 
-    def authority_is_valid(self, require=False):
+    def authority_is_valid(self, require: bool = False) -> bool:
         """Determine if the authority component is valid.
 
         .. deprecated:: 1.1.0
@@ -155,6 +171,7 @@ class URIMixin:
             "Please use rfc3986.validators.Validator instead. "
             "This method will be eventually removed.",
             DeprecationWarning,
+            stacklevel=2,
         )
         try:
             self.authority_info()
@@ -167,7 +184,7 @@ class URIMixin:
             require=require,
         )
 
-    def scheme_is_valid(self, require=False):
+    def scheme_is_valid(self, require: bool = False) -> bool:
         """Determine if the scheme component is valid.
 
         .. deprecated:: 1.1.0
@@ -183,10 +200,11 @@ class URIMixin:
             "Please use rfc3986.validators.Validator instead. "
             "This method will be eventually removed.",
             DeprecationWarning,
+            stacklevel=2,
         )
         return validators.scheme_is_valid(self.scheme, require)
 
-    def path_is_valid(self, require=False):
+    def path_is_valid(self, require: bool = False) -> bool:
         """Determine if the path component is valid.
 
         .. deprecated:: 1.1.0
@@ -202,10 +220,11 @@ class URIMixin:
             "Please use rfc3986.validators.Validator instead. "
             "This method will be eventually removed.",
             DeprecationWarning,
+            stacklevel=2,
         )
         return validators.path_is_valid(self.path, require)
 
-    def query_is_valid(self, require=False):
+    def query_is_valid(self, require: bool = False) -> bool:
         """Determine if the query component is valid.
 
         .. deprecated:: 1.1.0
@@ -221,10 +240,11 @@ class URIMixin:
             "Please use rfc3986.validators.Validator instead. "
             "This method will be eventually removed.",
             DeprecationWarning,
+            stacklevel=2,
         )
         return validators.query_is_valid(self.query, require)
 
-    def fragment_is_valid(self, require=False):
+    def fragment_is_valid(self, require: bool = False) -> bool:
         """Determine if the fragment component is valid.
 
         .. deprecated:: 1.1.0
@@ -240,10 +260,11 @@ class URIMixin:
             "Please use rfc3986.validators.Validator instead. "
             "This method will be eventually removed.",
             DeprecationWarning,
+            stacklevel=2,
         )
         return validators.fragment_is_valid(self.fragment, require)
 
-    def normalized_equality(self, other_ref):
+    def normalized_equality(self, other_ref) -> bool:
         """Compare this URIReference to another URIReference.
 
         :param URIReference other_ref: (required), The reference with which
@@ -325,7 +346,7 @@ class URIMixin:
                     )
         return target
 
-    def unsplit(self):
+    def unsplit(self) -> str:
         """Create a URI string from the components.
 
         :returns: The URI Reference reconstituted as a string.
@@ -347,11 +368,11 @@ class URIMixin:
 
     def copy_with(
         self,
-        scheme=misc.UseExisting,
-        authority=misc.UseExisting,
-        path=misc.UseExisting,
-        query=misc.UseExisting,
-        fragment=misc.UseExisting,
+        scheme: str = misc.UseExisting,
+        authority: str = misc.UseExisting,
+        path: str = misc.UseExisting,
+        query: str = misc.UseExisting,
+        fragment: str = misc.UseExisting,
     ):
         """Create a copy of this reference with the new components.
 

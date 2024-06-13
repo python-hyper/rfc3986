@@ -103,7 +103,7 @@ ABSOLUTE_URI_MATCHER = re.compile(
 # IRIs / RFC 3987
 # ###############
 
-IRI_MATCHER = re.compile(abnf_regexp.URL_PARSING_RE, re.UNICODE)
+IRI_MATCHER = re.compile(abnf_regexp.URL_PARSING_RE)
 
 ISUBAUTHORITY_MATCHER = re.compile(
     (

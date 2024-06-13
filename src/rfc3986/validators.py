@@ -12,9 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Module containing the validation logic for rfc3986."""
+import typing
+
+from . import compat
 from . import exceptions
 from . import misc
 from . import normalizers
+from . import uri
 
 
 class Validator:
@@ -50,10 +54,10 @@ class Validator:
 
     def __init__(self):
         """Initialize our default validations."""
-        self.allowed_schemes = set()
-        self.allowed_hosts = set()
-        self.allowed_ports = set()
-        self.allow_password = True
+        self.allowed_schemes: set[str] = set()
+        self.allowed_hosts: set[str] = set()
+        self.allowed_ports: set[str] = set()
+        self.allow_password: bool = True
         self.required_components = {
             "scheme": False,
             "userinfo": False,
@@ -65,7 +69,7 @@ class Validator:
         }
         self.validated_components = self.required_components.copy()
 
-    def allow_schemes(self, *schemes):
+    def allow_schemes(self, *schemes: str) -> compat.Self:
         """Require the scheme to be one of the provided schemes.
 
         .. versionadded:: 1.0
@@ -77,11 +81,10 @@ class Validator:
         :rtype:
             Validator
         """
-        for scheme in schemes:
-            self.allowed_schemes.add(normalizers.normalize_scheme(scheme))
+        self.allowed_schemes.update(schemes)
         return self
 
-    def allow_hosts(self, *hosts):
+    def allow_hosts(self, *hosts: str) -> compat.Self:
         """Require the host to be one of the provided hosts.
 
         .. versionadded:: 1.0
@@ -97,7 +100,7 @@ class Validator:
             self.allowed_hosts.add(normalizers.normalize_host(host))
         return self
 
-    def allow_ports(self, *ports):
+    def allow_ports(self, *ports: str) -> compat.Self:
         """Require the port to be one of the provided ports.
 
         .. versionadded:: 1.0
@@ -115,7 +118,7 @@ class Validator:
                 self.allowed_ports.add(port)
         return self
 
-    def allow_use_of_password(self):
+    def allow_use_of_password(self) -> compat.Self:
         """Allow passwords to be present in the URI.
 
         .. versionadded:: 1.0
@@ -128,7 +131,7 @@ class Validator:
         self.allow_password = True
         return self
 
-    def forbid_use_of_password(self):
+    def forbid_use_of_password(self) -> compat.Self:
         """Prevent passwords from being included in the URI.
 
         .. versionadded:: 1.0
@@ -141,7 +144,7 @@ class Validator:
         self.allow_password = False
         return self
 
-    def check_validity_of(self, *components):
+    def check_validity_of(self, *components: str) -> compat.Self:
         """Check the validity of the components provided.
 
         This can be specified repeatedly.
@@ -155,7 +158,7 @@ class Validator:
         :rtype:
             Validator
         """
-        components = [c.lower() for c in components]
+        components = tuple(c.lower() for c in components)
         for component in components:
             if component not in self.COMPONENT_NAMES:
                 raise ValueError(f'"{component}" is not a valid component')
@@ -164,7 +167,7 @@ class Validator:
         )
         return self
 
-    def require_presence_of(self, *components):
+    def require_presence_of(self, *components: str) -> compat.Self:
         """Require the components provided.
 
         This can be specified repeatedly.
@@ -178,7 +181,7 @@ class Validator:
         :rtype:
             Validator
         """
-        components = [c.lower() for c in components]
+        components = tuple(c.lower() for c in components)
         for component in components:
             if component not in self.COMPONENT_NAMES:
                 raise ValueError(f'"{component}" is not a valid component')
@@ -187,7 +190,7 @@ class Validator:
         )
         return self
 
-    def validate(self, uri):
+    def validate(self, uri: uri.URIReference) -> None:
         """Check a URI for conditions specified on this validator.
 
         .. versionadded:: 1.0
@@ -229,7 +232,7 @@ class Validator:
         ensure_one_of(self.allowed_ports, uri, "port")
 
 
-def check_password(uri):
+def check_password(uri: uri.URIReference) -> None:
     """Assert that there is no password present in the uri."""
     userinfo = uri.userinfo
     if not userinfo:
@@ -240,7 +243,11 @@ def check_password(uri):
     raise exceptions.PasswordForbidden(uri)
 
 
-def ensure_one_of(allowed_values, uri, attribute):
+def ensure_one_of(
+    allowed_values: typing.Container[object],
+    uri: uri.URIReference,
+    attribute: str,
+) -> None:
     """Assert that the uri's attribute is one of the allowed values."""
     value = getattr(uri, attribute)
     if value is not None and allowed_values and value not in allowed_values:
@@ -251,7 +258,10 @@ def ensure_one_of(allowed_values, uri, attribute):
         )
 
 
-def ensure_required_components_exist(uri, required_components):
+def ensure_required_components_exist(
+    uri: uri.URIReference,
+    required_components: typing.Iterable[str],
+) -> None:
     """Assert that all required components are present in the URI."""
     missing_components = sorted(
         component
@@ -262,7 +272,11 @@ def ensure_required_components_exist(uri, required_components):
         raise exceptions.MissingComponentError(uri, *missing_components)
 
 
-def is_valid(value, matcher, require):
+def is_valid(
+    value: typing.Optional[str],
+    matcher: typing.Pattern[str],
+    require: bool,
+) -> bool:
     """Determine if a value is valid based on the provided matcher.
 
     :param str value:
@@ -273,13 +287,17 @@ def is_valid(value, matcher, require):
         Whether or not the value is required.
     """
     if require:
-        return value is not None and matcher.match(value)
+        return value is not None and bool(matcher.match(value))
 
     # require is False and value is not None
-    return value is None or matcher.match(value)
+    return value is None or bool(matcher.match(value))
 
 
-def authority_is_valid(authority, host=None, require=False):
+def authority_is_valid(
+    authority: str,
+    host: typing.Optional[str] = None,
+    require: bool = False,
+) -> bool:
     """Determine if the authority string is valid.
 
     :param str authority:
@@ -299,7 +317,7 @@ def authority_is_valid(authority, host=None, require=False):
     return validated
 
 
-def host_is_valid(host, require=False):
+def host_is_valid(host: typing.Optional[str], require: bool = False) -> bool:
     """Determine if the host string is valid.
 
     :param str host:
@@ -319,7 +337,9 @@ def host_is_valid(host, require=False):
     return validated
 
 
-def scheme_is_valid(scheme, require=False):
+def scheme_is_valid(
+    scheme: typing.Optional[str], require: bool = False
+) -> bool:
     """Determine if the scheme is valid.
 
     :param str scheme:
@@ -334,7 +354,7 @@ def scheme_is_valid(scheme, require=False):
     return is_valid(scheme, misc.SCHEME_MATCHER, require)
 
 
-def path_is_valid(path, require=False):
+def path_is_valid(path: typing.Optional[str], require: bool = False) -> bool:
     """Determine if the path component is valid.
 
     :param str path:
@@ -349,7 +369,7 @@ def path_is_valid(path, require=False):
     return is_valid(path, misc.PATH_MATCHER, require)
 
 
-def query_is_valid(query, require=False):
+def query_is_valid(query: typing.Optional[str], require: bool = False) -> bool:
     """Determine if the query component is valid.
 
     :param str query:
@@ -364,7 +384,10 @@ def query_is_valid(query, require=False):
     return is_valid(query, misc.QUERY_MATCHER, require)
 
 
-def fragment_is_valid(fragment, require=False):
+def fragment_is_valid(
+    fragment: typing.Optional[str],
+    require: bool = False,
+) -> bool:
     """Determine if the fragment component is valid.
 
     :param str fragment:
@@ -379,11 +402,11 @@ def fragment_is_valid(fragment, require=False):
     return is_valid(fragment, misc.FRAGMENT_MATCHER, require)
 
 
-def valid_ipv4_host_address(host):
+def valid_ipv4_host_address(host: str) -> bool:
     """Determine if the given host is a valid IPv4 address."""
     # If the host exists, and it might be IPv4, check each byte in the
     # address.
-    return all([0 <= int(byte, base=10) <= 255 for byte in host.split(".")])
+    return all(0 <= int(byte, base=10) <= 255 for byte in host.split("."))
 
 
 _COMPONENT_VALIDATORS = {
@@ -396,7 +419,10 @@ _COMPONENT_VALIDATORS = {
 _SUBAUTHORITY_VALIDATORS = {"userinfo", "host", "port"}
 
 
-def subauthority_component_is_valid(uri, component):
+def subauthority_component_is_valid(
+    uri: uri.URIReference,
+    component: str,
+) -> bool:
     """Determine if the userinfo, host, and port are valid."""
     try:
         subauthority_dict = uri.authority_info()
@@ -420,21 +446,20 @@ def subauthority_component_is_valid(uri, component):
     return 0 <= port <= 65535
 
 
-def ensure_components_are_valid(uri, validated_components):
+def ensure_components_are_valid(
+    uri: uri.URIReference,
+    validated_components: typing.List[str],
+) -> None:
     """Assert that all components are valid in the URI."""
-    invalid_components = set()
-    for component in validated_components:
-        if component in _SUBAUTHORITY_VALIDATORS:
-            if not subauthority_component_is_valid(uri, component):
-                invalid_components.add(component)
-            # Python's peephole optimizer means that while this continue *is*
-            # actually executed, coverage.py cannot detect that. See also,
-            # https://bitbucket.org/ned/coveragepy/issues/198/continue-marked-as-not-covered
-            continue  # nocov: Python 2.7, 3.3, 3.4
-
-        validator = _COMPONENT_VALIDATORS[component]
-        if not validator(getattr(uri, component)):
-            invalid_components.add(component)
+    invalid_components: set[str] = {
+        component
+        for component in validated_components
+        if (
+            component in _SUBAUTHORITY_VALIDATORS
+            and not subauthority_component_is_valid(uri, component)
+        )
+        or not _COMPONENT_VALIDATORS[component](getattr(uri, component))
+    }
 
     if invalid_components:
         raise exceptions.InvalidComponentsError(uri, *invalid_components)
