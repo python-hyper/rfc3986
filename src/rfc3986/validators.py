@@ -272,7 +272,9 @@ def ensure_required_components_exist(
         raise exceptions.MissingComponentError(uri, *missing_components)
 
 
-def is_valid(value: t.Optional[str], matcher: t.Pattern[str], require: bool) -> bool:
+def is_valid(
+    value: t.Optional[str], matcher: t.Pattern[str], require: bool
+) -> bool:
     """Determine if a value is valid based on the provided matcher.
 
     :param str value:
@@ -289,7 +291,9 @@ def is_valid(value: t.Optional[str], matcher: t.Pattern[str], require: bool) -> 
     return value is None or bool(matcher.match(value))
 
 
-def authority_is_valid(authority: str, host: t.Optional[str] = None, require: bool = False) -> bool:
+def authority_is_valid(
+    authority: str, host: t.Optional[str] = None, require: bool = False
+) -> bool:
     """Determine if the authority string is valid.
 
     :param str authority:
@@ -374,7 +378,9 @@ def query_is_valid(query: t.Optional[str], require: bool = False) -> bool:
     return is_valid(query, misc.QUERY_MATCHER, require)
 
 
-def fragment_is_valid(fragment: t.Optional[str], require: bool = False) -> bool:
+def fragment_is_valid(
+    fragment: t.Optional[str], require: bool = False
+) -> bool:
     """Determine if the fragment component is valid.
 
     :param str fragment:
@@ -406,7 +412,9 @@ _COMPONENT_VALIDATORS = {
 _SUBAUTHORITY_VALIDATORS = {"userinfo", "host", "port"}
 
 
-def subauthority_component_is_valid(uri: "uri.URIReference", component: str) -> bool:
+def subauthority_component_is_valid(
+    uri: "uri.URIReference", component: str
+) -> bool:
     """Determine if the userinfo, host, and port are valid."""
     try:
         subauthority_dict = uri.authority_info()
@@ -430,7 +438,9 @@ def subauthority_component_is_valid(uri: "uri.URIReference", component: str) -> 
     return 0 <= port <= 65535
 
 
-def ensure_components_are_valid(uri: "uri.URIReference", validated_components: t.List[str]) -> None:
+def ensure_components_are_valid(
+    uri: "uri.URIReference", validated_components: t.List[str]
+) -> None:
     """Assert that all components are valid in the URI."""
     invalid_components: set[str] = set()
     for component in validated_components:

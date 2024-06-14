@@ -144,13 +144,20 @@ def remove_dot_segments(s: str) -> str:
 
     return "/".join(output)
 
+
 @t.overload
 def encode_component(uri_component: None, encoding: str) -> None:
     ...
+
+
 @t.overload
 def encode_component(uri_component: str, encoding: str) -> str:
     ...
-def encode_component(uri_component: t.Optional[str], encoding: str) -> t.Optional[str]:
+
+
+def encode_component(
+    uri_component: t.Optional[str], encoding: str
+) -> t.Optional[str]:
     """Encode the specific component in the provided encoding."""
     if uri_component is None:
         return uri_component
