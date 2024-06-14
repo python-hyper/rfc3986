@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Module containing the urlparse compatibility logic."""
-
 import typing as t
 
 from . import compat
@@ -34,18 +33,37 @@ PARSED_COMPONENTS = (
 )
 
 
+class _ParseResultProtocol(t.Protocol[t.AnyStr]):
+    @property
+    def userinfo(self) -> t.Optional[t.AnyStr]: ...
+    @property
+    def host(self) -> t.Optional[t.AnyStr]: ...
+    @property
+    def port(self) -> t.Optional[t.AnyStr]: ...
+    @property
+    def query(self) -> t.Optional[t.AnyStr]: ...
+    @property
+    def encoding(self) -> str: ...
+    @property
+    def authority(self) -> t.AnyStr: ...
+    def unsplit(self) -> t.AnyStr: ...
+
+
 class _ParseResultBase(t.NamedTuple, t.Generic[t.AnyStr]):
     scheme: t.Optional[t.AnyStr]
     userinfo: t.Optional[t.AnyStr]
-    host: t.AnyStr
+    host: t.Optional[t.AnyStr]
     port: t.Optional[t.AnyStr]
     path: t.Optional[t.AnyStr]
     query: t.Optional[t.AnyStr]
     fragment: t.Optional[t.AnyStr]
 
 
-class ParseResultMixin:
-    def _generate_authority(self, attributes):
+class ParseResultMixin(t.Generic[t.AnyStr]):
+    def _generate_authority(
+        self: _ParseResultProtocol[t.AnyStr],
+        attributes: t.Dict[str, t.Optional[t.AnyStr]],
+    ) -> str:
         # I swear I did not align the comparisons below. That's just how they
         # happened to align based on pep8 and attribute lengths.
         userinfo, host, port = (
@@ -65,27 +83,27 @@ class ParseResultMixin:
             return self.authority.decode("utf-8")
         return self.authority
 
-    def geturl(self):
+    def geturl(self: _ParseResultProtocol[t.AnyStr]) -> t.AnyStr:
         """Shim to match the standard library method."""
         return self.unsplit()
 
     @property
-    def hostname(self):
+    def hostname(self: _ParseResultProtocol[t.AnyStr]) -> t.Optional[t.AnyStr]:
         """Shim to match the standard library."""
         return self.host
 
     @property
-    def netloc(self):
+    def netloc(self: _ParseResultProtocol[t.AnyStr]) -> t.Optional[t.AnyStr]:
         """Shim to match the standard library."""
         return self.authority
 
     @property
-    def params(self):
+    def params(self: _ParseResultProtocol[t.AnyStr]) -> t.Optional[t.AnyStr]:
         """Shim to match the standard library."""
         return self.query
 
 
-class ParseResult(_ParseResultBase[str], ParseResultMixin):
+class ParseResult(_ParseResultBase[str], ParseResultMixin[str]):
     """Implementation of urlparse compatibility class.
 
     This uses the URIReference logic to handle compatibility with the
@@ -102,8 +120,8 @@ class ParseResult(_ParseResultBase[str], ParseResultMixin):
         host: t.Optional[str],
         port: t.Optional[str],
         path: t.Optional[str],
-        query: str,
-        fragment: str,
+        query: t.Optional[str],
+        fragment: t.Optional[str],
         uri_ref: "uri.URIReference",
         encoding: str = "utf-8",
     ):
@@ -198,26 +216,26 @@ class ParseResult(_ParseResultBase[str], ParseResultMixin):
         )
 
     @property
-    def authority(self):
+    def authority(self) -> str:
         """Return the normalized authority."""
         return self.reference.authority
 
     def copy_with(
         self,
-        scheme=misc.UseExisting,
-        userinfo=misc.UseExisting,
-        host=misc.UseExisting,
-        port=misc.UseExisting,
-        path=misc.UseExisting,
-        query=misc.UseExisting,
-        fragment=misc.UseExisting,
-    ):
+        scheme: t.Optional[str] = misc.UseExisting,
+        userinfo: t.Optional[str] = misc.UseExisting,
+        host: t.Optional[str] = misc.UseExisting,
+        port: t.Optional[str] = misc.UseExisting,
+        path: t.Optional[str] = misc.UseExisting,
+        query: t.Optional[str] = misc.UseExisting,
+        fragment: t.Optional[str] = misc.UseExisting,
+    ) -> "ParseResult":
         """Create a copy of this instance replacing with specified parts."""
         attributes = zip(
             PARSED_COMPONENTS,
             (scheme, userinfo, host, port, path, query, fragment),
         )
-        attrs_dict = {}
+        attrs_dict: dict[str, t.Optional[str]] = {}
         for name, value in attributes:
             if value is misc.UseExisting:
                 value = getattr(self, name)
@@ -245,7 +263,9 @@ class ParseResult(_ParseResultBase[str], ParseResultMixin):
             )
         )
         return ParseResultBytes(
-            uri_ref=self.reference, encoding=encoding, **attrs
+            uri_ref=self.reference,
+            encoding=encoding,
+            **attrs,
         )
 
     def unsplit(self, use_idna: bool = False) -> str:
@@ -262,7 +282,7 @@ class ParseResult(_ParseResultBase[str], ParseResultMixin):
         return parse_result.reference.unsplit()
 
 
-class ParseResultBytes(_ParseResultBase[bytes], ParseResultMixin):
+class ParseResultBytes(_ParseResultBase[bytes], ParseResultMixin[bytes]):
     """Compatibility shim for the urlparse.ParseResultBytes object."""
 
     encoding: str
@@ -273,12 +293,12 @@ class ParseResultBytes(_ParseResultBase[bytes], ParseResultMixin):
         cls,
         scheme: t.Optional[bytes],
         userinfo: t.Optional[bytes],
-        host: bytes,
+        host: t.Optional[bytes],
         port: t.Optional[bytes],
         path: t.Optional[bytes],
         query: t.Optional[bytes],
         fragment: t.Optional[bytes],
-        uri_ref: uri.URIReference,
+        uri_ref: "uri.URIReference",
         encoding: str = "utf-8",
         lazy_normalize: bool = True,
     ):
@@ -381,21 +401,21 @@ class ParseResultBytes(_ParseResultBase[bytes], ParseResultMixin):
         )
 
     @property
-    def authority(self):
+    def authority(self) -> bytes:
         """Return the normalized authority."""
         return self.reference.authority.encode(self.encoding)
 
     def copy_with(
         self,
-        scheme=misc.UseExisting,
-        userinfo=misc.UseExisting,
-        host=misc.UseExisting,
-        port=misc.UseExisting,
-        path=misc.UseExisting,
-        query=misc.UseExisting,
-        fragment=misc.UseExisting,
-        lazy_normalize=True,
-    ):
+        scheme: t.Optional[bytes] = misc.UseExisting,
+        userinfo: t.Optional[bytes] = misc.UseExisting,
+        host: t.Optional[bytes] = misc.UseExisting,
+        port: t.Optional[bytes] = misc.UseExisting,
+        path: t.Optional[bytes] = misc.UseExisting,
+        query: t.Optional[bytes] = misc.UseExisting,
+        fragment: t.Optional[bytes] = misc.UseExisting,
+        lazy_normalize: bool = True,
+    ) -> "ParseResultBytes":
         """Create a copy of this instance replacing with specified parts."""
         attributes = zip(
             PARSED_COMPONENTS,
@@ -405,9 +425,12 @@ class ParseResultBytes(_ParseResultBase[bytes], ParseResultMixin):
         for name, value in attributes:
             if value is misc.UseExisting:
                 value = getattr(self, name)
-            if not isinstance(value, bytes) and hasattr(value, "encode"):
-                value = value.encode(self.encoding)
+            value = compat.to_bytes(value, self.encoding)
             attrs_dict[name] = value
+
+        if t.TYPE_CHECKING:
+            attrs_dict = t.cast(t.Dict[str, t.Optional[bytes]], attrs_dict)
+
         authority = self._generate_authority(attrs_dict)
         to_str = compat.to_str
         ref = self.reference.copy_with(
@@ -426,7 +449,7 @@ class ParseResultBytes(_ParseResultBase[bytes], ParseResultMixin):
             **attrs_dict,
         )
 
-    def unsplit(self, use_idna=False):
+    def unsplit(self, use_idna: bool = False) -> bytes:
         """Create a URI bytes object from the components.
 
         :returns: The parsed URI reconstituted as a string.
@@ -475,7 +498,8 @@ def split_authority(
 
 
 def authority_from(
-    reference: "uri.URIReference", strict: bool
+    reference: "uri.URIReference",
+    strict: bool,
 ) -> t.Tuple[
     t.Optional[str],
     t.Optional[str],

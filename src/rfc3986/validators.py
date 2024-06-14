@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Module containing the validation logic for rfc3986."""
-import typing
+import typing as t
 
 from . import compat
 from . import exceptions
@@ -190,7 +190,7 @@ class Validator:
         )
         return self
 
-    def validate(self, uri: uri.URIReference) -> None:
+    def validate(self, uri: "uri.URIReference") -> None:
         """Check a URI for conditions specified on this validator.
 
         .. versionadded:: 1.0
@@ -232,7 +232,7 @@ class Validator:
         ensure_one_of(self.allowed_ports, uri, "port")
 
 
-def check_password(uri: uri.URIReference) -> None:
+def check_password(uri: "uri.URIReference") -> None:
     """Assert that there is no password present in the uri."""
     userinfo = uri.userinfo
     if not userinfo:
@@ -244,8 +244,8 @@ def check_password(uri: uri.URIReference) -> None:
 
 
 def ensure_one_of(
-    allowed_values: typing.Container[object],
-    uri: uri.URIReference,
+    allowed_values: t.Container[object],
+    uri: "uri.URIReference",
     attribute: str,
 ) -> None:
     """Assert that the uri's attribute is one of the allowed values."""
@@ -259,8 +259,8 @@ def ensure_one_of(
 
 
 def ensure_required_components_exist(
-    uri: uri.URIReference,
-    required_components: typing.Iterable[str],
+    uri: "uri.URIReference",
+    required_components: t.Iterable[str],
 ) -> None:
     """Assert that all required components are present in the URI."""
     missing_components = sorted(
@@ -273,8 +273,8 @@ def ensure_required_components_exist(
 
 
 def is_valid(
-    value: typing.Optional[str],
-    matcher: typing.Pattern[str],
+    value: t.Optional[str],
+    matcher: t.Pattern[str],
     require: bool,
 ) -> bool:
     """Determine if a value is valid based on the provided matcher.
@@ -295,7 +295,7 @@ def is_valid(
 
 def authority_is_valid(
     authority: str,
-    host: typing.Optional[str] = None,
+    host: t.Optional[str] = None,
     require: bool = False,
 ) -> bool:
     """Determine if the authority string is valid.
@@ -317,7 +317,7 @@ def authority_is_valid(
     return validated
 
 
-def host_is_valid(host: typing.Optional[str], require: bool = False) -> bool:
+def host_is_valid(host: t.Optional[str], require: bool = False) -> bool:
     """Determine if the host string is valid.
 
     :param str host:
@@ -337,9 +337,7 @@ def host_is_valid(host: typing.Optional[str], require: bool = False) -> bool:
     return validated
 
 
-def scheme_is_valid(
-    scheme: typing.Optional[str], require: bool = False
-) -> bool:
+def scheme_is_valid(scheme: t.Optional[str], require: bool = False) -> bool:
     """Determine if the scheme is valid.
 
     :param str scheme:
@@ -354,7 +352,7 @@ def scheme_is_valid(
     return is_valid(scheme, misc.SCHEME_MATCHER, require)
 
 
-def path_is_valid(path: typing.Optional[str], require: bool = False) -> bool:
+def path_is_valid(path: t.Optional[str], require: bool = False) -> bool:
     """Determine if the path component is valid.
 
     :param str path:
@@ -369,7 +367,7 @@ def path_is_valid(path: typing.Optional[str], require: bool = False) -> bool:
     return is_valid(path, misc.PATH_MATCHER, require)
 
 
-def query_is_valid(query: typing.Optional[str], require: bool = False) -> bool:
+def query_is_valid(query: t.Optional[str], require: bool = False) -> bool:
     """Determine if the query component is valid.
 
     :param str query:
@@ -385,7 +383,7 @@ def query_is_valid(query: typing.Optional[str], require: bool = False) -> bool:
 
 
 def fragment_is_valid(
-    fragment: typing.Optional[str],
+    fragment: t.Optional[str],
     require: bool = False,
 ) -> bool:
     """Determine if the fragment component is valid.
@@ -420,7 +418,7 @@ _SUBAUTHORITY_VALIDATORS = {"userinfo", "host", "port"}
 
 
 def subauthority_component_is_valid(
-    uri: uri.URIReference,
+    uri: "uri.URIReference",
     component: str,
 ) -> bool:
     """Determine if the userinfo, host, and port are valid."""
@@ -447,19 +445,23 @@ def subauthority_component_is_valid(
 
 
 def ensure_components_are_valid(
-    uri: uri.URIReference,
-    validated_components: typing.List[str],
+    uri: "uri.URIReference",
+    validated_components: t.List[str],
 ) -> None:
     """Assert that all components are valid in the URI."""
-    invalid_components: set[str] = {
-        component
-        for component in validated_components
-        if (
-            component in _SUBAUTHORITY_VALIDATORS
-            and not subauthority_component_is_valid(uri, component)
-        )
-        or not _COMPONENT_VALIDATORS[component](getattr(uri, component))
-    }
+    invalid_components: set[str] = set()
+    for component in validated_components:
+        if component in _SUBAUTHORITY_VALIDATORS:
+            if not subauthority_component_is_valid(uri, component):
+                invalid_components.add(component)
+            # Python's peephole optimizer means that while this continue *is*
+            # actually executed, coverage.py cannot detect that. See also,
+            # https://bitbucket.org/ned/coveragepy/issues/198/continue-marked-as-not-covered
+            continue  # nocov: Python 2.7, 3.3, 3.4
+
+        validator = _COMPONENT_VALIDATORS[component]
+        if not validator(getattr(uri, component)):
+            invalid_components.add(component)
 
     if invalid_components:
         raise exceptions.InvalidComponentsError(uri, *invalid_components)

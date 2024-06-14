@@ -1,4 +1,3 @@
-"""Module containing the implementation of the IRIReference class."""
 # Copyright (c) 2014 Rackspace
 # Copyright (c) 2015 Ian Stapleton Cordasco
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,9 +12,8 @@
 # implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import sys
-import typing
-from collections import namedtuple
+"""Module containing the implementation of the IRIReference class."""
+import typing as t
 
 from . import compat
 from . import exceptions
@@ -28,27 +26,8 @@ try:
 except ImportError:  # pragma: no cover
     idna = None
 
-if sys.version_info >= (3, 11):
-    from typing import Self
-elif typing.TYPE_CHECKING:
-    from typing_extensions import Self
-else:
 
-    class Self:
-        pass
-
-
-class IRIReference2(typing.NamedTuple):
-    scheme: typing.Optional[str]
-    authority: typing.Optional[str]
-    path: typing.Optional[str]
-    query: str
-    fragment: str
-    encoding: str = "utf-8"
-
-class IRIReference(
-    namedtuple("IRIReference", misc.URI_COMPONENTS), uri.URIMixin
-):
+class IRIReference(misc.URIReferenceBase, uri.URIMixin):
     """Immutable object representing a parsed IRI Reference.
 
     Can be encoded into an URIReference object via the procedure
@@ -58,11 +37,16 @@ class IRIReference(
         The IRI submodule is a new interface and may possibly change in
         the future. Check for changes to the interface when upgrading.
     """
-
-    slots = ()
+    encoding: str
 
     def __new__(
-        cls, scheme, authority, path, query, fragment, encoding="utf-8"
+        cls,
+        scheme: t.Optional[str],
+        authority: t.Optional[str],
+        path: t.Optional[str],
+        query: t.Optional[str],
+        fragment: t.Optional[str],
+        encoding: str = "utf-8",
     ):
         """Create a new IRIReference."""
         ref = super().__new__(
@@ -76,27 +60,33 @@ class IRIReference(
         ref.encoding = encoding
         return ref
 
+    __hash__ = tuple.__hash__  # type: ignore
+
     def __eq__(self, other: object):
         """Compare this reference to another."""
         other_ref = other
         if isinstance(other, tuple):
-            other_ref = self.__class__(*other)
+            other_ref = type(self)(*other)
         elif not isinstance(other, IRIReference):
             try:
-                other_ref = self.__class__.from_string(other)
+                other_ref = self.from_string(other)
             except TypeError:
                 raise TypeError(
                     f"Unable to compare {type(self).__name__}() to {type(other).__name__}()"
-                )
+                ) from None
 
         # See http://tools.ietf.org/html/rfc3986#section-6.2
         return tuple(self) == tuple(other_ref)
 
-    def _match_subauthority(self) -> typing.Optional[typing.Match[str]]:
+    def _match_subauthority(self) -> t.Optional[t.Match[str]]:
         return misc.ISUBAUTHORITY_MATCHER.match(self.authority)
 
     @classmethod
-    def from_string(cls, iri_string: str, encoding: str = "utf-8") -> Self:
+    def from_string(
+        cls,
+        iri_string: str,
+        encoding: str = "utf-8",
+    ) -> compat.Self:
         """Parse a IRI reference from the given unicode IRI string.
 
         :param str iri_string: Unicode IRI to be parsed into a reference.
@@ -115,7 +105,12 @@ class IRIReference(
             encoding,
         )
 
-    def encode(self, idna_encoder=None) -> uri.URIReference:  # noqa: C901
+    def encode(
+        self,
+        idna_encoder: t.Optional[
+            t.Callable[[str], t.Union[str, bytes]]
+        ] = None,
+    ) -> uri.URIReference:
         """Encode an IRIReference into a URIReference instance.
 
         If the ``idna`` module is installed or the ``rfc3986[idna]``
@@ -138,23 +133,24 @@ class IRIReference(
                         "and the IRI hostname requires encoding"
                     )
 
-                def idna_encoder(name):
+                def idna_encoder(name: str) -> t.Union[bytes, str]:
+                    assert idna
                     if any(ord(c) > 128 for c in name):
                         try:
                             return idna.encode(
                                 name.lower(), strict=True, std3_rules=True
                             )
                         except idna.IDNAError:
-                            raise exceptions.InvalidAuthority(self.authority)
+                            raise exceptions.InvalidAuthority(
+                                self.authority
+                            ) from None
                     return name
 
             authority = ""
             if self.host:
                 authority = ".".join(
-                    [
-                        compat.to_str(idna_encoder(part))
-                        for part in self.host.split(".")
-                    ]
+                    compat.to_str(idna_encoder(part))
+                    for part in self.host.split(".")
                 )
 
             if self.userinfo is not None:

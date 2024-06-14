@@ -89,7 +89,7 @@ class PasswordForbidden(ValidationError):
 class InvalidComponentsError(ValidationError):
     """Exception raised when one or more components are invalid."""
 
-    def __init__(self, uri, *component_names):
+    def __init__(self, uri, *component_names: str):
         """Initialize the error with the invalid component name(s)."""
         verb = "was"
         if len(component_names) > 1:

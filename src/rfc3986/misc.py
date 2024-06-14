@@ -18,12 +18,20 @@ This module contains important constants, patterns, and compiled regular
 expressions for parsing and validating URIs and their components.
 """
 import re
+import typing as t
 
 from . import abnf_regexp
 
-# These are enumerated for the named tuple used as a superclass of
-# URIReference
-URI_COMPONENTS = ["scheme", "authority", "path", "query", "fragment"]
+
+# This is the named tuple used as a superclass of URIReference and
+# IRIReference
+class URIReferenceBase(t.NamedTuple):
+    scheme: t.Optional[str]
+    authority: t.Optional[str]
+    path: t.Optional[str]
+    query: t.Optional[str]
+    fragment: t.Optional[str]
+
 
 important_characters = {
     "generic_delimiters": abnf_regexp.GENERIC_DELIMITERS,
@@ -48,13 +56,9 @@ NON_PCT_ENCODED = abnf_regexp.NON_PCT_ENCODED_SET
 URI_MATCHER = re.compile(abnf_regexp.URL_PARSING_RE)
 
 SUBAUTHORITY_MATCHER = re.compile(
-    (
-        "^(?:(?P<userinfo>{})@)?"  # userinfo
-        "(?P<host>{})"  # host
-        "(?::(?P<port>{}))?$"  # port
-    ).format(
-        abnf_regexp.USERINFO_RE, abnf_regexp.HOST_PATTERN, abnf_regexp.PORT_RE
-    )
+    f"^(?:(?P<userinfo>{abnf_regexp.USERINFO_RE})@)?"  # userinfo
+    f"(?P<host>{abnf_regexp.HOST_PATTERN})"  # host
+    f"(?::(?P<port>{abnf_regexp.PORT_RE}))?$"  # port
 )
 
 
@@ -81,22 +85,16 @@ FRAGMENT_MATCHER = QUERY_MATCHER
 SCHEME_MATCHER = re.compile(f"^{abnf_regexp.SCHEME_RE}$")
 
 RELATIVE_REF_MATCHER = re.compile(
-    r"^%s(\?%s)?(#%s)?$"
-    % (
-        abnf_regexp.RELATIVE_PART_RE,
-        abnf_regexp.QUERY_RE,
-        abnf_regexp.FRAGMENT_RE,
-    )
+    rf"^{abnf_regexp.RELATIVE_PART_RE}"
+    rf"(\?{abnf_regexp.QUERY_RE})?"
+    rf"(#{abnf_regexp.FRAGMENT_RE})?$"
 )
 
 # See http://tools.ietf.org/html/rfc3986#section-4.3
 ABSOLUTE_URI_MATCHER = re.compile(
-    r"^%s:%s(\?%s)?$"
-    % (
-        abnf_regexp.COMPONENT_PATTERN_DICT["scheme"],
-        abnf_regexp.HIER_PART_RE,
-        abnf_regexp.QUERY_RE[1:-1],
-    )
+    rf"^{abnf_regexp.COMPONENT_PATTERN_DICT['scheme']}:"
+    rf"{abnf_regexp.HIER_PART_RE}"
+    rf"(\?{abnf_regexp.QUERY_RE[1:-1]})?$"
 )
 
 # ###############
@@ -106,14 +104,9 @@ ABSOLUTE_URI_MATCHER = re.compile(
 IRI_MATCHER = re.compile(abnf_regexp.URL_PARSING_RE)
 
 ISUBAUTHORITY_MATCHER = re.compile(
-    (
-        "^(?:(?P<userinfo>{})@)?"  # iuserinfo
-        "(?P<host>{})"  # ihost
-        ":?(?P<port>{})?$"  # port
-    ).format(
-        abnf_regexp.IUSERINFO_RE, abnf_regexp.IHOST_RE, abnf_regexp.PORT_RE
-    ),
-    re.UNICODE,
+    f"^(?:(?P<userinfo>{abnf_regexp.IUSERINFO_RE})@)?"  # iuserinfo
+    f"(?P<host>{abnf_regexp.IHOST_RE})"  # ihost
+    f":?(?P<port>{abnf_regexp.PORT_RE})?$"  # port
 )
 
 
@@ -128,4 +121,4 @@ def merge_paths(base_uri, relative_path):
         return path[:index] + "/" + relative_path
 
 
-UseExisting = object()
+UseExisting: t.Any = object()

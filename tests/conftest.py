@@ -164,6 +164,3 @@ def uri_fragment_with_line_terminators(request):
 @pytest.fixture(params=equivalent_schemes)
 def scheme_only(request):
     return "%s:" % request.param
-
-
-sys.path.insert(0, ".")

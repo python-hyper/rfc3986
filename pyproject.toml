@@ -110,12 +110,15 @@ ignore = [
     "TRY003",
     "EM101",
     "EM102",
-    # Allow any number of arguments to a function.
+    # Allow any number of parameters for a function.
     "PLR0913",
 ]
 
 [tool.ruff.lint.isort]
 force-single-line = true
+
+[tool.ruff.lint.pyupgrade]
+keep-runtime-typing = true
 
 [tool.pyright]
 include = ["src/rfc3986"]
@@ -123,6 +126,7 @@ ignore = ["tests"]
 pythonVersion = "3.8"
 typeCheckingMode = "strict"
 
+reportPrivateUsage = "none"
 reportImportCycles = "warning"
 reportPropertyTypeMismatch = "warning"
 reportUnnecessaryTypeIgnoreComment = "warning"

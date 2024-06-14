@@ -50,7 +50,7 @@ def iri_reference(iri: str, encoding: str = "utf-8") -> IRIReference:
     return IRIReference.from_string(iri, encoding)
 
 
-def is_valid_uri(uri: str, encoding: str = "utf-8", **kwargs) -> bool:
+def is_valid_uri(uri: str, encoding: str = "utf-8", **kwargs: bool) -> bool:
     """Determine if the URI given is valid.
 
     This is a convenience function. You could use either

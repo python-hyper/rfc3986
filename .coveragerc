@@ -1,6 +1,6 @@
+[run]
+plugins = covdefaults
+
 [report]
-exclude_lines =
-    .* # Python \d.*
-    .* # nocov: Python \d.*
-    .* # pragma: no cover.*
-fail_under = 100
+exclude_lines = 
+    ^(?:\s*)(?:el)?if t.TYPE_CHECKING:$

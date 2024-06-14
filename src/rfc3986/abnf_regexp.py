@@ -195,8 +195,8 @@ HIER_PART_RE = "(//{}{}|{}|{}|{})".format(
 
 # Only wide-unicode gets the high-ranges of UCSCHAR
 if sys.maxunicode > 0xFFFF:  # pragma: no cover
-    IPRIVATE = "\uE000-\uF8FF\U000F0000-\U000FFFFD\U00100000-\U0010FFFD"
-    UCSCHAR_RE = (
+    _iprivate = "\uE000-\uF8FF\U000F0000-\U000FFFFD\U00100000-\U0010FFFD"
+    _ucschar_re = (
         "\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF"
         "\U00010000-\U0001FFFD\U00020000-\U0002FFFD"
         "\U00030000-\U0003FFFD\U00040000-\U0004FFFD"
@@ -207,8 +207,12 @@ if sys.maxunicode > 0xFFFF:  # pragma: no cover
         "\U000D0000-\U000DFFFD\U000E1000-\U000EFFFD"
     )
 else:  # pragma: no cover
-    IPRIVATE = "\uE000-\uF8FF"
-    UCSCHAR_RE = "\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF"
+    _iprivate = "\uE000-\uF8FF"
+    _ucschar_re = "\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF"
+
+IPRIVATE = _iprivate
+UCSCHAR_RE = _ucschar_re
+
 
 IUNRESERVED_RE = "A-Za-z0-9\\._~\\-" + UCSCHAR_RE
 IPCHAR = "([" + IUNRESERVED_RE + SUB_DELIMITERS_RE + ":@]|%s)" % PCT_ENCODED

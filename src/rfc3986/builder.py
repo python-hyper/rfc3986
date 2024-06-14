@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Module containing the logic for the URIBuilder object."""
-import typing
+import typing as t
 from urllib.parse import parse_qsl
 from urllib.parse import urlencode
 
@@ -22,11 +22,11 @@ from . import uri
 from . import uri_reference
 
 # Copied from urllib.parse in typeshed.
-_QueryType = typing.Union[
-    typing.Mapping[typing.Any, typing.Any],
-    typing.Mapping[typing.Any, typing.Sequence[typing.Any]],
-    typing.Sequence[typing.Tuple[typing.Any, typing.Any]],
-    typing.Sequence[typing.Tuple[typing.Any, typing.Sequence[typing.Any]]],
+_QueryType = t.Union[
+    t.Mapping[t.Any, t.Any],
+    t.Mapping[t.Any, t.Sequence[t.Any]],
+    t.Sequence[t.Tuple[t.Any, t.Any]],
+    t.Sequence[t.Tuple[t.Any, t.Sequence[t.Any]]],
 ]
 
 
@@ -43,13 +43,13 @@ class URIBuilder:
 
     def __init__(
         self,
-        scheme: typing.Optional[str] = None,
-        userinfo: typing.Optional[str] = None,
-        host: typing.Optional[str] = None,
-        port: typing.Optional[str] = None,
-        path: typing.Optional[str] = None,
-        query: typing.Optional[str] = None,
-        fragment: typing.Optional[str] = None,
+        scheme: t.Optional[str] = None,
+        userinfo: t.Optional[str] = None,
+        host: t.Optional[str] = None,
+        port: t.Optional[str] = None,
+        path: t.Optional[str] = None,
+        query: t.Optional[str] = None,
+        fragment: t.Optional[str] = None,
     ):
         """Initialize our URI builder.
 
@@ -86,7 +86,7 @@ class URIBuilder:
 
     @classmethod
     def from_uri(
-        cls, reference: typing.Union[uri.URIReference, str]
+        cls, reference: t.Union[uri.URIReference, str]
     ) -> compat.Self:
         """Initialize the URI builder from another URI.
 
@@ -133,7 +133,7 @@ class URIBuilder:
     def add_credentials(
         self,
         username: str,
-        password: typing.Optional[str],
+        password: t.Optional[str],
     ) -> compat.Self:
         """Add credentials as the userinfo portion of the URI.
 
@@ -184,7 +184,7 @@ class URIBuilder:
             fragment=self.fragment,
         )
 
-    def add_port(self, port: compat.ConvertibleToInt) -> compat.Self:
+    def add_port(self, port: t.Union[str, int]) -> compat.Self:
         """Add port to the URI.
 
         .. code-block:: python
@@ -317,7 +317,7 @@ class URIBuilder:
                     path=None, query='a=b+c&a=b+c', fragment=None)
         """
         original_query_items = parse_qsl(self.query or "")
-        if not isinstance(query_items, typing.Sequence):
+        if not isinstance(query_items, t.Sequence):
             query_items = list(query_items.items())
 
         return self.add_query_from([*original_query_items, *query_items])

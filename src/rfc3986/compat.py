@@ -11,50 +11,25 @@
 # implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Compatibility module for Python 2 and 3 support."""
+"""Compatibility module for Python 2 and 3 support, as well as typing support."""
 import sys
 import typing as t
 
 __all__ = (
-    "ReadableBuffer",
     "Self",
-    "ConvertibleToInt",
     "to_bytes",
     "to_str",
 )
 
-if sys.version_info >= (3, 12):
-    from typing import Buffer as ReadableBuffer
-elif t.TYPE_CHECKING:
-    from typing_extensions import Buffer as ReadableBuffer
-else:
 
-    class ReadableBuffer:
-        pass
-
-
-if sys.version_info >= (3, 11):
+if sys.version_info >= (3, 11):  # pragma: >=3.11 cover
     from typing import Self
 elif t.TYPE_CHECKING:
     from typing_extensions import Self
-else:
+else:  # pragma: <3.11 cover
 
     class Self:
         pass
-
-
-# Copied from _typeshed in typeshed.
-class _SupportsTrunc(t.Protocol):
-    def __trunc__(self) -> int: ...
-
-
-ConvertibleToInt = t.Union[
-    str,
-    ReadableBuffer,
-    t.SupportsInt,
-    t.SupportsIndex,
-    _SupportsTrunc,
-]
 
 
 @t.overload

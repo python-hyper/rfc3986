@@ -27,7 +27,9 @@ def normalize_scheme(scheme: str) -> str:
 
 def normalize_authority(
     authority: typing.Tuple[
-        typing.Optional[str], typing.Optional[str], typing.Optional[str]
+        typing.Optional[str],
+        typing.Optional[str],
+        typing.Optional[str],
     ],
 ) -> str:
     """Normalize an authority tuple to a string."""

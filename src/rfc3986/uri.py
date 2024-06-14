@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Module containing the implementation of the URIReference class."""
-from collections import namedtuple
+import typing as t
 
 from . import compat
 from . import misc
@@ -21,7 +21,7 @@ from . import normalizers
 from ._mixin import URIMixin
 
 
-class URIReference(namedtuple("URIReference", misc.URI_COMPONENTS), URIMixin):
+class URIReference(misc.URIReferenceBase, URIMixin):
     """Immutable object representing a parsed URI Reference.
 
     .. note::
@@ -78,11 +78,16 @@ class URIReference(namedtuple("URIReference", misc.URI_COMPONENTS), URIMixin):
 
         The port parsed from the authority.
     """
-
-    slots = ()
+    encoding: str
 
     def __new__(
-        cls, scheme, authority, path, query, fragment, encoding="utf-8"
+        cls,
+        scheme: t.Optional[str],
+        authority: t.Optional[str],
+        path: t.Optional[str],
+        query: t.Optional[str],
+        fragment: t.Optional[str],
+        encoding: str = "utf-8",
     ):
         """Create a new URIReference."""
         ref = super().__new__(
@@ -96,19 +101,19 @@ class URIReference(namedtuple("URIReference", misc.URI_COMPONENTS), URIMixin):
         ref.encoding = encoding
         return ref
 
-    __hash__ = tuple.__hash__
+    __hash__ = tuple.__hash__  # type: ignore
 
     def __eq__(self, other: object):
         """Compare this reference to another."""
         other_ref = other
         if isinstance(other, tuple):
             other_ref = type(self)(*other)
-        elif not isinstance(other, type(self)):
+        elif not isinstance(other, URIReference):
             try:
                 other_ref = self.from_string(other)
             except TypeError:
                 raise TypeError(
-                    f"Unable to compare URIReference() to {type(other).__name__}()"
+                    f"Unable to compare {type(self).__name__}() to {type(other).__name__}()"
                 ) from None
 
         # See http://tools.ietf.org/html/rfc3986#section-6.2
@@ -138,7 +143,11 @@ class URIReference(namedtuple("URIReference", misc.URI_COMPONENTS), URIMixin):
         )
 
     @classmethod
-    def from_string(cls, uri_string: str, encoding: str = "utf-8") -> compat.Self:
+    def from_string(
+        cls,
+        uri_string: str,
+        encoding: str = "utf-8",
+    ) -> compat.Self:
         """Parse a URI reference from the given unicode URI string.
 
         :param str uri_string: Unicode URI to be parsed into a reference.

@@ -17,8 +17,6 @@ class _AuthorityInfo(t.TypedDict):
 class URIMixin:
     """Mixin with all shared methods for URIs and IRIs."""
 
-    __hash__ = tuple.__hash__
-
     def authority_info(self) -> _AuthorityInfo:
         """Return a dictionary with the ``userinfo``, ``host``, and ``port``.
 
@@ -64,8 +62,10 @@ class URIMixin:
         return misc.SUBAUTHORITY_MATCHER.match(self.authority)
 
     @property
-    def _validator(self):
-        v = getattr(self, "_cached_validator", None)
+    def _validator(self) -> validators.Validator:
+        v: t.Optional[validators.Validator] = getattr(
+            self, "_cached_validator", None
+        )
         if v is not None:
             return v
         self._cached_validator = validators.Validator().require_presence_of(
@@ -274,7 +274,11 @@ class URIMixin:
         """
         return tuple(self.normalize()) == tuple(other_ref.normalize())
 
-    def resolve_with(self, base_uri, strict=False):
+    def resolve_with(
+        self,
+        base_uri: t.Union[str, "misc.URIReferenceBase"],
+        strict: bool = False,
+    ) -> "misc.URIReferenceBase":
         """Use an absolute URI Reference to resolve this relative reference.
 
         Assuming this is a relative reference that you would like to resolve,
@@ -296,7 +300,7 @@ class URIMixin:
         try:
             self._validator.validate(base_uri)
         except exc.ValidationError:
-            raise exc.ResolutionError(base_uri)
+            raise exc.ResolutionError(base_uri) from None
 
         # This is optional per
         # http://tools.ietf.org/html/rfc3986#section-5.2.1
@@ -313,37 +317,35 @@ class URIMixin:
             target = resolving.copy_with(
                 path=normalizers.normalize_path(resolving.path)
             )
-        else:
-            if resolving.authority is not None:
-                target = resolving.copy_with(
-                    scheme=base_uri.scheme,
-                    path=normalizers.normalize_path(resolving.path),
-                )
+        elif resolving.authority is not None:
+            target = resolving.copy_with(
+                scheme=base_uri.scheme,
+                path=normalizers.normalize_path(resolving.path),
+            )
+        elif resolving.path is None:
+            if resolving.query is not None:
+                query = resolving.query
             else:
-                if resolving.path is None:
-                    if resolving.query is not None:
-                        query = resolving.query
-                    else:
-                        query = base_uri.query
-                    target = resolving.copy_with(
-                        scheme=base_uri.scheme,
-                        authority=base_uri.authority,
-                        path=base_uri.path,
-                        query=query,
-                    )
-                else:
-                    if resolving.path.startswith("/"):
-                        path = normalizers.normalize_path(resolving.path)
-                    else:
-                        path = normalizers.normalize_path(
-                            misc.merge_paths(base_uri, resolving.path)
-                        )
-                    target = resolving.copy_with(
-                        scheme=base_uri.scheme,
-                        authority=base_uri.authority,
-                        path=path,
-                        query=resolving.query,
-                    )
+                query = base_uri.query
+            target = resolving.copy_with(
+                scheme=base_uri.scheme,
+                authority=base_uri.authority,
+                path=base_uri.path,
+                query=query,
+            )
+        else:
+            if resolving.path.startswith("/"):
+                path = normalizers.normalize_path(resolving.path)
+            else:
+                path = normalizers.normalize_path(
+                    misc.merge_paths(base_uri, resolving.path)
+                )
+            target = resolving.copy_with(
+                scheme=base_uri.scheme,
+                authority=base_uri.authority,
+                path=path,
+                query=resolving.query,
+            )
         return target
 
     def unsplit(self) -> str:
@@ -368,11 +370,11 @@ class URIMixin:
 
     def copy_with(
         self,
-        scheme: str = misc.UseExisting,
-        authority: str = misc.UseExisting,
-        path: str = misc.UseExisting,
-        query: str = misc.UseExisting,
-        fragment: str = misc.UseExisting,
+        scheme: t.Optional[str] = misc.UseExisting,
+        authority: t.Optional[str] = misc.UseExisting,
+        path: t.Optional[str] = misc.UseExisting,
+        query: t.Optional[str] = misc.UseExisting,
+        fragment: t.Optional[str] = misc.UseExisting,
     ):
         """Create a copy of this reference with the new components.
 

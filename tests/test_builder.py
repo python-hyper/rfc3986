@@ -12,14 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Module containing the tests for the URIBuilder object."""
-try:
-    from urllib.parse import parse_qs
-except ImportError:
-    from urlparse import parse_qs
+from urllib.parse import parse_qs
 
 import pytest
 
-from rfc3986 import builder, uri_reference
+from rfc3986 import builder
+from rfc3986 import uri_reference
 
 
 def test_builder_default():
