@@ -36,9 +36,15 @@ else:  # pragma: <3.11 cover
 
 
 @t.overload
-def to_str(b: t.Union[str, bytes], encoding: str = "utf-8") -> str: ...
+def to_str(b: t.Union[str, bytes], encoding: str = "utf-8") -> str:
+    ...
+
+
 @t.overload
-def to_str(b: None, encoding: str = "utf-8") -> None: ...
+def to_str(b: None, encoding: str = "utf-8") -> None:
+    ...
+
+
 def to_str(
     b: t.Optional[t.Union[str, bytes]],
     encoding: str = "utf-8",
@@ -50,9 +56,15 @@ def to_str(
 
 
 @t.overload
-def to_bytes(s: t.Union[str, bytes], encoding: str = "utf-8") -> bytes: ...
+def to_bytes(s: t.Union[str, bytes], encoding: str = "utf-8") -> bytes:
+    ...
+
+
 @t.overload
-def to_bytes(s: None, encoding: str = "utf-8") -> None: ...
+def to_bytes(s: None, encoding: str = "utf-8") -> None:
+    ...
+
+
 def to_bytes(
     s: t.Optional[t.Union[str, bytes]],
     encoding: str = "utf-8",

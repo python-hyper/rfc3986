@@ -2,5 +2,5 @@
 plugins = covdefaults
 
 [report]
-exclude_lines = 
+exclude_lines =
     ^(?:\s*)(?:el)?if t.TYPE_CHECKING:$
