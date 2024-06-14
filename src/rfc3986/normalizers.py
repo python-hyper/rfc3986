@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Module with functions to normalize components."""
-
 import re
 import typing as t
 from urllib.parse import quote as urlquote

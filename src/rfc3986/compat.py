@@ -11,10 +11,9 @@
 # implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Compatibility module for Python 2 and 3 support, as well as typing 
+"""Compatibility module for Python 2 and 3 support, as well as typing
 support.
 """
-
 import sys
 import typing as t
 

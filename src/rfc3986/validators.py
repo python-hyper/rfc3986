@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Module containing the validation logic for rfc3986."""
-
 import typing as t
 
 from . import compat

@@ -1,5 +1,4 @@
 """Exceptions module for rfc3986."""
-
 from . import compat
 
 

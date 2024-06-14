@@ -17,7 +17,6 @@ Module containing compiled regular expressions and constants.
 This module contains important constants, patterns, and compiled regular
 expressions for parsing and validating URIs and their components.
 """
-
 import dataclasses
 import re
 import typing as t
