@@ -37,6 +37,7 @@ class IRIReference(misc.URIReferenceBase, uri.URIMixin):
         The IRI submodule is a new interface and may possibly change in
         the future. Check for changes to the interface when upgrading.
     """
+
     encoding: str
 
     def __new__(

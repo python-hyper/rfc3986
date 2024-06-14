@@ -78,6 +78,7 @@ class URIReference(misc.URIReferenceBase, URIMixin):
 
         The port parsed from the authority.
     """
+
     encoding: str
 
     def __new__(
