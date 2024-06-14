@@ -36,7 +36,7 @@ def uri_reference(uri: str, encoding: str = "utf-8") -> URIReference:
     return URIReference.from_string(uri, encoding)
 
 
-def iri_reference(iri: str, encoding: str= "utf-8") -> IRIReference:
+def iri_reference(iri: str, encoding: str = "utf-8") -> IRIReference:
     """Parse a IRI string into an IRIReference.
 
     This is a convenience function. You could achieve the same end by using
