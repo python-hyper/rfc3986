@@ -1,0 +1,10 @@
+[tool.pyright]
+include = ["src/rfc3986"]
+ignore = ["tests"]
+pythonVersion = "3.8"
+typeCheckingMode = "strict"
+
+reportPrivateUsage = "none"
+reportImportCycles = "warning"
+reportPropertyTypeMismatch = "warning"
+reportUnnecessaryTypeIgnoreComment = "warning"

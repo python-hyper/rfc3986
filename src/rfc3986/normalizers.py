@@ -13,18 +13,21 @@
 # limitations under the License.
 """Module with functions to normalize components."""
 import re
+import typing as t
 from urllib.parse import quote as urlquote
 
 from . import compat
 from . import misc
 
 
-def normalize_scheme(scheme):
+def normalize_scheme(scheme: str) -> str:
     """Normalize the scheme component."""
     return scheme.lower()
 
 
-def normalize_authority(authority):
+def normalize_authority(
+    authority: t.Tuple[t.Optional[str], t.Optional[str], t.Optional[str]],
+) -> str:
     """Normalize an authority tuple to a string."""
     userinfo, host, port = authority
     result = ""
@@ -37,17 +40,17 @@ def normalize_authority(authority):
     return result
 
 
-def normalize_username(username):
+def normalize_username(username: str) -> str:
     """Normalize a username to make it safe to include in userinfo."""
     return urlquote(username)
 
 
-def normalize_password(password):
+def normalize_password(password: str) -> str:
     """Normalize a password to make safe for userinfo."""
     return urlquote(password)
 
 
-def normalize_host(host):
+def normalize_host(host: str) -> str:
     """Normalize a host string."""
     if misc.IPv6_MATCHER.match(host):
         percent = host.find("%")
@@ -70,7 +73,7 @@ def normalize_host(host):
     return host.lower()
 
 
-def normalize_path(path):
+def normalize_path(path: str) -> str:
     """Normalize the path string."""
     if not path:
         return path
@@ -79,14 +82,14 @@ def normalize_path(path):
     return remove_dot_segments(path)
 
 
-def normalize_query(query):
+def normalize_query(query: str) -> str:
     """Normalize the query string."""
     if not query:
         return query
     return normalize_percent_characters(query)
 
 
-def normalize_fragment(fragment):
+def normalize_fragment(fragment: str) -> str:
     """Normalize the fragment string."""
     if not fragment:
         return fragment
@@ -96,7 +99,7 @@ def normalize_fragment(fragment):
 PERCENT_MATCHER = re.compile("%[A-Fa-f0-9]{2}")
 
 
-def normalize_percent_characters(s):
+def normalize_percent_characters(s: str) -> str:
     """All percent characters should be upper-cased.
 
     For example, ``"%3afoo%DF%ab"`` should be turned into ``"%3Afoo%DF%AB"``.
@@ -108,14 +111,14 @@ def normalize_percent_characters(s):
     return s
 
 
-def remove_dot_segments(s):
+def remove_dot_segments(s: str) -> str:
     """Remove dot segments from the string.
 
     See also Section 5.2.4 of :rfc:`3986`.
     """
     # See http://tools.ietf.org/html/rfc3986#section-5.2.4 for pseudo-code
     segments = s.split("/")  # Turn the path into a list of segments
-    output = []  # Initialize the variable to use to store output
+    output: list[str] = []  # Initialize the variable to use to store output
 
     for segment in segments:
         # '.' is the current directory, so ignore it, it is superfluous
@@ -141,8 +144,13 @@ def remove_dot_segments(s):
 
     return "/".join(output)
 
-
-def encode_component(uri_component, encoding):
+@t.overload
+def encode_component(uri_component: None, encoding: str) -> None:
+    ...
+@t.overload
+def encode_component(uri_component: str, encoding: str) -> str:
+    ...
+def encode_component(uri_component: t.Optional[str], encoding: str) -> t.Optional[str]:
     """Encode the specific component in the provided encoding."""
     if uri_component is None:
         return uri_component
