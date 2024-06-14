@@ -1,10 +1,10 @@
 import pytest
-
-from . import base
 from rfc3986.exceptions import InvalidAuthority
 from rfc3986.exceptions import ResolutionError
 from rfc3986.misc import URI_MATCHER
 from rfc3986.uri import URIReference
+
+from . import base
 
 
 @pytest.fixture

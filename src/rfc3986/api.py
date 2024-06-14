@@ -16,6 +16,7 @@
 This module defines functions and provides access to the public attributes
 and classes of rfc3986.
 """
+
 from .iri import IRIReference
 from .parseresult import ParseResult
 from .uri import URIReference

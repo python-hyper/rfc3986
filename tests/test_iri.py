@@ -1,5 +1,4 @@
 import pytest
-
 import rfc3986
 from rfc3986.exceptions import InvalidAuthority
 

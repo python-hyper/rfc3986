@@ -1,5 +1,4 @@
 import pytest
-
 from rfc3986.normalizers import encode_component
 from rfc3986.normalizers import normalize_host
 from rfc3986.normalizers import normalize_percent_characters
@@ -9,9 +8,9 @@ from rfc3986.uri import URIReference
 
 
 def test_normalize_scheme():
-    assert "http" == normalize_scheme("htTp")
-    assert "http" == normalize_scheme("http")
-    assert "http" == normalize_scheme("HTTP")
+    assert normalize_scheme("htTp") == "http"
+    assert normalize_scheme("http") == "http"
+    assert normalize_scheme("HTTP") == "http"
 
 
 def test_normalize_percent_characters():

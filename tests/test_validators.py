@@ -1,6 +1,6 @@
 """Tests for the validators module."""
-import pytest
 
+import pytest
 import rfc3986
 from rfc3986 import exceptions
 from rfc3986 import validators
@@ -156,7 +156,7 @@ def test_multiple_missing_components(uri):
     with pytest.raises(exceptions.MissingComponentError) as captured_exc:
         validator.validate(uri)
     exception = captured_exc.value
-    assert 2 == len(exception.args[-1])
+    assert len(exception.args[-1]) == 2
 
 
 @pytest.mark.parametrize(

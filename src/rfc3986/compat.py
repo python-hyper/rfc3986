@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Compatibility module for Python 2, Python 3, and typing support."""
+
 import sys
 import typing as t
 

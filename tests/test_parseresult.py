@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import pytest
-
 import rfc3986
-from . import base
 from rfc3986 import exceptions
 from rfc3986 import parseresult as pr
+
+from . import base
 
 INVALID_PORTS = [
     "443:80",

@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Module containing the logic for the URIBuilder object."""
+
 import typing as t
 from urllib.parse import parse_qsl
 from urllib.parse import urlencode
