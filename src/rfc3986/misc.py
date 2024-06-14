@@ -11,8 +11,7 @@
 # implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""
-Module containing compiled regular expressions and constants.
+"""Module containing compiled regular expressions and constants.
 
 This module contains important constants, patterns, and compiled regular
 expressions for parsing and validating URIs and their components.
@@ -23,11 +22,15 @@ import typing as t
 
 from . import abnf_regexp
 
+if t.TYPE_CHECKING:
+    # Break a circular import.
+    from . import uri
 
-# This is the dataclass used as a superclass of URIReference and
-# IRIReference
+
 @dataclasses.dataclass(frozen=True)
 class URIReferenceBase:
+    """The dataclass used as a superclass for URIReference and IRIReference."""
+
     scheme: t.Optional[str]
     authority: t.Optional[str]
     path: t.Optional[str]
@@ -35,6 +38,10 @@ class URIReferenceBase:
     fragment: t.Optional[str]
 
     def __iter__(self):
+        """Iterate over the main components of this URI reference.
+
+        In order: scheme, authority, path, query, fragment.
+        """
         yield self.scheme
         yield self.authority
         yield self.path
@@ -120,7 +127,7 @@ ISUBAUTHORITY_MATCHER = re.compile(
 
 
 # Path merger as defined in http://tools.ietf.org/html/rfc3986#section-5.2.3
-def merge_paths(base_uri, relative_path):
+def merge_paths(base_uri: "uri.URIReference", relative_path: str) -> str:
     """Merge a base URI's path with a relative URI's path."""
     if base_uri.path is None and base_uri.authority is not None:
         return "/" + relative_path

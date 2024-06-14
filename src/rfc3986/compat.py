@@ -11,9 +11,7 @@
 # implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Compatibility module for Python 2 and 3 support, as well as typing
-support.
-"""
+"""Compatibility module for Python 2, Python 3, and typing support."""
 import sys
 import typing as t
 
@@ -31,17 +29,15 @@ elif t.TYPE_CHECKING:
 else:  # pragma: <3.11 cover
 
     class Self:
-        pass
+        """Placeholder for "typing.Self"."""
 
 
 @t.overload
-def to_str(b: t.Union[str, bytes], encoding: str = "utf-8") -> str:
-    ...
+def to_str(b: t.Union[str, bytes], encoding: str = "utf-8") -> str: ...
 
 
 @t.overload
-def to_str(b: None, encoding: str = "utf-8") -> None:
-    ...
+def to_str(b: None, encoding: str = "utf-8") -> None: ...
 
 
 def to_str(
@@ -50,18 +46,16 @@ def to_str(
 ) -> t.Optional[str]:
     """Ensure that b is text in the specified encoding."""
     if hasattr(b, "decode") and not isinstance(b, str):
-        b = b.decode(encoding)
-    return b
+        b = b.decode(encoding)  # pyright: ignore[reportOptionalMemberAccess] # hasattr() doesn't narrow.
+    return b  # pyright: ignore[reportReturnType] # This should always be str | None as used.
 
 
 @t.overload
-def to_bytes(s: t.Union[str, bytes], encoding: str = "utf-8") -> bytes:
-    ...
+def to_bytes(s: t.Union[str, bytes], encoding: str = "utf-8") -> bytes: ...
 
 
 @t.overload
-def to_bytes(s: None, encoding: str = "utf-8") -> None:
-    ...
+def to_bytes(s: None, encoding: str = "utf-8") -> None: ...
 
 
 def to_bytes(
@@ -70,5 +64,5 @@ def to_bytes(
 ) -> t.Optional[bytes]:
     """Ensure that s is converted to bytes from the encoding."""
     if hasattr(s, "encode") and not isinstance(s, bytes):
-        s = s.encode(encoding)
-    return s
+        s = s.encode(encoding)  # pyright: ignore[reportOptionalMemberAccess] # hasattr() doesn't narrow.
+    return s  # pyright: ignore[reportReturnType] # This should always be bytes | None as used.

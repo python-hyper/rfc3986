@@ -3,6 +3,7 @@ import dataclasses
 import typing as t
 import warnings
 
+from . import compat
 from . import exceptions as exc
 from . import misc
 from . import normalizers
@@ -376,7 +377,7 @@ class URIMixin:
         path: t.Optional[str] = misc.UseExisting,
         query: t.Optional[str] = misc.UseExisting,
         fragment: t.Optional[str] = misc.UseExisting,
-    ):
+    ) -> compat.Self:
         """Create a copy of this reference with the new components.
 
         :param str scheme:

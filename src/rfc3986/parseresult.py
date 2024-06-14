@@ -36,31 +36,24 @@ PARSED_COMPONENTS = (
 
 class _ParseResultProtocol(t.Protocol[t.AnyStr]):
     @property
-    def userinfo(self) -> t.Optional[t.AnyStr]:
-        ...
+    def userinfo(self) -> t.Optional[t.AnyStr]: ...
 
     @property
-    def host(self) -> t.Optional[t.AnyStr]:
-        ...
+    def host(self) -> t.Optional[t.AnyStr]: ...
 
     @property
-    def port(self) -> t.Optional[t.AnyStr]:
-        ...
+    def port(self) -> t.Optional[t.AnyStr]: ...
 
     @property
-    def query(self) -> t.Optional[t.AnyStr]:
-        ...
+    def query(self) -> t.Optional[t.AnyStr]: ...
 
     @property
-    def encoding(self) -> str:
-        ...
+    def encoding(self) -> str: ...
 
     @property
-    def authority(self) -> t.AnyStr:
-        ...
+    def authority(self) -> t.AnyStr: ...
 
-    def unsplit(self) -> t.AnyStr:
-        ...
+    def unsplit(self) -> t.AnyStr: ...
 
 
 @dataclasses.dataclass(order=True, frozen=True)
@@ -74,6 +67,10 @@ class _ParseResultBase(t.Generic[t.AnyStr]):
     fragment: t.Optional[t.AnyStr]
 
     def __iter__(self):
+        """Iterate over the main components of this parse result.
+
+        In order: scheme, userinfo, host, port, path, query, fragment.
+        """
         yield self.scheme
         yield self.userinfo
         yield self.host

@@ -43,7 +43,7 @@ def test_port_parsing(port):
 
 
 @pytest.mark.parametrize(
-    "parts, unsplit",
+    ["parts", "unsplit"],
     [
         (("https", None, "httpbin.org"), "https://httpbin.org"),
         (("https", "user", "httpbin.org"), "https://user@httpbin.org"),
@@ -60,7 +60,7 @@ def test_from_parts(parts, unsplit):
 
 
 @pytest.mark.parametrize(
-    "parts, unsplit",
+    ["parts", "unsplit"],
     [
         (("https", None, "httpbin.org"), b"https://httpbin.org"),
         (("https", "user", "httpbin.org"), b"https://user@httpbin.org"),

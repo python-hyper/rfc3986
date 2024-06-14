@@ -41,8 +41,26 @@ Source = "https://github.com/python-hyper/rfc3986"
 [tool.setuptools.dynamic]
 version = { attr = "rfc3986.__version__" }
 
+
+# ==== Testing settings.
+
+
+[tool.pytest.ini_options]
+addopts = "-q"
+norecursedirs = ["*.egg", ".git", ".*", "_*"]
+
+[tool.coverage.run]
+plugins = ["covdefaults"]
+
+[tool.coverage.report]
+exclude_lines = ["^(?:\\s*)(?:el)?if t.TYPE_CHECKING:$"]
+
+
+# ==== Linter settings.
+
+
 [tool.ruff]
-include = ["src/rfc3986"]
+include = ["src/rfc3986/*.py"]
 target-version = "py38"
 line-length = 79
 
@@ -51,6 +69,7 @@ select = [
     "F",
     "E",
     "I",
+    "D",
     "UP",
     "YTT",
     "ANN",
@@ -80,26 +99,29 @@ select = [
     "RUF",
 ]
 ignore = [
-    "S101",    # Use of assert for typing is understood.
+    "S101",    # Allow use of assert for typing reasons.
     "PLR2004", # Magic value comparison.
     "SIM105",  # Suppressable exception. contextlib.suppress is a stylistic choice with overhead.
-    # "C90",     # McCabe complexity memes.
-    # "PLR",     # Complexity things.
     "ANN101", # Type of Self for self is usually implicit.
     "ANN102", # Type of type[Self] for cls is usually implicit.
     "ANN204", # Special method return types are usually implicit or known by type checkers.
-    # "ANN401",  # Need to use Any for some places.
-    # Recommended ignores by ruff when using ruff format.
+    "ANN401", # Any is necessary sometimes.
+    "PT001",  # pytest recommends against empty parentheses on pytest.fixture.
+    # == Recommended ignores by ruff when using ruff format.
     "E111",
     "E114",
     "E117",
-    "Q003",
+    "D206",
+    "D300",
     "COM812",
     "COM819",
     # "E501",
     "ISC001",
     "ISC002",
-    # == Others for existing codebase.
+    # == Rules that conflict with the codebase style.
+    # Docstring rules that don't fit with the project's docstring style.
+    "D203", # Blank line before docstring.
+    "D213", # Starting a multi-line docstring on the second line.
     # Allow elif after return, raise, and continue, respectively.
     "RET505",
     "RET506",
@@ -113,12 +135,37 @@ ignore = [
     # Allow any number of parameters for a function.
     "PLR0913",
 ]
+unfixable = [
+    "UP031", # Prevent percent-formatted strings from being automatic converted.
+    "UP032", # Prevent .format call from being automatic converted.
+    "ERA",   # Prevent incorrectly detected comments from being automatically deleted.
+]
+
+[tool.ruff.lint.pyupgrade]
+keep-runtime-typing = true
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.flake8-pytest-style]
+parametrize-names-type = "list"
 
 [tool.ruff.lint.isort]
 force-single-line = true
 
-[tool.ruff.lint.pyupgrade]
-keep-runtime-typing = true
+[tool.ruff.lint.per-file-ignores]
+# This many percent-formatted strings and .format calls shouldn't be converted automatically. Might be a stylistic choice.
+"src/rfc3986/abnf_regexp.py" = ["UP031", "UP032"]
+"src/rfc3986/misc.py" = ["UP031", "UP032"]
+"tests/conftest.py" = ["UP031", "UP032"]
+"tests/*.py" = [
+    "ANN", # Annotations aren't really needed for tests.
+    "D",   # Docstrings aren't really needed for tests.
+]
+
+
+# ==== Type checker settings.
+
 
 [tool.pyright]
 include = ["src/rfc3986"]

@@ -174,7 +174,7 @@ def test_ensure_uri_has_a_scheme(uri):
 
 
 @pytest.mark.parametrize(
-    "uri, failed_component",
+    ["uri", "failed_component"],
     [
         (rfc3986.uri_reference("git://github.com"), "scheme"),
         (rfc3986.uri_reference("http://github.com"), "scheme"),
@@ -263,7 +263,7 @@ def test_successful_complex_validation(uri):
         "query",
         "fragment",
     ).validate(
-        uri
+        uri,
     )
 
 

@@ -340,7 +340,8 @@ class TestURIReferencesResolve:
             R.resolve_with(B)
         except ResolutionError:  # pragma: no cover
             pytest.fail(
-                "Should not raise ResolutionError with URL with scheme and other components"
+                "Should not raise ResolutionError with URL with scheme and "
+                "other components"
             )
 
     def test_uri_with_just_scheme_resolves(self, scheme_only):

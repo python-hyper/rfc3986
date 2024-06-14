@@ -146,13 +146,11 @@ def remove_dot_segments(s: str) -> str:
 
 
 @t.overload
-def encode_component(uri_component: None, encoding: str) -> None:
-    ...
+def encode_component(uri_component: None, encoding: str) -> None: ...
 
 
 @t.overload
-def encode_component(uri_component: str, encoding: str) -> str:
-    ...
+def encode_component(uri_component: str, encoding: str) -> str: ...
 
 
 def encode_component(

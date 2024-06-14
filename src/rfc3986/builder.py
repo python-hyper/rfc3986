@@ -147,7 +147,7 @@ class URIBuilder:
             URIBuilder(scheme=None, userinfo='root', host=None,
                     port=None, path=None, query=None, fragment=None)
         """
-        if username is None:
+        if username is None:  # pyright: ignore [reportUnnecessaryComparison] # Maintain behavior; users may disregard type hint.
             raise ValueError("Username cannot be None")
         userinfo = normalizers.normalize_username(username)
 

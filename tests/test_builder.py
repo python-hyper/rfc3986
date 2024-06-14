@@ -78,7 +78,7 @@ def test_add_scheme(scheme):
 
 
 @pytest.mark.parametrize(
-    "username, password, userinfo",
+    ["username", "password", "userinfo"],
     [
         ("user", "pass", "user:pass"),
         ("user", None, "user"),
@@ -139,7 +139,7 @@ def test_add_invalid_port(port):
 
 
 @pytest.mark.parametrize(
-    "port, expected",
+    ["port", "expected"],
     [
         (0, "0"),
         ("0", "0"),
@@ -175,7 +175,7 @@ def test_add_path(path):
 
 
 @pytest.mark.parametrize(
-    "query_items, expected",
+    ["query_items", "expected"],
     [
         ({"a": "b c"}, "a=b+c"),
         ({"a": "b+c"}, "a=b%2Bc"),
@@ -205,7 +205,7 @@ def test_add_fragment():
 
 
 @pytest.mark.parametrize(
-    "uri, extend_with, expected_path",
+    ["uri", "extend_with", "expected_path"],
     [
         ("https://api.github.com", "/users", "/users"),
         ("https://api.github.com", "/users/", "/users/"),
@@ -242,7 +242,7 @@ def test_extend_path(uri, extend_with, expected_path):
 
 
 @pytest.mark.parametrize(
-    "uri, extend_with, expected_query",
+    ["uri", "extend_with", "expected_query"],
     [
         (
             "https://github.com",
