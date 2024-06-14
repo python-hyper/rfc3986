@@ -14,8 +14,3 @@ repos:
       args: [ --fix ]
     # Formatter.
     - id: ruff-format
-repos:
-  - repo: https://github.com/RobertCraigie/pyright-python
-    rev: v1.1.367
-    hooks:
-    - id: pyright
