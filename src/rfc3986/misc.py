@@ -17,20 +17,30 @@ Module containing compiled regular expressions and constants.
 This module contains important constants, patterns, and compiled regular
 expressions for parsing and validating URIs and their components.
 """
+
+import dataclasses
 import re
 import typing as t
 
 from . import abnf_regexp
 
 
-# This is the named tuple used as a superclass of URIReference and
+# This is the dataclass used as a superclass of URIReference and
 # IRIReference
-class URIReferenceBase(t.NamedTuple):
+@dataclasses.dataclass(frozen=True)
+class URIReferenceBase:
     scheme: t.Optional[str]
     authority: t.Optional[str]
     path: t.Optional[str]
     query: t.Optional[str]
     fragment: t.Optional[str]
+
+    def __iter__(self):
+        yield self.scheme
+        yield self.authority
+        yield self.path
+        yield self.query
+        yield self.fragment
 
 
 important_characters = {

@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Module containing the implementation of the IRIReference class."""
+
 import typing as t
 
 from . import compat
@@ -39,8 +40,8 @@ class IRIReference(misc.URIReferenceBase, uri.URIMixin):
     """
     encoding: str
 
-    def __new__(
-        cls,
+    def __init__(
+        self,
         scheme: t.Optional[str],
         authority: t.Optional[str],
         path: t.Optional[str],
@@ -49,18 +50,16 @@ class IRIReference(misc.URIReferenceBase, uri.URIMixin):
         encoding: str = "utf-8",
     ):
         """Create a new IRIReference."""
-        ref = super().__new__(
-            cls,
+        super().__init__(
             scheme or None,
             authority or None,
             path or None,
             query,
             fragment,
         )
-        ref.encoding = encoding
-        return ref
+        self.encoding = encoding
 
-    __hash__ = tuple.__hash__  # type: ignore
+    __hash__ = misc.URIReferenceBase.__hash__
 
     def __eq__(self, other: object):
         """Compare this reference to another."""
@@ -72,7 +71,8 @@ class IRIReference(misc.URIReferenceBase, uri.URIMixin):
                 other_ref = self.from_string(other)
             except TypeError:
                 raise TypeError(
-                    f"Unable to compare {type(self).__name__}() to {type(other).__name__}()"
+                    f"Unable to compare {type(self).__name__}() to "
+                    f"{type(other).__name__}()"
                 ) from None
 
         # See http://tools.ietf.org/html/rfc3986#section-6.2

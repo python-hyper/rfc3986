@@ -339,7 +339,7 @@ class TestURIReferencesResolve:
         B = URIReference.from_string(uri_with_everything)
         try:
             R.resolve_with(B)
-        except ResolutionError:
+        except ResolutionError:  # pragma: no cover
             pytest.fail(
                 "Should not raise ResolutionError with URL with scheme and other components"
             )

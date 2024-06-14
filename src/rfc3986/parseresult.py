@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Module containing the urlparse compatibility logic."""
+
+import dataclasses
 import typing as t
 
 from . import compat
@@ -49,7 +51,8 @@ class _ParseResultProtocol(t.Protocol[t.AnyStr]):
     def unsplit(self) -> t.AnyStr: ...
 
 
-class _ParseResultBase(t.NamedTuple, t.Generic[t.AnyStr]):
+@dataclasses.dataclass(order=True, frozen=True)
+class _ParseResultBase(t.Generic[t.AnyStr]):
     scheme: t.Optional[t.AnyStr]
     userinfo: t.Optional[t.AnyStr]
     host: t.Optional[t.AnyStr]
@@ -57,6 +60,15 @@ class _ParseResultBase(t.NamedTuple, t.Generic[t.AnyStr]):
     path: t.Optional[t.AnyStr]
     query: t.Optional[t.AnyStr]
     fragment: t.Optional[t.AnyStr]
+
+    def __iter__(self):
+        yield self.scheme
+        yield self.userinfo
+        yield self.host
+        yield self.port
+        yield self.path
+        yield self.query
+        yield self.fragment
 
 
 class ParseResultMixin(t.Generic[t.AnyStr]):
@@ -113,8 +125,8 @@ class ParseResult(_ParseResultBase[str], ParseResultMixin[str]):
     encoding: str
     reference: "uri.URIReference"
 
-    def __new__(
-        cls,
+    def __init__(
+        self,
         scheme: t.Optional[str],
         userinfo: t.Optional[str],
         host: t.Optional[str],
@@ -126,8 +138,7 @@ class ParseResult(_ParseResultBase[str], ParseResultMixin[str]):
         encoding: str = "utf-8",
     ):
         """Create a new ParseResult instance."""
-        parse_result = super().__new__(
-            cls,
+        super().__init__(
             scheme or None,
             userinfo or None,
             host,
@@ -136,9 +147,8 @@ class ParseResult(_ParseResultBase[str], ParseResultMixin[str]):
             query,
             fragment,
         )
-        parse_result.encoding = encoding
-        parse_result.reference = uri_ref
-        return parse_result
+        self.encoding = encoding
+        self.reference = uri_ref
 
     @classmethod
     def from_parts(
@@ -289,8 +299,8 @@ class ParseResultBytes(_ParseResultBase[bytes], ParseResultMixin[bytes]):
     reference: "uri.URIReference"
     lazy_normalize: bool
 
-    def __new__(
-        cls,
+    def __init__(
+        self,
         scheme: t.Optional[bytes],
         userinfo: t.Optional[bytes],
         host: t.Optional[bytes],
@@ -303,8 +313,7 @@ class ParseResultBytes(_ParseResultBase[bytes], ParseResultMixin[bytes]):
         lazy_normalize: bool = True,
     ):
         """Create a new ParseResultBytes instance."""
-        parse_result = super().__new__(
-            cls,
+        super().__init__(
             scheme or None,
             userinfo or None,
             host,
@@ -313,10 +322,9 @@ class ParseResultBytes(_ParseResultBase[bytes], ParseResultMixin[bytes]):
             query or None,
             fragment or None,
         )
-        parse_result.encoding = encoding
-        parse_result.reference = uri_ref
-        parse_result.lazy_normalize = lazy_normalize
-        return parse_result
+        self.encoding = encoding
+        self.reference = uri_ref
+        self.lazy_normalize = lazy_normalize
 
     @classmethod
     def from_parts(

@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Module with functions to normalize components."""
+
 import re
-import typing
+import typing as t
 from urllib.parse import quote as urlquote
 
 from . import compat
@@ -26,11 +27,7 @@ def normalize_scheme(scheme: str) -> str:
 
 
 def normalize_authority(
-    authority: typing.Tuple[
-        typing.Optional[str],
-        typing.Optional[str],
-        typing.Optional[str],
-    ],
+    authority: t.Tuple[t.Optional[str], t.Optional[str], t.Optional[str]],
 ) -> str:
     """Normalize an authority tuple to a string."""
     userinfo, host, port = authority
@@ -149,14 +146,14 @@ def remove_dot_segments(s: str) -> str:
     return "/".join(output)
 
 
-@typing.overload
+@t.overload
 def encode_component(uri_component: None, encoding: str) -> None: ...
-@typing.overload
+@t.overload
 def encode_component(uri_component: str, encoding: str) -> str: ...
 def encode_component(
-    uri_component: typing.Optional[str],
+    uri_component: t.Optional[str],
     encoding: str,
-) -> typing.Optional[str]:
+) -> t.Optional[str]:
     """Encode the specific component in the provided encoding."""
     if uri_component is None:
         return uri_component

@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Module containing the logic for the URIBuilder object."""
+
 import typing as t
 from urllib.parse import parse_qsl
 from urllib.parse import urlencode
@@ -201,7 +202,8 @@ class URIBuilder:
         port_int = int(port)
         if port_int < 0:
             raise ValueError(
-                f"ports are not allowed to be negative. You provided {port_int}"
+                "ports are not allowed to be negative. You provided "
+                f"{port_int}"
             )
         if port_int > 65535:
             raise ValueError(

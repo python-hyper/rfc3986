@@ -1,4 +1,6 @@
 """Module containing the implementation of the URIMixin class."""
+
+import dataclasses
 import typing as t
 import warnings
 
@@ -403,6 +405,5 @@ class URIMixin:
         for key, value in list(attributes.items()):
             if value is misc.UseExisting:
                 del attributes[key]
-        uri = self._replace(**attributes)
-        uri.encoding = self.encoding
+        uri = dataclasses.replace(self, encoding=self.encoding, **attributes)
         return uri
