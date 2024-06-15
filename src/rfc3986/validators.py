@@ -435,7 +435,9 @@ def subauthority_component_is_valid(
         return True
 
     try:
-        port = int(subauthority_dict["port"])  # pyright: ignore[reportArgumentType] # Guarded by "except TypeError".
+        port = int(
+            subauthority_dict["port"]
+        )  # pyright: ignore[reportArgumentType] # Guarded by "except TypeError".
     except TypeError:
         # If the port wasn't provided it'll be None and int(None) raises a
         # TypeError
