@@ -18,8 +18,13 @@ This module contains important constants, patterns, and compiled regular
 expressions for parsing and validating URIs and their components.
 """
 import re
+import typing as t
 
 from . import abnf_regexp
+
+if t.TYPE_CHECKING:
+    # Break an import loop.
+    from . import uri
 
 # These are enumerated for the named tuple used as a superclass of
 # URIReference
@@ -118,7 +123,7 @@ ISUBAUTHORITY_MATCHER = re.compile(
 
 
 # Path merger as defined in http://tools.ietf.org/html/rfc3986#section-5.2.3
-def merge_paths(base_uri, relative_path):
+def merge_paths(base_uri: "uri.URIReference", relative_path: str) -> str:
     """Merge a base URI's path with a relative URI's path."""
     if base_uri.path is None and base_uri.authority is not None:
         return "/" + relative_path
