@@ -20,10 +20,12 @@ from . import normalizers
 from . import uri
 from . import uri_reference
 
-# Copied from urllib.parse in typeshed.
+# Modified from urllib.parse in typeshed.
 _QueryType = t.Union[
     t.Mapping[t.Any, t.Any],
     t.Mapping[t.Any, t.Sequence[t.Any]],
+    # Substituting List for Sequence since one of the add/extend methods
+    # below has a runtime isinstance check for list.
     t.List[t.Tuple[t.Any, t.Any]],
     t.List[t.Tuple[t.Any, t.Sequence[t.Any]]],
 ]
