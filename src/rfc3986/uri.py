@@ -14,15 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import typing as t
-from collections import namedtuple
 
 from . import compat
 from . import misc
 from . import normalizers
 from ._mixin import URIMixin
+from ._typing_compat import Self
 
 
-class URIReference(namedtuple("URIReference", misc.URI_COMPONENTS), URIMixin):
+class URIReference(misc.URIReferenceBase, URIMixin):
     """Immutable object representing a parsed URI Reference.
 
     .. note::
@@ -80,10 +80,16 @@ class URIReference(namedtuple("URIReference", misc.URI_COMPONENTS), URIMixin):
         The port parsed from the authority.
     """
 
-    slots = ()
+    encoding: str
 
     def __new__(
-        cls, scheme, authority, path, query, fragment, encoding="utf-8"
+        cls,
+        scheme: t.Optional[str],
+        authority: t.Optional[str],
+        path: t.Optional[str],
+        query: t.Optional[str],
+        fragment: t.Optional[str],
+        encoding: str = "utf-8",
     ):
         """Create a new URIReference."""
         ref = super().__new__(
@@ -99,18 +105,18 @@ class URIReference(namedtuple("URIReference", misc.URI_COMPONENTS), URIMixin):
 
     __hash__ = tuple.__hash__
 
-    def __eq__(self, other):
+    def __eq__(self, other: object):
         """Compare this reference to another."""
         other_ref = other
         if isinstance(other, tuple):
-            other_ref = URIReference(*other)
+            other_ref = type(self)(*other)
         elif not isinstance(other, URIReference):
             try:
-                other_ref = URIReference.from_string(other)
+                other_ref = self.from_string(other)
             except TypeError:
                 raise TypeError(
-                    "Unable to compare URIReference() to {}()".format(
-                        type(other).__name__
+                    "Unable to compare {}() to {}()".format(
+                        type(self).__name__, type(other).__name__
                     )
                 )
 
@@ -118,7 +124,7 @@ class URIReference(namedtuple("URIReference", misc.URI_COMPONENTS), URIMixin):
         naive_equality = tuple(self) == tuple(other_ref)
         return naive_equality or self.normalized_equality(other_ref)
 
-    def normalize(self):
+    def normalize(self) -> "URIReference":
         """Normalize this reference as described in Section 6.2.2.
 
         This is not an in-place normalization. Instead this creates a new
@@ -145,7 +151,7 @@ class URIReference(namedtuple("URIReference", misc.URI_COMPONENTS), URIMixin):
         cls,
         uri_string: t.Union[str, bytes, bytearray],
         encoding: str = "utf-8",
-    ):
+    ) -> Self:
         """Parse a URI reference from the given unicode URI string.
 
         :param str uri_string: Unicode URI to be parsed into a reference.

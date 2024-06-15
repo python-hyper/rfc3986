@@ -26,9 +26,16 @@ if t.TYPE_CHECKING:
     # Break an import loop.
     from . import uri
 
-# These are enumerated for the named tuple used as a superclass of
-# URIReference
-URI_COMPONENTS = ["scheme", "authority", "path", "query", "fragment"]
+
+class URIReferenceBase(t.NamedTuple):
+    """The namedtuple used as a superclass of URIReference and IRIReference."""
+
+    scheme: t.Optional[str]
+    authority: t.Optional[str]
+    path: t.Optional[str]
+    query: t.Optional[str]
+    fragment: t.Optional[str]
+
 
 important_characters = {
     "generic_delimiters": abnf_regexp.GENERIC_DELIMITERS,

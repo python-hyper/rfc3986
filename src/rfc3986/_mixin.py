@@ -10,8 +10,6 @@ from . import validators
 class URIMixin:
     """Mixin with all shared methods for URIs and IRIs."""
 
-    __hash__ = tuple.__hash__
-
     def authority_info(self):
         """Return a dictionary with the ``userinfo``, ``host``, and ``port``.
 

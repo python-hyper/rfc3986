@@ -82,14 +82,34 @@ def normalize_path(path: str) -> str:
     return remove_dot_segments(path)
 
 
-def normalize_query(query: str) -> str:
+@t.overload
+def normalize_query(query: str) -> str:  # noqa: D103
+    ...
+
+
+@t.overload
+def normalize_query(query: None) -> None:  # noqa: D103
+    ...
+
+
+def normalize_query(query: t.Optional[str]) -> t.Optional[str]:
     """Normalize the query string."""
     if not query:
         return query
     return normalize_percent_characters(query)
 
 
-def normalize_fragment(fragment: str) -> str:
+@t.overload
+def normalize_fragment(fragment: str) -> str:  # noqa: D103
+    ...
+
+
+@t.overload
+def normalize_fragment(fragment: None) -> None:  # noqa: D103
+    ...
+
+
+def normalize_fragment(fragment: t.Optional[str]) -> t.Optional[str]:
     """Normalize the fragment string."""
     if not fragment:
         return fragment

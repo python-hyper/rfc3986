@@ -47,7 +47,7 @@ class URIBuilder:
         scheme: t.Optional[str] = None,
         userinfo: t.Optional[str] = None,
         host: t.Optional[str] = None,
-        port: t.Optional[str] = None,
+        port: t.Optional[t.Union[int, str]] = None,
         path: t.Optional[str] = None,
         query: t.Optional[str] = None,
         fragment: t.Optional[str] = None,
@@ -60,7 +60,7 @@ class URIBuilder:
             (optional)
         :param str host:
             (optional)
-        :param int port:
+        :param int | str port:
             (optional)
         :param str path:
             (optional)
@@ -72,7 +72,7 @@ class URIBuilder:
         self.scheme = scheme
         self.userinfo = userinfo
         self.host = host
-        self.port = port
+        self.port = str(port) if port is not None else port
         self.path = path
         self.query = query
         self.fragment = fragment
