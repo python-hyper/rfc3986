@@ -20,6 +20,14 @@ from . import normalizers
 from . import uri
 from . import uri_reference
 
+# Copied from urllib.parse in typeshed.
+_QueryType = t.Union[
+    t.Mapping[t.Any, t.Any],
+    t.Mapping[t.Any, t.Sequence[t.Any]],
+    t.List[t.Tuple[t.Any, t.Any]],
+    t.List[t.Tuple[t.Any, t.Sequence[t.Any]]],
+]
+
 
 class URIBuilder:
     """Object to aid in building up a URI Reference from parts.
@@ -268,7 +276,7 @@ class URIBuilder:
 
         return self.add_path(path)
 
-    def add_query_from(self, query_items):
+    def add_query_from(self, query_items: _QueryType):
         """Generate and add a query a dictionary or list of tuples.
 
         .. code-block:: python
@@ -294,7 +302,7 @@ class URIBuilder:
             fragment=self.fragment,
         )
 
-    def extend_query_with(self, query_items):
+    def extend_query_with(self, query_items: _QueryType):
         """Extend the existing query string with the new query items.
 
         .. versionadded:: 1.5.0
