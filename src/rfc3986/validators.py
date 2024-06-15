@@ -273,7 +273,9 @@ def ensure_required_components_exist(
 
 
 def is_valid(
-    value: t.Optional[str], matcher: t.Pattern[str], require: bool
+    value: t.Optional[str],
+    matcher: t.Pattern[str],
+    require: bool,
 ) -> bool:
     """Determine if a value is valid based on the provided matcher.
 
@@ -292,7 +294,9 @@ def is_valid(
 
 
 def authority_is_valid(
-    authority: str, host: t.Optional[str] = None, require: bool = False
+    authority: str,
+    host: t.Optional[str] = None,
+    require: bool = False,
 ) -> bool:
     """Determine if the authority string is valid.
 
@@ -379,7 +383,8 @@ def query_is_valid(query: t.Optional[str], require: bool = False) -> bool:
 
 
 def fragment_is_valid(
-    fragment: t.Optional[str], require: bool = False
+    fragment: t.Optional[str],
+    require: bool = False,
 ) -> bool:
     """Determine if the fragment component is valid.
 
@@ -413,7 +418,8 @@ _SUBAUTHORITY_VALIDATORS = {"userinfo", "host", "port"}
 
 
 def subauthority_component_is_valid(
-    uri: "uri.URIReference", component: str
+    uri: "uri.URIReference",
+    component: str,
 ) -> bool:
     """Determine if the userinfo, host, and port are valid."""
     try:
@@ -429,7 +435,7 @@ def subauthority_component_is_valid(
         return True
 
     try:
-        port = int(subauthority_dict["port"])
+        port = int(subauthority_dict["port"])  # pyright: ignore[reportArgumentType] # Guarded by "except TypeError".
     except TypeError:
         # If the port wasn't provided it'll be None and int(None) raises a
         # TypeError
@@ -439,7 +445,8 @@ def subauthority_component_is_valid(
 
 
 def ensure_components_are_valid(
-    uri: "uri.URIReference", validated_components: t.List[str]
+    uri: "uri.URIReference",
+    validated_components: t.List[str],
 ) -> None:
     """Assert that all components are valid in the URI."""
     invalid_components: set[str] = set()
