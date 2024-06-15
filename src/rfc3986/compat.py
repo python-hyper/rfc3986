@@ -24,7 +24,8 @@ __all__ = (
 def to_str(  # noqa: D103
     b: t.Union[str, bytes],
     encoding: str = "utf-8",
-) -> str: ...
+) -> str:
+    ...
 
 
 @t.overload
@@ -46,7 +47,8 @@ def to_str(
 def to_bytes(  # noqa: D103
     s: t.Union[str, bytes],
     encoding: str = "utf-8",
-) -> bytes: ...
+) -> bytes:
+    ...
 
 
 @t.overload
