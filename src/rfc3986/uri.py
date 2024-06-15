@@ -149,7 +149,7 @@ class URIReference(misc.URIReferenceBase, URIMixin):
     @classmethod
     def from_string(
         cls,
-        uri_string: t.Union[str, bytes, bytearray],
+        uri_string: t.Union[str, bytes],
         encoding: str = "utf-8",
     ) -> Self:
         """Parse a URI reference from the given unicode URI string.

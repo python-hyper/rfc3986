@@ -25,7 +25,7 @@ from .uri import URIReference
 
 
 def uri_reference(
-    uri: t.Union[str, bytes, bytearray],
+    uri: t.Union[str, bytes],
     encoding: str = "utf-8",
 ) -> URIReference:
     """Parse a URI string into a URIReference.
@@ -42,7 +42,7 @@ def uri_reference(
 
 
 def iri_reference(
-    iri: t.Union[str, bytes, bytearray],
+    iri: t.Union[str, bytes],
     encoding: str = "utf-8",
 ) -> IRIReference:
     """Parse a IRI string into an IRIReference.
@@ -59,7 +59,7 @@ def iri_reference(
 
 
 def is_valid_uri(
-    uri: t.Union[str, bytes, bytearray],
+    uri: t.Union[str, bytes],
     encoding: str = "utf-8",
     **kwargs: bool,
 ) -> bool:
@@ -87,10 +87,7 @@ def is_valid_uri(
     return URIReference.from_string(uri, encoding).is_valid(**kwargs)
 
 
-def normalize_uri(
-    uri: t.Union[str, bytes, bytearray],
-    encoding: str = "utf-8",
-) -> str:
+def normalize_uri(uri: t.Union[str, bytes], encoding: str = "utf-8") -> str:
     """Normalize the given URI.
 
     This is a convenience function. You could use either
@@ -106,10 +103,7 @@ def normalize_uri(
     return normalized_reference.unsplit()
 
 
-def urlparse(
-    uri: t.Union[str, bytes, bytearray],
-    encoding: str = "utf-8",
-) -> ParseResult:
+def urlparse(uri: t.Union[str, bytes], encoding: str = "utf-8") -> ParseResult:
     """Parse a given URI and return a ParseResult.
 
     This is a partial replacement of the standard library's urlparse function.

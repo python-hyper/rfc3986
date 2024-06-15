@@ -157,7 +157,7 @@ class ParseResult(
     @classmethod
     def from_string(
         cls,
-        uri_string: t.Union[str, bytes, bytearray],
+        uri_string: t.Union[str, bytes],
         encoding: str = "utf-8",
         strict: bool = True,
         lazy_normalize: bool = True,

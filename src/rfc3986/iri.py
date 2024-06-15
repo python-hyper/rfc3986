@@ -89,7 +89,7 @@ class IRIReference(misc.URIReferenceBase, uri.URIMixin):
     @classmethod
     def from_string(
         cls,
-        iri_string: t.Union[str, bytes, bytearray],
+        iri_string: t.Union[str, bytes],
         encoding: str = "utf-8",
     ) -> Self:
         """Parse a IRI reference from the given unicode IRI string.
