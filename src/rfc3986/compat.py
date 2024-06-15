@@ -22,7 +22,7 @@ __all__ = (
 
 @t.overload
 def to_str(  # noqa: D103
-    b: t.Union[str, bytes],
+    b: t.Union[str, bytes, bytearray],
     encoding: str = "utf-8",
 ) -> str:
     ...
@@ -34,7 +34,7 @@ def to_str(b: None, encoding: str = "utf-8") -> None:  # noqa: D103
 
 
 def to_str(
-    b: t.Optional[t.Union[str, bytes]],
+    b: t.Optional[t.Union[str, bytes, bytearray]],
     encoding: str = "utf-8",
 ) -> t.Optional[str]:
     """Ensure that b is text in the specified encoding."""
@@ -45,7 +45,7 @@ def to_str(
 
 @t.overload
 def to_bytes(  # noqa: D103
-    s: t.Union[str, bytes],
+    s: t.Union[str, bytes, bytearray],
     encoding: str = "utf-8",
 ) -> bytes:
     ...
@@ -57,7 +57,7 @@ def to_bytes(s: None, encoding: str = "utf-8") -> None:  # noqa: D103
 
 
 def to_bytes(
-    s: t.Optional[t.Union[str, bytes]],
+    s: t.Optional[t.Union[str, bytes, bytearray]],
     encoding: str = "utf-8",
 ) -> t.Optional[bytes]:
     """Ensure that s is converted to bytes from the encoding."""

@@ -13,6 +13,7 @@
 # implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import typing as t
 from collections import namedtuple
 
 from . import compat
@@ -140,7 +141,11 @@ class URIReference(namedtuple("URIReference", misc.URI_COMPONENTS), URIMixin):
         )
 
     @classmethod
-    def from_string(cls, uri_string, encoding="utf-8"):
+    def from_string(
+        cls,
+        uri_string: t.Union[str, bytes, bytearray],
+        encoding: str = "utf-8",
+    ):
         """Parse a URI reference from the given unicode URI string.
 
         :param str uri_string: Unicode URI to be parsed into a reference.

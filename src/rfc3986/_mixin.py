@@ -103,7 +103,7 @@ class URIMixin:
         """
         return bool(misc.ABSOLUTE_URI_MATCHER.match(self.unsplit()))
 
-    def is_valid(self, **kwargs):
+    def is_valid(self, **kwargs: bool) -> bool:
         """Determine if the URI is valid.
 
         .. deprecated:: 1.1.0

@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Module containing the urlparse compatibility logic."""
+import typing as t
 from collections import namedtuple
 
 from . import compat
@@ -155,7 +156,11 @@ class ParseResult(
 
     @classmethod
     def from_string(
-        cls, uri_string, encoding="utf-8", strict=True, lazy_normalize=True
+        cls,
+        uri_string: t.Union[str, bytes, bytearray],
+        encoding: str = "utf-8",
+        strict: bool = True,
+        lazy_normalize: bool = True,
     ):
         """Parse a URI from the given unicode URI string.
 

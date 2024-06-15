@@ -13,6 +13,7 @@
 # implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import typing as t
 from collections import namedtuple
 
 from . import compat
@@ -80,7 +81,11 @@ class IRIReference(
         return misc.ISUBAUTHORITY_MATCHER.match(self.authority)
 
     @classmethod
-    def from_string(cls, iri_string, encoding="utf-8"):
+    def from_string(
+        cls,
+        iri_string: t.Union[str, bytes, bytearray],
+        encoding: str = "utf-8",
+    ):
         """Parse a IRI reference from the given unicode IRI string.
 
         :param str iri_string: Unicode IRI to be parsed into a reference.

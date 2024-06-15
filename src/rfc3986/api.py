@@ -17,12 +17,17 @@ Module containing the simple and functional API for rfc3986.
 This module defines functions and provides access to the public attributes
 and classes of rfc3986.
 """
+import typing as t
+
 from .iri import IRIReference
 from .parseresult import ParseResult
 from .uri import URIReference
 
 
-def uri_reference(uri: str, encoding: str = "utf-8") -> URIReference:
+def uri_reference(
+    uri: t.Union[str, bytes, bytearray],
+    encoding: str = "utf-8",
+) -> URIReference:
     """Parse a URI string into a URIReference.
 
     This is a convenience function. You could achieve the same end by using
@@ -36,7 +41,10 @@ def uri_reference(uri: str, encoding: str = "utf-8") -> URIReference:
     return URIReference.from_string(uri, encoding)
 
 
-def iri_reference(iri: str, encoding: str = "utf-8") -> IRIReference:
+def iri_reference(
+    iri: t.Union[str, bytes, bytearray],
+    encoding: str = "utf-8",
+) -> IRIReference:
     """Parse a IRI string into an IRIReference.
 
     This is a convenience function. You could achieve the same end by using
@@ -50,7 +58,11 @@ def iri_reference(iri: str, encoding: str = "utf-8") -> IRIReference:
     return IRIReference.from_string(iri, encoding)
 
 
-def is_valid_uri(uri: str, encoding: str = "utf-8", **kwargs: bool) -> bool:
+def is_valid_uri(
+    uri: t.Union[str, bytes, bytearray],
+    encoding: str = "utf-8",
+    **kwargs: bool,
+) -> bool:
     """Determine if the URI given is valid.
 
     This is a convenience function. You could use either
@@ -75,7 +87,10 @@ def is_valid_uri(uri: str, encoding: str = "utf-8", **kwargs: bool) -> bool:
     return URIReference.from_string(uri, encoding).is_valid(**kwargs)
 
 
-def normalize_uri(uri: str, encoding: str = "utf-8") -> str:
+def normalize_uri(
+    uri: t.Union[str, bytes, bytearray],
+    encoding: str = "utf-8",
+) -> str:
     """Normalize the given URI.
 
     This is a convenience function. You could use either
@@ -91,7 +106,10 @@ def normalize_uri(uri: str, encoding: str = "utf-8") -> str:
     return normalized_reference.unsplit()
 
 
-def urlparse(uri: str, encoding: str = "utf-8") -> ParseResult:
+def urlparse(
+    uri: t.Union[str, bytes, bytearray],
+    encoding: str = "utf-8",
+) -> ParseResult:
     """Parse a given URI and return a ParseResult.
 
     This is a partial replacement of the standard library's urlparse function.
