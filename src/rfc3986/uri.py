@@ -19,7 +19,7 @@ from . import compat
 from . import misc
 from . import normalizers
 from ._mixin import URIMixin
-from ._typing_compat import Self
+from ._typing_compat import Self as _Self
 
 
 class URIReference(misc.URIReferenceBase, URIMixin):
@@ -151,7 +151,7 @@ class URIReference(misc.URIReferenceBase, URIMixin):
         cls,
         uri_string: t.Union[str, bytes],
         encoding: str = "utf-8",
-    ) -> Self:
+    ) -> _Self:
         """Parse a URI reference from the given unicode URI string.
 
         :param str uri_string: Unicode URI to be parsed into a reference.

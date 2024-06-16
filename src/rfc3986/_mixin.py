@@ -1,16 +1,24 @@
 """Module containing the implementation of the URIMixin class."""
+import typing as t
 import warnings
 
 from . import exceptions as exc
 from . import misc
 from . import normalizers
 from . import validators
+from ._typing_compat import Self as _Self
+
+
+class _AuthorityInfo(t.TypedDict):
+    userinfo: t.Optional[str]
+    host: t.Optional[str]
+    port: t.Optional[str]
 
 
 class URIMixin:
     """Mixin with all shared methods for URIs and IRIs."""
 
-    def authority_info(self):
+    def authority_info(self) -> _AuthorityInfo:
         """Return a dictionary with the ``userinfo``, ``host``, and ``port``.
 
         If the authority is not valid, it will raise a
@@ -51,11 +59,11 @@ class URIMixin:
 
         return matches
 
-    def _match_subauthority(self):
+    def _match_subauthority(self) -> t.Optional[t.Match[str]]:
         return misc.SUBAUTHORITY_MATCHER.match(self.authority)
 
     @property
-    def _validator(self):
+    def _validator(self) -> validators.Validator:
         v = getattr(self, "_cached_validator", None)
         if v is not None:
             return v
@@ -65,7 +73,7 @@ class URIMixin:
         return self._cached_validator
 
     @property
-    def host(self):
+    def host(self) -> t.Optional[str]:
         """If present, a string representing the host."""
         try:
             authority = self.authority_info()
@@ -74,7 +82,7 @@ class URIMixin:
         return authority["host"]
 
     @property
-    def port(self):
+    def port(self) -> t.Optional[str]:
         """If present, the port extracted from the authority."""
         try:
             authority = self.authority_info()
@@ -83,7 +91,7 @@ class URIMixin:
         return authority["port"]
 
     @property
-    def userinfo(self):
+    def userinfo(self) -> t.Optional[str]:
         """If present, the userinfo extracted from the authority."""
         try:
             authority = self.authority_info()
@@ -91,7 +99,7 @@ class URIMixin:
             return None
         return authority["userinfo"]
 
-    def is_absolute(self):
+    def is_absolute(self) -> bool:
         """Determine if this URI Reference is an absolute URI.
 
         See http://tools.ietf.org/html/rfc3986#section-4.3 for explanation.
@@ -135,7 +143,7 @@ class URIMixin:
         ]
         return all(v(r) for v, r in validators)
 
-    def authority_is_valid(self, require=False):
+    def authority_is_valid(self, require: bool = False) -> bool:
         """Determine if the authority component is valid.
 
         .. deprecated:: 1.1.0
@@ -165,7 +173,7 @@ class URIMixin:
             require=require,
         )
 
-    def scheme_is_valid(self, require=False):
+    def scheme_is_valid(self, require: bool = False) -> bool:
         """Determine if the scheme component is valid.
 
         .. deprecated:: 1.1.0
@@ -184,7 +192,7 @@ class URIMixin:
         )
         return validators.scheme_is_valid(self.scheme, require)
 
-    def path_is_valid(self, require=False):
+    def path_is_valid(self, require: bool = False) -> bool:
         """Determine if the path component is valid.
 
         .. deprecated:: 1.1.0
@@ -203,7 +211,7 @@ class URIMixin:
         )
         return validators.path_is_valid(self.path, require)
 
-    def query_is_valid(self, require=False):
+    def query_is_valid(self, require: bool = False) -> bool:
         """Determine if the query component is valid.
 
         .. deprecated:: 1.1.0
@@ -222,7 +230,7 @@ class URIMixin:
         )
         return validators.query_is_valid(self.query, require)
 
-    def fragment_is_valid(self, require=False):
+    def fragment_is_valid(self, require: bool = False) -> bool:
         """Determine if the fragment component is valid.
 
         .. deprecated:: 1.1.0
@@ -241,7 +249,7 @@ class URIMixin:
         )
         return validators.fragment_is_valid(self.fragment, require)
 
-    def normalized_equality(self, other_ref):
+    def normalized_equality(self, other_ref) -> bool:
         """Compare this URIReference to another URIReference.
 
         :param URIReference other_ref: (required), The reference with which
@@ -251,7 +259,7 @@ class URIMixin:
         """
         return tuple(self.normalize()) == tuple(other_ref.normalize())
 
-    def resolve_with(self, base_uri, strict=False):
+    def resolve_with(self, base_uri, strict: bool = False) -> _Self:
         """Use an absolute URI Reference to resolve this relative reference.
 
         Assuming this is a relative reference that you would like to resolve,
@@ -323,14 +331,14 @@ class URIMixin:
                     )
         return target
 
-    def unsplit(self):
+    def unsplit(self) -> str:
         """Create a URI string from the components.
 
         :returns: The URI Reference reconstituted as a string.
         :rtype: str
         """
         # See http://tools.ietf.org/html/rfc3986#section-5.3
-        result_list = []
+        result_list: list[str] = []
         if self.scheme:
             result_list.extend([self.scheme, ":"])
         if self.authority:
@@ -345,12 +353,12 @@ class URIMixin:
 
     def copy_with(
         self,
-        scheme=misc.UseExisting,
-        authority=misc.UseExisting,
-        path=misc.UseExisting,
-        query=misc.UseExisting,
-        fragment=misc.UseExisting,
-    ):
+        scheme: t.Optional[str] = misc.UseExisting,
+        authority: t.Optional[str] = misc.UseExisting,
+        path: t.Optional[str] = misc.UseExisting,
+        query: t.Optional[str] = misc.UseExisting,
+        fragment: t.Optional[str] = misc.UseExisting,
+    ) -> _Self:
         """Create a copy of this reference with the new components.
 
         :param str scheme:

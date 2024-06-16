@@ -140,4 +140,4 @@ def merge_paths(base_uri: "uri.URIReference", relative_path: str) -> str:
         return path[:index] + "/" + relative_path
 
 
-UseExisting = object()
+UseExisting: t.Any = object()

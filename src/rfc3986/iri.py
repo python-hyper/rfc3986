@@ -20,7 +20,7 @@ from . import exceptions
 from . import misc
 from . import normalizers
 from . import uri
-from ._typing_compat import Self
+from ._typing_compat import Self as _Self
 
 
 try:
@@ -91,7 +91,7 @@ class IRIReference(misc.URIReferenceBase, uri.URIMixin):
         cls,
         iri_string: t.Union[str, bytes],
         encoding: str = "utf-8",
-    ) -> Self:
+    ) -> _Self:
         """Parse a IRI reference from the given unicode IRI string.
 
         :param str iri_string: Unicode IRI to be parsed into a reference.
