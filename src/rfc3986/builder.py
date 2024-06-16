@@ -188,7 +188,7 @@ class URIBuilder:
             fragment=self.fragment,
         )
 
-    def add_port(self, port: t.Union[str, int]) -> "URIBuilder":
+    def add_port(self, port: t.Union[int, str]) -> "URIBuilder":
         """Add port to the URI.
 
         .. code-block:: python

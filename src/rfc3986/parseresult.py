@@ -64,17 +64,17 @@ class ParseResultMixin(t.Generic[t.AnyStr]):
         return self.unsplit()
 
     @property
-    def hostname(self) -> t.AnyStr:
+    def hostname(self) -> t.Optional[t.AnyStr]:
         """Shim to match the standard library."""
         return self.host
 
     @property
-    def netloc(self) -> t.AnyStr:
+    def netloc(self) -> t.Optional[t.AnyStr]:
         """Shim to match the standard library."""
         return self.authority
 
     @property
-    def params(self) -> t.AnyStr:
+    def params(self) -> t.Optional[t.AnyStr]:
         """Shim to match the standard library."""
         return self.query
 
@@ -210,7 +210,7 @@ class ParseResult(
         scheme: t.Optional[str] = misc.UseExisting,
         userinfo: t.Optional[str] = misc.UseExisting,
         host: t.Optional[str] = misc.UseExisting,
-        port: t.Optional[str] = misc.UseExisting,
+        port: t.Optional[t.Union[int, str]] = misc.UseExisting,
         path: t.Optional[str] = misc.UseExisting,
         query: t.Optional[str] = misc.UseExisting,
         fragment: t.Optional[str] = misc.UseExisting,
@@ -316,7 +316,7 @@ class ParseResultBytes(
         scheme: t.Optional[str] = None,
         userinfo: t.Optional[str] = None,
         host: t.Optional[str] = None,
-        port: t.Optional[t.Union[str, int]] = None,
+        port: t.Optional[t.Union[int, str]] = None,
         path: t.Optional[str] = None,
         query: t.Optional[str] = None,
         fragment: t.Optional[str] = None,
