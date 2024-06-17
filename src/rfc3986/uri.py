@@ -90,7 +90,7 @@ class URIReference(misc.URIReferenceBase, URIMixin):
         query: t.Optional[str],
         fragment: t.Optional[str],
         encoding: str = "utf-8",
-    ):
+    ) -> _Self:
         """Create a new URIReference."""
         ref = super().__new__(
             cls,
@@ -105,7 +105,7 @@ class URIReference(misc.URIReferenceBase, URIMixin):
 
     __hash__ = tuple.__hash__
 
-    def __eq__(self, other: object):
+    def __eq__(self, other: object) -> bool:
         """Compare this reference to another."""
         other_ref = other
         if isinstance(other, tuple):

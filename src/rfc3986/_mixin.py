@@ -10,6 +10,8 @@ from ._typing_compat import Self as _Self
 
 
 class _AuthorityInfo(t.TypedDict):
+    """A typed dict for the authority info triple: userinfo, host, and port."""
+
     userinfo: t.Optional[str]
     host: t.Optional[str]
     port: t.Optional[str]

@@ -91,7 +91,7 @@ class ParseResult(
     scheme: t.Optional[str]
     userinfo: t.Optional[str]
     host: t.Optional[str]
-    port: t.Optional[str]
+    port: t.Optional[int]
     path: t.Optional[str]
     query: t.Optional[str]
     fragment: t.Optional[str]
@@ -103,13 +103,13 @@ class ParseResult(
         scheme: t.Optional[str],
         userinfo: t.Optional[str],
         host: t.Optional[str],
-        port: t.Optional[str],
+        port: t.Optional[int],
         path: t.Optional[str],
         query: t.Optional[str],
         fragment: t.Optional[str],
         uri_ref: "uri.URIReference",
         encoding: str = "utf-8",
-    ):
+    ) -> _Self:
         """Create a new ParseResult."""
         parse_result = super().__new__(
             cls,
@@ -201,7 +201,7 @@ class ParseResult(
         )
 
     @property
-    def authority(self):
+    def authority(self) -> t.Optional[str]:
         """Return the normalized authority."""
         return self.reference.authority
 
@@ -214,7 +214,7 @@ class ParseResult(
         path: t.Optional[str] = misc.UseExisting,
         query: t.Optional[str] = misc.UseExisting,
         fragment: t.Optional[str] = misc.UseExisting,
-    ):
+    ) -> "ParseResult":
         """Create a copy of this instance replacing with specified parts."""
         attributes = zip(
             PARSED_COMPONENTS,
@@ -273,7 +273,7 @@ class ParseResultBytes(
     scheme: t.Optional[bytes]
     userinfo: t.Optional[bytes]
     host: t.Optional[bytes]
-    port: t.Optional[bytes]
+    port: t.Optional[int]
     path: t.Optional[bytes]
     query: t.Optional[bytes]
     fragment: t.Optional[bytes]
@@ -286,14 +286,14 @@ class ParseResultBytes(
         scheme: t.Optional[bytes],
         userinfo: t.Optional[bytes],
         host: t.Optional[bytes],
-        port: t.Optional[bytes],
+        port: t.Optional[int],
         path: t.Optional[bytes],
         query: t.Optional[bytes],
         fragment: t.Optional[bytes],
         uri_ref: "uri.URIReference",
         encoding: str = "utf-8",
         lazy_normalize: bool = True,
-    ):
+    ) -> _Self:
         """Create a new ParseResultBytes instance."""
         parse_result = super().__new__(
             cls,
@@ -322,7 +322,7 @@ class ParseResultBytes(
         fragment: t.Optional[str] = None,
         encoding: str = "utf-8",
         lazy_normalize: bool = True,
-    ):
+    ) -> _Self:
         """Create a ParseResult instance from its parts."""
         authority = ""
         if userinfo is not None:
