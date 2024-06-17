@@ -5,6 +5,7 @@ import warnings
 from . import exceptions as exc
 from . import misc
 from . import normalizers
+from . import uri
 from . import validators
 from ._typing_compat import Self as _Self
 
@@ -19,6 +20,14 @@ class _AuthorityInfo(t.TypedDict):
 
 class URIMixin:
     """Mixin with all shared methods for URIs and IRIs."""
+
+    if t.TYPE_CHECKING:
+        scheme: t.Optional[str]
+        authority: t.Optional[str]
+        path: t.Optional[str]
+        query: t.Optional[str]
+        fragment: t.Optional[str]
+        encoding: str
 
     def authority_info(self) -> _AuthorityInfo:
         """Return a dictionary with the ``userinfo``, ``host``, and ``port``.
@@ -251,7 +260,7 @@ class URIMixin:
         )
         return validators.fragment_is_valid(self.fragment, require)
 
-    def normalized_equality(self, other_ref) -> bool:
+    def normalized_equality(self, other_ref: "uri.URIReference") -> bool:
         """Compare this URIReference to another URIReference.
 
         :param URIReference other_ref: (required), The reference with which
@@ -261,7 +270,11 @@ class URIMixin:
         """
         return tuple(self.normalize()) == tuple(other_ref.normalize())
 
-    def resolve_with(self, base_uri, strict: bool = False) -> _Self:
+    def resolve_with(
+        self,
+        base_uri: t.Union[str, "uri.URIReference"],
+        strict: bool = False,
+    ) -> _Self:
         """Use an absolute URI Reference to resolve this relative reference.
 
         Assuming this is a relative reference that you would like to resolve,
@@ -279,6 +292,9 @@ class URIMixin:
         """
         if not isinstance(base_uri, URIMixin):
             base_uri = type(self).from_string(base_uri)
+
+        if t.TYPE_CHECKING:
+            base_uri = t.cast(uri.URIReference, base_uri)
 
         try:
             self._validator.validate(base_uri)
@@ -388,6 +404,6 @@ class URIMixin:
         for key, value in list(attributes.items()):
             if value is misc.UseExisting:
                 del attributes[key]
-        uri = self._replace(**attributes)
+        uri: "uri.URIReference" = self._replace(**attributes)
         uri.encoding = self.encoding
         return uri

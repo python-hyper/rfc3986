@@ -22,10 +22,6 @@ import typing as t
 
 from . import abnf_regexp
 
-if t.TYPE_CHECKING:
-    # Break an import loop.
-    from . import uri
-
 
 class URIReferenceBase(t.NamedTuple):
     """The namedtuple used as a superclass of URIReference and IRIReference."""
@@ -130,7 +126,7 @@ ISUBAUTHORITY_MATCHER = re.compile(
 
 
 # Path merger as defined in http://tools.ietf.org/html/rfc3986#section-5.2.3
-def merge_paths(base_uri: "uri.URIReference", relative_path: str) -> str:
+def merge_paths(base_uri: URIReferenceBase, relative_path: str) -> str:
     """Merge a base URI's path with a relative URI's path."""
     if base_uri.path is None and base_uri.authority is not None:
         return "/" + relative_path

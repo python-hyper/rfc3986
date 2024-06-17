@@ -18,6 +18,7 @@ from . import exceptions
 from . import misc
 from . import normalizers
 from . import uri
+from ._typing_compat import Self as _Self
 
 
 class Validator:
@@ -51,13 +52,13 @@ class Validator:
         ["scheme", "userinfo", "host", "port", "path", "query", "fragment"]
     )
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize our default validations."""
-        self.allowed_schemes: set[str] = set()
-        self.allowed_hosts: set[str] = set()
-        self.allowed_ports: set[str] = set()
-        self.allow_password = True
-        self.required_components = {
+        self.allowed_schemes: t.Set[str] = set()
+        self.allowed_hosts: t.Set[str] = set()
+        self.allowed_ports: t.Set[str] = set()
+        self.allow_password: bool = True
+        self.required_components: t.Dict[str, bool] = {
             "scheme": False,
             "userinfo": False,
             "host": False,
@@ -66,9 +67,11 @@ class Validator:
             "query": False,
             "fragment": False,
         }
-        self.validated_components = self.required_components.copy()
+        self.validated_components: t.Dict[
+            str, bool
+        ] = self.required_components.copy()
 
-    def allow_schemes(self, *schemes: str):
+    def allow_schemes(self, *schemes: str) -> _Self:
         """Require the scheme to be one of the provided schemes.
 
         .. versionadded:: 1.0
@@ -84,7 +87,7 @@ class Validator:
             self.allowed_schemes.add(normalizers.normalize_scheme(scheme))
         return self
 
-    def allow_hosts(self, *hosts: str):
+    def allow_hosts(self, *hosts: str) -> _Self:
         """Require the host to be one of the provided hosts.
 
         .. versionadded:: 1.0
@@ -100,7 +103,7 @@ class Validator:
             self.allowed_hosts.add(normalizers.normalize_host(host))
         return self
 
-    def allow_ports(self, *ports: str):
+    def allow_ports(self, *ports: str) -> _Self:
         """Require the port to be one of the provided ports.
 
         .. versionadded:: 1.0
@@ -118,7 +121,7 @@ class Validator:
                 self.allowed_ports.add(port)
         return self
 
-    def allow_use_of_password(self):
+    def allow_use_of_password(self) -> _Self:
         """Allow passwords to be present in the URI.
 
         .. versionadded:: 1.0
@@ -131,7 +134,7 @@ class Validator:
         self.allow_password = True
         return self
 
-    def forbid_use_of_password(self):
+    def forbid_use_of_password(self) -> _Self:
         """Prevent passwords from being included in the URI.
 
         .. versionadded:: 1.0
@@ -144,7 +147,7 @@ class Validator:
         self.allow_password = False
         return self
 
-    def check_validity_of(self, *components: str):
+    def check_validity_of(self, *components: str) -> _Self:
         """Check the validity of the components provided.
 
         This can be specified repeatedly.
@@ -167,7 +170,7 @@ class Validator:
         )
         return self
 
-    def require_presence_of(self, *components: str):
+    def require_presence_of(self, *components: str) -> _Self:
         """Require the components provided.
 
         This can be specified repeatedly.
@@ -190,7 +193,7 @@ class Validator:
         )
         return self
 
-    def validate(self, uri: "uri.URIReference"):
+    def validate(self, uri: "uri.URIReference") -> None:
         """Check a URI for conditions specified on this validator.
 
         .. versionadded:: 1.0
@@ -244,7 +247,7 @@ def check_password(uri: "uri.URIReference") -> None:
 
 
 def ensure_one_of(
-    allowed_values: t.Container[object],
+    allowed_values: t.Collection[object],
     uri: "uri.URIReference",
     attribute: str,
 ) -> None:
@@ -261,7 +264,7 @@ def ensure_one_of(
 def ensure_required_components_exist(
     uri: "uri.URIReference",
     required_components: t.Iterable[str],
-):
+) -> None:
     """Assert that all required components are present in the URI."""
     missing_components = sorted(
         component
@@ -294,7 +297,7 @@ def is_valid(
 
 
 def authority_is_valid(
-    authority: str,
+    authority: t.Optional[str],
     host: t.Optional[str] = None,
     require: bool = False,
 ) -> bool:

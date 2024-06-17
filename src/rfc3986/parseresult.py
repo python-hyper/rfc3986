@@ -36,10 +36,21 @@ PARSED_COMPONENTS = (
 
 
 class ParseResultMixin(t.Generic[t.AnyStr]):
+    if t.TYPE_CHECKING:
+        userinfo: t.Optional[t.AnyStr]
+        host: t.Optional[t.AnyStr]
+        port: t.Optional[int]
+        query: t.Optional[t.AnyStr]
+        encoding: str
+
+        @property
+        def authority(self) -> t.Optional[t.AnyStr]:
+            ...
+
     def _generate_authority(
         self,
         attributes: t.Dict[str, t.Optional[t.AnyStr]],
-    ) -> str:
+    ) -> t.Optional[str]:
         # I swear I did not align the comparisons below. That's just how they
         # happened to align based on pep8 and attribute lengths.
         userinfo, host, port = (
@@ -402,7 +413,7 @@ class ParseResultBytes(
         scheme: t.Optional[t.Union[str, bytes]] = misc.UseExisting,
         userinfo: t.Optional[t.Union[str, bytes]] = misc.UseExisting,
         host: t.Optional[t.Union[str, bytes]] = misc.UseExisting,
-        port: t.Optional[t.Union[str, bytes]] = misc.UseExisting,
+        port: t.Optional[t.Union[int, str, bytes]] = misc.UseExisting,
         path: t.Optional[t.Union[str, bytes]] = misc.UseExisting,
         query: t.Optional[t.Union[str, bytes]] = misc.UseExisting,
         fragment: t.Optional[t.Union[str, bytes]] = misc.UseExisting,
@@ -490,7 +501,10 @@ def split_authority(
     return userinfo, host, port
 
 
-def authority_from(reference: "uri.URIReference", strict: bool):
+def authority_from(
+    reference: "uri.URIReference",
+    strict: bool,
+) -> t.Tuple[t.Optional[str], t.Optional[str], t.Optional[int]]:
     try:
         subauthority = reference.authority_info()
     except exceptions.InvalidAuthority:
