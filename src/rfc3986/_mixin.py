@@ -404,6 +404,6 @@ class URIMixin:
         for key, value in list(attributes.items()):
             if value is misc.UseExisting:
                 del attributes[key]
-        uri: "uri.URIReference" = self._replace(**attributes)
+        uri: _Self = self._replace(**attributes)
         uri.encoding = self.encoding
         return uri
