@@ -270,7 +270,7 @@ class URIMixin:
         """
         return tuple(self.normalize()) == tuple(other_ref.normalize())
 
-    def resolve_with(
+    def resolve_with(  # noqa: C901
         self,
         base_uri: t.Union[str, "uri.URIReference"],
         strict: bool = False,
