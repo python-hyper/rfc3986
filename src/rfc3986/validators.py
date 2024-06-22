@@ -437,16 +437,16 @@ def subauthority_component_is_valid(
     elif component != "port":
         return True
 
-    try:
-        # fmt: off
-        port = int(subauthority_dict["port"])  # pyright: ignore[reportArgumentType] # noqa: E501 # Guarded by "except TypeError".
-        # fmt: on
-    except TypeError:
-        # If the port wasn't provided it'll be None and int(None) raises a
-        # TypeError
+    port = subauthority_dict["port"]
+
+    if port is None:
         return True
 
-    return 0 <= port <= 65535
+    # We know it has to have fewer than 6 digits if it exists.
+    if not (port.isdigit() and len(port) < 6):
+        return False
+
+    return 0 <= int(port) <= 65535
 
 
 def ensure_components_are_valid(
