@@ -1,5 +1,8 @@
 """Exceptions module for rfc3986."""
+import typing as t
+
 from . import compat
+from . import uri
 
 
 class RFC3986Exception(Exception):
@@ -11,7 +14,7 @@ class RFC3986Exception(Exception):
 class InvalidAuthority(RFC3986Exception):
     """Exception when the authority string is invalid."""
 
-    def __init__(self, authority):
+    def __init__(self, authority: t.Union[str, bytes]) -> None:
         """Initialize the exception with the invalid authority."""
         super().__init__(
             f"The authority ({compat.to_str(authority)}) is not valid."
@@ -21,7 +24,7 @@ class InvalidAuthority(RFC3986Exception):
 class InvalidPort(RFC3986Exception):
     """Exception when the port is invalid."""
 
-    def __init__(self, port):
+    def __init__(self, port: str) -> None:
         """Initialize the exception with the invalid port."""
         super().__init__(f'The port ("{port}") is not valid.')
 
@@ -29,7 +32,7 @@ class InvalidPort(RFC3986Exception):
 class ResolutionError(RFC3986Exception):
     """Exception to indicate a failure to resolve a URI."""
 
-    def __init__(self, uri):
+    def __init__(self, uri: "uri.URIReference") -> None:
         """Initialize the error with the failed URI."""
         super().__init__(
             "{} does not meet the requirements for resolution.".format(
@@ -47,7 +50,7 @@ class ValidationError(RFC3986Exception):
 class MissingComponentError(ValidationError):
     """Exception raised when a required component is missing."""
 
-    def __init__(self, uri, *component_names):
+    def __init__(self, uri: "uri.URIReference", *component_names: str) -> None:
         """Initialize the error with the missing component name."""
         verb = "was"
         if len(component_names) > 1:
@@ -66,7 +69,12 @@ class MissingComponentError(ValidationError):
 class UnpermittedComponentError(ValidationError):
     """Exception raised when a component has an unpermitted value."""
 
-    def __init__(self, component_name, component_value, allowed_values):
+    def __init__(
+        self,
+        component_name: str,
+        component_value: t.Any,
+        allowed_values: t.Collection[t.Any],
+    ) -> None:
         """Initialize the error with the unpermitted component."""
         super().__init__(
             "{} was required to be one of {!r} but was {!r}".format(
@@ -86,7 +94,7 @@ class UnpermittedComponentError(ValidationError):
 class PasswordForbidden(ValidationError):
     """Exception raised when a URL has a password in the userinfo section."""
 
-    def __init__(self, uri):
+    def __init__(self, uri: t.Union[str, "uri.URIReference"]) -> None:
         """Initialize the error with the URI that failed validation."""
         unsplit = getattr(uri, "unsplit", lambda: uri)
         super().__init__(
@@ -100,7 +108,7 @@ class PasswordForbidden(ValidationError):
 class InvalidComponentsError(ValidationError):
     """Exception raised when one or more components are invalid."""
 
-    def __init__(self, uri, *component_names):
+    def __init__(self, uri: "uri.URIReference", *component_names: str) -> None:
         """Initialize the error with the invalid component name(s)."""
         verb = "was"
         if len(component_names) > 1:

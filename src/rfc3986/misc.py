@@ -18,12 +18,20 @@ This module contains important constants, patterns, and compiled regular
 expressions for parsing and validating URIs and their components.
 """
 import re
+import typing as t
 
 from . import abnf_regexp
 
-# These are enumerated for the named tuple used as a superclass of
-# URIReference
-URI_COMPONENTS = ["scheme", "authority", "path", "query", "fragment"]
+
+class URIReferenceBase(t.NamedTuple):
+    """The namedtuple used as a superclass of URIReference and IRIReference."""
+
+    scheme: t.Optional[str]
+    authority: t.Optional[str]
+    path: t.Optional[str]
+    query: t.Optional[str]
+    fragment: t.Optional[str]
+
 
 important_characters = {
     "generic_delimiters": abnf_regexp.GENERIC_DELIMITERS,
@@ -118,7 +126,7 @@ ISUBAUTHORITY_MATCHER = re.compile(
 
 
 # Path merger as defined in http://tools.ietf.org/html/rfc3986#section-5.2.3
-def merge_paths(base_uri, relative_path):
+def merge_paths(base_uri: URIReferenceBase, relative_path: str) -> str:
     """Merge a base URI's path with a relative URI's path."""
     if base_uri.path is None and base_uri.authority is not None:
         return "/" + relative_path
@@ -128,4 +136,4 @@ def merge_paths(base_uri, relative_path):
         return path[:index] + "/" + relative_path
 
 
-UseExisting = object()
+UseExisting: t.Final[t.Any] = object()
