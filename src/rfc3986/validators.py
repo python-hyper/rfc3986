@@ -443,7 +443,11 @@ def subauthority_component_is_valid(
         return True
 
     # We know it has to have fewer than 6 digits if it exists.
-    if not (port.isdigit() and len(port) < 6):
+    if not (port.isdigit() and len(port) < 6):  # pragma: no cover
+        # This branch can only execute when this function is called directly
+        # with a URI reference manually constructed with an invalid port.
+        # Such a use case is unsupported, since this function isn't part of
+        # the public API.
         return False
 
     return 0 <= int(port) <= 65535
