@@ -19,7 +19,8 @@ except ImportError:
 
 import pytest
 
-from rfc3986 import builder, uri_reference
+from rfc3986 import builder
+from rfc3986 import uri_reference
 
 
 def test_builder_default():

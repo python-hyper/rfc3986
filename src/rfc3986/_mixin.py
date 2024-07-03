@@ -1,4 +1,5 @@
 """Module containing the implementation of the URIMixin class."""
+
 import typing as t
 import warnings
 

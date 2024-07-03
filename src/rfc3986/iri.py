@@ -1,4 +1,5 @@
 """Module containing the implementation of the IRIReference class."""
+
 # Copyright (c) 2014 Rackspace
 # Copyright (c) 2015 Ian Stapleton Cordasco
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +22,6 @@ from . import misc
 from . import normalizers
 from . import uri
 from ._typing_compat import Self as _Self
-
 
 try:
     import idna

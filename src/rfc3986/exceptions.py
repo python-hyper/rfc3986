@@ -1,4 +1,5 @@
 """Exceptions module for rfc3986."""
+
 import typing as t
 
 from . import compat

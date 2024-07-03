@@ -1,4 +1,5 @@
 """Tests for the validators module."""
+
 import pytest
 
 import rfc3986

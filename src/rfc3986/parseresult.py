@@ -44,8 +44,7 @@ class ParseResultMixin(t.Generic[t.AnyStr]):
         encoding: str
 
         @property
-        def authority(self) -> t.Optional[t.AnyStr]:
-            ...
+        def authority(self) -> t.Optional[t.AnyStr]: ...
 
     def _generate_authority(
         self,

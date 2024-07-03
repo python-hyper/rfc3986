@@ -67,9 +67,9 @@ class Validator:
             "query": False,
             "fragment": False,
         }
-        self.validated_components: t.Dict[
-            str, bool
-        ] = self.required_components.copy()
+        self.validated_components: t.Dict[str, bool] = (
+            self.required_components.copy()
+        )
 
     def allow_schemes(self, *schemes: str) -> _Self:
         """Require the scheme to be one of the provided schemes.
