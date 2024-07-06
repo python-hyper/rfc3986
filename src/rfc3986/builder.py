@@ -12,12 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Module containing the logic for the URIBuilder object."""
+import typing as t
 from urllib.parse import parse_qsl
 from urllib.parse import urlencode
 
 from . import normalizers
 from . import uri
 from . import uri_reference
+from ._typing_compat import Self as _Self
+
+# Modified from urllib.parse in typeshed.
+_QueryType = t.Union[
+    t.Mapping[t.Any, t.Any],
+    t.Mapping[t.Any, t.Sequence[t.Any]],
+    # Substituting List for Sequence since one of the add/extend methods
+    # below has a runtime isinstance check for list.
+    t.List[t.Tuple[t.Any, t.Any]],
+    t.List[t.Tuple[t.Any, t.Sequence[t.Any]]],
+]
 
 
 class URIBuilder:
@@ -33,13 +45,13 @@ class URIBuilder:
 
     def __init__(
         self,
-        scheme=None,
-        userinfo=None,
-        host=None,
-        port=None,
-        path=None,
-        query=None,
-        fragment=None,
+        scheme: t.Optional[str] = None,
+        userinfo: t.Optional[str] = None,
+        host: t.Optional[str] = None,
+        port: t.Optional[t.Union[int, str]] = None,
+        path: t.Optional[str] = None,
+        query: t.Optional[str] = None,
+        fragment: t.Optional[str] = None,
     ):
         """Initialize our URI builder.
 
@@ -49,7 +61,7 @@ class URIBuilder:
             (optional)
         :param str host:
             (optional)
-        :param int port:
+        :param int | str port:
             (optional)
         :param str path:
             (optional)
@@ -61,7 +73,7 @@ class URIBuilder:
         self.scheme = scheme
         self.userinfo = userinfo
         self.host = host
-        self.port = port
+        self.port = str(port) if port is not None else port
         self.path = path
         self.query = query
         self.fragment = fragment
@@ -76,7 +88,7 @@ class URIBuilder:
         return formatstr.format(b=self)
 
     @classmethod
-    def from_uri(cls, reference):
+    def from_uri(cls, reference: t.Union["uri.URIReference", str]) -> _Self:
         """Initialize the URI builder from another URI.
 
         Takes the given URI reference and creates a new URI builder instance
@@ -95,7 +107,7 @@ class URIBuilder:
             fragment=reference.fragment,
         )
 
-    def add_scheme(self, scheme):
+    def add_scheme(self, scheme: str) -> "URIBuilder":
         """Add a scheme to our builder object.
 
         After normalizing, this will generate a new URIBuilder instance with
@@ -119,7 +131,11 @@ class URIBuilder:
             fragment=self.fragment,
         )
 
-    def add_credentials(self, username, password):
+    def add_credentials(
+        self,
+        username: str,
+        password: t.Optional[str],
+    ) -> "URIBuilder":
         """Add credentials as the userinfo portion of the URI.
 
         .. code-block:: python
@@ -152,7 +168,7 @@ class URIBuilder:
             fragment=self.fragment,
         )
 
-    def add_host(self, host):
+    def add_host(self, host: str) -> "URIBuilder":
         """Add hostname to the URI.
 
         .. code-block:: python
@@ -172,7 +188,7 @@ class URIBuilder:
             fragment=self.fragment,
         )
 
-    def add_port(self, port):
+    def add_port(self, port: t.Union[int, str]) -> "URIBuilder":
         """Add port to the URI.
 
         .. code-block:: python
@@ -211,7 +227,7 @@ class URIBuilder:
             fragment=self.fragment,
         )
 
-    def add_path(self, path):
+    def add_path(self, path: str) -> "URIBuilder":
         """Add a path to the URI.
 
         .. code-block:: python
@@ -238,7 +254,7 @@ class URIBuilder:
             fragment=self.fragment,
         )
 
-    def extend_path(self, path):
+    def extend_path(self, path: str) -> "URIBuilder":
         """Extend the existing path value with the provided value.
 
         .. versionadded:: 1.5.0
@@ -267,7 +283,7 @@ class URIBuilder:
 
         return self.add_path(path)
 
-    def add_query_from(self, query_items):
+    def add_query_from(self, query_items: _QueryType) -> "URIBuilder":
         """Generate and add a query a dictionary or list of tuples.
 
         .. code-block:: python
@@ -293,7 +309,7 @@ class URIBuilder:
             fragment=self.fragment,
         )
 
-    def extend_query_with(self, query_items):
+    def extend_query_with(self, query_items: _QueryType) -> "URIBuilder":
         """Extend the existing query string with the new query items.
 
         .. versionadded:: 1.5.0
@@ -314,7 +330,7 @@ class URIBuilder:
 
         return self.add_query_from(original_query_items + query_items)
 
-    def add_query(self, query):
+    def add_query(self, query: str) -> "URIBuilder":
         """Add a pre-formated query string to the URI.
 
         .. code-block:: python
@@ -334,7 +350,7 @@ class URIBuilder:
             fragment=self.fragment,
         )
 
-    def add_fragment(self, fragment):
+    def add_fragment(self, fragment: str) -> "URIBuilder":
         """Add a fragment to the URI.
 
         .. code-block:: python
@@ -354,7 +370,7 @@ class URIBuilder:
             fragment=normalizers.normalize_fragment(fragment),
         )
 
-    def finalize(self):
+    def finalize(self) -> "uri.URIReference":
         """Create a URIReference from our builder.
 
         .. code-block:: python
@@ -379,7 +395,7 @@ class URIBuilder:
             self.fragment,
         )
 
-    def geturl(self):
+    def geturl(self) -> str:
         """Generate the URL from this builder.
 
         .. versionadded:: 1.5.0

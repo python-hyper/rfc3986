@@ -1,0 +1,19 @@
+[tool.black]
+line-length = 79
+target-version = ["py38"]
+
+[tool.isort]
+profile = "black"
+line_length = 79
+force_single_line = true
+
+[tool.pyright]
+include = ["src/rfc3986"]
+ignore = ["tests"]
+pythonVersion = "3.8"
+typeCheckingMode = "strict"
+
+reportPrivateUsage = "none"
+reportImportCycles = "warning"
+reportPropertyTypeMismatch = "warning"
+reportUnnecessaryTypeIgnoreComment = "warning"

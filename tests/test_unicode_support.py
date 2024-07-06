@@ -5,7 +5,6 @@ from rfc3986 import parseresult
 from rfc3986 import uri_reference
 from rfc3986 import urlparse
 
-
 SNOWMAN = b"\xe2\x98\x83"
 SNOWMAN_PARAMS = b"http://example.com?utf8=" + SNOWMAN
 SNOWMAN_HOST = b"http://" + SNOWMAN + b".com"

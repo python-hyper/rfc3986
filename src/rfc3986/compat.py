@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Compatibility module for Python 2 and 3 support."""
+import typing as t
 
 __all__ = (
     "to_bytes",
@@ -19,14 +20,44 @@ __all__ = (
 )
 
 
-def to_str(b, encoding="utf-8"):
+@t.overload
+def to_str(  # noqa: D103
+    b: t.Union[str, bytes],
+    encoding: str = "utf-8",
+) -> str: ...
+
+
+@t.overload
+def to_str(b: None, encoding: str = "utf-8") -> None:  # noqa: D103
+    ...
+
+
+def to_str(
+    b: t.Optional[t.Union[str, bytes]],
+    encoding: str = "utf-8",
+) -> t.Optional[str]:
     """Ensure that b is text in the specified encoding."""
     if hasattr(b, "decode") and not isinstance(b, str):
         b = b.decode(encoding)
     return b
 
 
-def to_bytes(s, encoding="utf-8"):
+@t.overload
+def to_bytes(  # noqa: D103
+    s: t.Union[str, bytes],
+    encoding: str = "utf-8",
+) -> bytes: ...
+
+
+@t.overload
+def to_bytes(s: None, encoding: str = "utf-8") -> None:  # noqa: D103
+    ...
+
+
+def to_bytes(
+    s: t.Optional[t.Union[str, bytes]],
+    encoding: str = "utf-8",
+) -> t.Optional[bytes]:
     """Ensure that s is converted to bytes from the encoding."""
     if hasattr(s, "encode") and not isinstance(s, bytes):
         s = s.encode(encoding)

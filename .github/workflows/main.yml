@@ -19,6 +19,10 @@ jobs:
         - os: windows-latest
           python: '3.12'
           toxenv: py
+        # typing
+        - os: ubuntu-latest
+          python: '3.8'
+          toxenv: typing
         # misc
         - os: ubuntu-latest
           python: '3.12'

@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Module containing the urlparse compatibility logic."""
+import typing as t
 from collections import namedtuple
 
 from . import compat
@@ -19,6 +20,7 @@ from . import exceptions
 from . import misc
 from . import normalizers
 from . import uri
+from ._typing_compat import Self as _Self
 
 __all__ = ("ParseResult", "ParseResultBytes")
 
@@ -33,8 +35,21 @@ PARSED_COMPONENTS = (
 )
 
 
-class ParseResultMixin:
-    def _generate_authority(self, attributes):
+class ParseResultMixin(t.Generic[t.AnyStr]):
+    if t.TYPE_CHECKING:
+        userinfo: t.Optional[t.AnyStr]
+        host: t.Optional[t.AnyStr]
+        port: t.Optional[int]
+        query: t.Optional[t.AnyStr]
+        encoding: str
+
+        @property
+        def authority(self) -> t.Optional[t.AnyStr]: ...
+
+    def _generate_authority(
+        self,
+        attributes: t.Dict[str, t.Optional[t.AnyStr]],
+    ) -> t.Optional[str]:
         # I swear I did not align the comparisons below. That's just how they
         # happened to align based on pep8 and attribute lengths.
         userinfo, host, port = (
@@ -54,28 +69,28 @@ class ParseResultMixin:
             return self.authority.decode("utf-8")
         return self.authority
 
-    def geturl(self):
+    def geturl(self) -> t.AnyStr:
         """Shim to match the standard library method."""
         return self.unsplit()
 
     @property
-    def hostname(self):
+    def hostname(self) -> t.Optional[t.AnyStr]:
         """Shim to match the standard library."""
         return self.host
 
     @property
-    def netloc(self):
+    def netloc(self) -> t.Optional[t.AnyStr]:
         """Shim to match the standard library."""
         return self.authority
 
     @property
-    def params(self):
+    def params(self) -> t.Optional[t.AnyStr]:
         """Shim to match the standard library."""
         return self.query
 
 
 class ParseResult(
-    namedtuple("ParseResult", PARSED_COMPONENTS), ParseResultMixin
+    namedtuple("ParseResult", PARSED_COMPONENTS), ParseResultMixin[str]
 ):
     """Implementation of urlparse compatibility class.
 
@@ -83,20 +98,28 @@ class ParseResult(
     urlparse.ParseResult class.
     """
 
-    slots = ()
+    scheme: t.Optional[str]
+    userinfo: t.Optional[str]
+    host: t.Optional[str]
+    port: t.Optional[int]
+    path: t.Optional[str]
+    query: t.Optional[str]
+    fragment: t.Optional[str]
+    encoding: str
+    reference: "uri.URIReference"
 
     def __new__(
         cls,
-        scheme,
-        userinfo,
-        host,
-        port,
-        path,
-        query,
-        fragment,
-        uri_ref,
-        encoding="utf-8",
-    ):
+        scheme: t.Optional[str],
+        userinfo: t.Optional[str],
+        host: t.Optional[str],
+        port: t.Optional[int],
+        path: t.Optional[str],
+        query: t.Optional[str],
+        fragment: t.Optional[str],
+        uri_ref: "uri.URIReference",
+        encoding: str = "utf-8",
+    ) -> _Self:
         """Create a new ParseResult."""
         parse_result = super().__new__(
             cls,
@@ -115,15 +138,15 @@ class ParseResult(
     @classmethod
     def from_parts(
         cls,
-        scheme=None,
-        userinfo=None,
-        host=None,
-        port=None,
-        path=None,
-        query=None,
-        fragment=None,
-        encoding="utf-8",
-    ):
+        scheme: t.Optional[str] = None,
+        userinfo: t.Optional[str] = None,
+        host: t.Optional[str] = None,
+        port: t.Optional[t.Union[int, str]] = None,
+        path: t.Optional[str] = None,
+        query: t.Optional[str] = None,
+        fragment: t.Optional[str] = None,
+        encoding: str = "utf-8",
+    ) -> _Self:
         """Create a ParseResult instance from its parts."""
         authority = ""
         if userinfo is not None:
@@ -155,8 +178,12 @@ class ParseResult(
 
     @classmethod
     def from_string(
-        cls, uri_string, encoding="utf-8", strict=True, lazy_normalize=True
-    ):
+        cls,
+        uri_string: t.Union[str, bytes],
+        encoding: str = "utf-8",
+        strict: bool = True,
+        lazy_normalize: bool = True,
+    ) -> _Self:
         """Parse a URI from the given unicode URI string.
 
         :param str uri_string: Unicode URI to be parsed into a reference.
@@ -184,26 +211,26 @@ class ParseResult(
         )
 
     @property
-    def authority(self):
+    def authority(self) -> t.Optional[str]:
         """Return the normalized authority."""
         return self.reference.authority
 
     def copy_with(
         self,
-        scheme=misc.UseExisting,
-        userinfo=misc.UseExisting,
-        host=misc.UseExisting,
-        port=misc.UseExisting,
-        path=misc.UseExisting,
-        query=misc.UseExisting,
-        fragment=misc.UseExisting,
-    ):
+        scheme: t.Optional[str] = misc.UseExisting,
+        userinfo: t.Optional[str] = misc.UseExisting,
+        host: t.Optional[str] = misc.UseExisting,
+        port: t.Optional[t.Union[int, str]] = misc.UseExisting,
+        path: t.Optional[str] = misc.UseExisting,
+        query: t.Optional[str] = misc.UseExisting,
+        fragment: t.Optional[str] = misc.UseExisting,
+    ) -> "ParseResult":
         """Create a copy of this instance replacing with specified parts."""
         attributes = zip(
             PARSED_COMPONENTS,
             (scheme, userinfo, host, port, path, query, fragment),
         )
-        attrs_dict = {}
+        attrs_dict: t.Dict[str, t.Optional[str]] = {}
         for name, value in attributes:
             if value is misc.UseExisting:
                 value = getattr(self, name)
@@ -218,7 +245,7 @@ class ParseResult(
         )
         return ParseResult(uri_ref=ref, encoding=self.encoding, **attrs_dict)
 
-    def encode(self, encoding=None):
+    def encode(self, encoding: t.Optional[str] = None) -> "ParseResultBytes":
         """Convert to an instance of ParseResultBytes."""
         encoding = encoding or self.encoding
         attrs = dict(
@@ -234,7 +261,7 @@ class ParseResult(
             uri_ref=self.reference, encoding=encoding, **attrs
         )
 
-    def unsplit(self, use_idna=False):
+    def unsplit(self, use_idna: bool = False) -> str:
         """Create a URI string from the components.
 
         :returns: The parsed URI reconstituted as a string.
@@ -249,23 +276,34 @@ class ParseResult(
 
 
 class ParseResultBytes(
-    namedtuple("ParseResultBytes", PARSED_COMPONENTS), ParseResultMixin
+    namedtuple("ParseResultBytes", PARSED_COMPONENTS), ParseResultMixin[bytes]
 ):
     """Compatibility shim for the urlparse.ParseResultBytes object."""
 
+    scheme: t.Optional[bytes]
+    userinfo: t.Optional[bytes]
+    host: t.Optional[bytes]
+    port: t.Optional[int]
+    path: t.Optional[bytes]
+    query: t.Optional[bytes]
+    fragment: t.Optional[bytes]
+    encoding: str
+    reference: "uri.URIReference"
+    lazy_normalize: bool
+
     def __new__(
         cls,
-        scheme,
-        userinfo,
-        host,
-        port,
-        path,
-        query,
-        fragment,
-        uri_ref,
-        encoding="utf-8",
-        lazy_normalize=True,
-    ):
+        scheme: t.Optional[bytes],
+        userinfo: t.Optional[bytes],
+        host: t.Optional[bytes],
+        port: t.Optional[int],
+        path: t.Optional[bytes],
+        query: t.Optional[bytes],
+        fragment: t.Optional[bytes],
+        uri_ref: "uri.URIReference",
+        encoding: str = "utf-8",
+        lazy_normalize: bool = True,
+    ) -> _Self:
         """Create a new ParseResultBytes instance."""
         parse_result = super().__new__(
             cls,
@@ -285,16 +323,16 @@ class ParseResultBytes(
     @classmethod
     def from_parts(
         cls,
-        scheme=None,
-        userinfo=None,
-        host=None,
-        port=None,
-        path=None,
-        query=None,
-        fragment=None,
-        encoding="utf-8",
-        lazy_normalize=True,
-    ):
+        scheme: t.Optional[str] = None,
+        userinfo: t.Optional[str] = None,
+        host: t.Optional[str] = None,
+        port: t.Optional[t.Union[int, str]] = None,
+        path: t.Optional[str] = None,
+        query: t.Optional[str] = None,
+        fragment: t.Optional[str] = None,
+        encoding: str = "utf-8",
+        lazy_normalize: bool = True,
+    ) -> _Self:
         """Create a ParseResult instance from its parts."""
         authority = ""
         if userinfo is not None:
@@ -330,8 +368,12 @@ class ParseResultBytes(
 
     @classmethod
     def from_string(
-        cls, uri_string, encoding="utf-8", strict=True, lazy_normalize=True
-    ):
+        cls,
+        uri_string: t.Union[str, bytes],
+        encoding: str = "utf-8",
+        strict: bool = True,
+        lazy_normalize: bool = True,
+    ) -> _Self:
         """Parse a URI from the given unicode URI string.
 
         :param str uri_string: Unicode URI to be parsed into a reference.
@@ -361,21 +403,21 @@ class ParseResultBytes(
         )
 
     @property
-    def authority(self):
+    def authority(self) -> bytes:
         """Return the normalized authority."""
         return self.reference.authority.encode(self.encoding)
 
     def copy_with(
         self,
-        scheme=misc.UseExisting,
-        userinfo=misc.UseExisting,
-        host=misc.UseExisting,
-        port=misc.UseExisting,
-        path=misc.UseExisting,
-        query=misc.UseExisting,
-        fragment=misc.UseExisting,
-        lazy_normalize=True,
-    ):
+        scheme: t.Optional[t.Union[str, bytes]] = misc.UseExisting,
+        userinfo: t.Optional[t.Union[str, bytes]] = misc.UseExisting,
+        host: t.Optional[t.Union[str, bytes]] = misc.UseExisting,
+        port: t.Optional[t.Union[int, str, bytes]] = misc.UseExisting,
+        path: t.Optional[t.Union[str, bytes]] = misc.UseExisting,
+        query: t.Optional[t.Union[str, bytes]] = misc.UseExisting,
+        fragment: t.Optional[t.Union[str, bytes]] = misc.UseExisting,
+        lazy_normalize: bool = True,
+    ) -> "ParseResultBytes":
         """Create a copy of this instance replacing with specified parts."""
         attributes = zip(
             PARSED_COMPONENTS,
@@ -388,6 +430,10 @@ class ParseResultBytes(
             if not isinstance(value, bytes) and hasattr(value, "encode"):
                 value = value.encode(self.encoding)
             attrs_dict[name] = value
+
+        if t.TYPE_CHECKING:
+            attrs_dict = t.cast(t.Dict[str, t.Optional[bytes]], attrs_dict)
+
         authority = self._generate_authority(attrs_dict)
         to_str = compat.to_str
         ref = self.reference.copy_with(
@@ -406,7 +452,7 @@ class ParseResultBytes(
             **attrs_dict,
         )
 
-    def unsplit(self, use_idna=False):
+    def unsplit(self, use_idna: bool = False) -> bytes:
         """Create a URI bytes object from the components.
 
         :returns: The parsed URI reconstituted as a string.
@@ -425,7 +471,9 @@ class ParseResultBytes(
         return uri.encode(self.encoding)
 
 
-def split_authority(authority):
+def split_authority(
+    authority: str,
+) -> t.Tuple[t.Optional[str], t.Optional[str], t.Optional[str]]:
     # Initialize our expected return values
     userinfo = host = port = None
     # Initialize an extra var we may need to use
@@ -452,7 +500,10 @@ def split_authority(authority):
     return userinfo, host, port
 
 
-def authority_from(reference, strict):
+def authority_from(
+    reference: "uri.URIReference",
+    strict: bool,
+) -> t.Tuple[t.Optional[str], t.Optional[str], t.Optional[int]]:
     try:
         subauthority = reference.authority_info()
     except exceptions.InvalidAuthority:
@@ -462,9 +513,9 @@ def authority_from(reference, strict):
     else:
         # Thanks to Richard Barrell for this idea:
         # https://twitter.com/0x2ba22e11/status/617338811975139328
-        userinfo, host, port = (
-            subauthority.get(p) for p in ("userinfo", "host", "port")
-        )
+        userinfo = subauthority.get("userinfo")
+        host = subauthority.get("host")
+        port = subauthority.get("port")
 
     if port:
         if port.isascii() and port.isdigit():
