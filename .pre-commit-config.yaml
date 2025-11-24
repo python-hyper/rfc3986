@@ -1,3 +1,6 @@
+ci:
+  autoupdate_schedule: monthly
+
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v4.6.0
@@ -27,10 +30,10 @@ repos:
     additional_dependencies:
     - flake8-docstrings
 - repo: https://github.com/asottile/setup-cfg-fmt
-  rev: v2.5.0
+  rev: v3.1.0
   hooks:
   - id: setup-cfg-fmt
-    args: [--include-version-classifiers]
+    args: [--include-version-classifiers, --min-py-version=3.8, --max-py-version=3.12]
 #- repo: https://github.com/pre-commit/mirrors-mypy
 #  rev: v0.910-1
 #  hooks:
