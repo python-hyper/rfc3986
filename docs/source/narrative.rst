@@ -18,7 +18,7 @@ URIs, and finally there's an API to build URIs.
 |rfc3986| parses URIs much differently from :mod:`urllib.parse` so users may
 see some subtle differences with very specific URLs that contain rough
 edgecases. Regardless, we do our best to implement the same API so you should
-be able to seemlessly swap |rfc3986| for ``urlparse``.
+be able to seamlessly swap |rfc3986| for ``urlparse``.
 
 
 .. toctree::
