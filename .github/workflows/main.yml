@@ -12,12 +12,12 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        python: ['pypy3.11', '3.10', '3.11', '3.12']
+        python: ['pypy3.11', '3.10', '3.11', '3.12', '3.13', '3.14']
         toxenv: [py]
         include:
         # windows
         - os: windows-latest
-          python: '3.12'
+          python: '3.14'
           toxenv: py
         # typing
         - os: ubuntu-latest
@@ -25,10 +25,10 @@ jobs:
           toxenv: typing
         # misc
         - os: ubuntu-latest
-          python: '3.12'
+          python: '3.14'
           toxenv: docs
         - os: ubuntu-latest
-          python: '3.12'
+          python: '3.14'
           toxenv: pre-commit
     runs-on: ${{ matrix.os }}
     steps:
