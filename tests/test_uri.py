@@ -275,6 +275,7 @@ class TestURIReferenceIsAbsolute:
         uri_without_authority_with_empty_path,
     ):
         uri = URIReference.from_string(uri_without_authority_with_empty_path)
+        assert uri.is_absolute() is True
 
     def test_uris_with_no_authority_with_query_only_are_absolute(
         self,
