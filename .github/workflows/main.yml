@@ -32,8 +32,8 @@ jobs:
           toxenv: pre-commit
     runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v4
-    - uses: actions/setup-python@f677139bbe7f9c59b41e40162b753c062f5d49a3 # v5
+    - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+    - uses: actions/setup-python@f677139bbe7f9c59b41e40162b753c062f5d49a3 # v5.2.0
       with:
         python-version: ${{ matrix.python }}
     - run: python -mpip install --upgrade setuptools pip tox virtualenv
