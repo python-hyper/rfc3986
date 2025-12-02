@@ -195,20 +195,20 @@ HIER_PART_RE = "(//{}{}|{}|{}|{})".format(
 
 # Only wide-unicode gets the high-ranges of UCSCHAR
 if sys.maxunicode > 0xFFFF:  # pragma: no cover
-    IPRIVATE = "\uE000-\uF8FF\U000F0000-\U000FFFFD\U00100000-\U0010FFFD"
+    IPRIVATE = "\ue000-\uf8ff\U000f0000-\U000ffffd\U00100000-\U0010fffd"
     UCSCHAR_RE = (
-        "\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF"
-        "\U00010000-\U0001FFFD\U00020000-\U0002FFFD"
-        "\U00030000-\U0003FFFD\U00040000-\U0004FFFD"
-        "\U00050000-\U0005FFFD\U00060000-\U0006FFFD"
-        "\U00070000-\U0007FFFD\U00080000-\U0008FFFD"
-        "\U00090000-\U0009FFFD\U000A0000-\U000AFFFD"
-        "\U000B0000-\U000BFFFD\U000C0000-\U000CFFFD"
-        "\U000D0000-\U000DFFFD\U000E1000-\U000EFFFD"
+        "\u00a0-\ud7ff\uf900-\ufdcf\ufdf0-\uffef"
+        "\U00010000-\U0001fffd\U00020000-\U0002fffd"
+        "\U00030000-\U0003fffd\U00040000-\U0004fffd"
+        "\U00050000-\U0005fffd\U00060000-\U0006fffd"
+        "\U00070000-\U0007fffd\U00080000-\U0008fffd"
+        "\U00090000-\U0009fffd\U000a0000-\U000afffd"
+        "\U000b0000-\U000bfffd\U000c0000-\U000cfffd"
+        "\U000d0000-\U000dfffd\U000e1000-\U000efffd"
     )
 else:  # pragma: no cover
-    IPRIVATE = "\uE000-\uF8FF"
-    UCSCHAR_RE = "\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF"
+    IPRIVATE = "\ue000-\uf8ff"
+    UCSCHAR_RE = "\u00a0-\ud7ff\uf900-\ufdcf\ufdf0-\uffef"
 
 IUNRESERVED_RE = "A-Za-z0-9\\._~\\-" + UCSCHAR_RE
 IPCHAR = "([" + IUNRESERVED_RE + SUB_DELIMITERS_RE + ":@]|%s)" % PCT_ENCODED
