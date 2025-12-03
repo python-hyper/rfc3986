@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        python: ['pypy3.9', '3.8', '3.9', '3.10', '3.11', '3.12']
+        python: ['pypy3.11', '3.10', '3.11', '3.12']
         toxenv: [py]
         include:
         # windows
@@ -21,7 +21,7 @@ jobs:
           toxenv: py
         # typing
         - os: ubuntu-latest
-          python: '3.8'
+          python: '3.10'
           toxenv: typing
         # misc
         - os: ubuntu-latest
