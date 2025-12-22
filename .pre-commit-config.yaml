@@ -27,7 +27,7 @@ repos:
     additional_dependencies:
     - flake8-docstrings
 - repo: https://github.com/asottile/setup-cfg-fmt
-  rev: v3.1.0
+  rev: v3.2.0
   hooks:
   - id: setup-cfg-fmt
     args: [--include-version-classifiers]
