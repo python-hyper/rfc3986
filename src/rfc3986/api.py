@@ -17,6 +17,7 @@ Module containing the simple and functional API for rfc3986.
 This module defines functions and provides access to the public attributes
 and classes of rfc3986.
 """
+
 import typing as t
 
 from .iri import IRIReference

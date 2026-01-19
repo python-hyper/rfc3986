@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Compatibility module for Python 2 and 3 support."""
+
 import typing as t
 
 __all__ = (
