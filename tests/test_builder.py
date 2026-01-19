@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Module containing the tests for the URIBuilder object."""
+
 try:
     from urllib.parse import parse_qs
 except ImportError:

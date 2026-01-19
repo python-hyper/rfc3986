@@ -19,6 +19,7 @@ See http://rfc3986.readthedocs.io/ for detailed documentation.
 :copyright: (c) 2014 Rackspace
 :license: Apache v2.0, see LICENSE for details
 """
+
 from .api import IRIReference
 from .api import URIReference
 from .api import iri_reference

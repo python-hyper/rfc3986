@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Module containing the urlparse compatibility logic."""
+
 import typing as t
 from collections import namedtuple
 
