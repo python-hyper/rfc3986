@@ -2,6 +2,7 @@ include README.rst
 include LICENSE
 include AUTHORS.rst
 include setup.cfg
+include tox.ini
 prune *.pyc
 recursive-include docs *.rst *.py
 recursive-include tests *.py
