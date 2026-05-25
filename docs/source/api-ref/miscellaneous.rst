@@ -136,6 +136,22 @@ regular expressions.
     - :data:`rfc3986.abnf_regexp.IPv4_RE`
     - :data:`rfc3986.abnf_regexp.IP_LITERAL_RE`
 
+    Consumers that need to distinguish IP address hosts from registered names
+    can compose the IP address alternatives directly:
+
+    .. code-block:: python
+
+        import re
+
+        from rfc3986 import abnf_regexp
+
+        IP_HOST_RE = re.compile(
+            "^({}|{})$".format(
+                abnf_regexp.IPv4_RE,
+                abnf_regexp.IP_LITERAL_RE,
+            )
+        )
+
     See :rfc:`3986#section-3.2.2`.
 
 .. data:: rfc3986.abnf_regexp.USERINFO_RE
