@@ -119,16 +119,26 @@ def normalize_fragment(fragment: t.Optional[str]) -> t.Optional[str]:
 
 PERCENT_MATCHER = re.compile("%[A-Fa-f0-9]{2}")
 
+# RFC 3986 Section 2.3
+UNRESERVED_PERCENT_ENCODING = frozenset(
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~"
+)
+
 
 def normalize_percent_characters(s: str) -> str:
-    """All percent characters should be upper-cased.
+    """Upper-case percent-encodings; decode those of unreserved characters.
 
-    For example, ``"%3afoo%DF%ab"`` should be turned into ``"%3Afoo%DF%AB"``.
+    For example, ``"%3afoo%DF%ab%7e"`` should be turned into
+    ``"%3Afoo%DF%AB~"``.
     """
     matches = set(PERCENT_MATCHER.findall(s))
     for m in matches:
         if not m.isupper():
             s = s.replace(m, m.upper())
+    for m in set(PERCENT_MATCHER.findall(s)):
+        char = chr(int(m[1:], 16))
+        if char in UNRESERVED_PERCENT_ENCODING:
+            s = s.replace(m, char)
     return s
 
 
