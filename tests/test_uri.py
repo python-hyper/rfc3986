@@ -153,6 +153,17 @@ class TestURIReferenceUnsplits(base.BaseTestUnsplits):
         uri = self.test_class.from_string(scheme_and_path_uri)
         assert uri.unsplit() == scheme_and_path_uri
 
+    def test_normalize_does_not_invent_an_authority(self):
+        # scheme:/..///bar has no authority. Removing dot-segments leaves
+        # path "//bar"; unsplitting that as-is becomes scheme://bar.
+        uri = self.test_class.from_string("scheme:/..///bar")
+        assert uri.authority is None
+        normalized = uri.normalize()
+        assert normalized.authority is None
+        rebuilt = self.test_class.from_string(normalized.unsplit())
+        assert rebuilt.authority is None
+        assert rebuilt.scheme == "scheme"
+
 
 class TestURIReferenceComparesToStrings:
     def test_basic_uri(self, basic_uri):
