@@ -363,7 +363,14 @@ class URIMixin:
         if self.authority:
             result_list.extend(["//", self.authority])
         if self.path:
-            result_list.append(self.path)
+            path = self.path
+            # A path that starts with "//" is a network-path reference
+            # (RFC 3986 §4.2). Without an authority, reconstituting it
+            # as-is would produce "scheme://host" and the next parse
+            # would steal the first segment as the authority.
+            if path.startswith("//") and not self.authority:
+                path = "/." + path
+            result_list.append(path)
         if self.query is not None:
             result_list.extend(["?", self.query])
         if self.fragment is not None:
