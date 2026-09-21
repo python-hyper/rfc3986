@@ -293,6 +293,22 @@ class TestURIReferenceIsAbsolute:
 
 
 class TestURIReferencesResolve:
+    @pytest.mark.parametrize(
+        ["relative", "expected"],
+        [
+            ("../baz", "scheme:/baz"),
+            ("..", "scheme:/"),
+            ("../../baz", "scheme:/baz"),
+            ("../baz?query#fragment", "scheme:/baz?query#fragment"),
+            ("baz", "scheme:foo/baz"),
+        ],
+    )
+    def test_resolve_with_rootless_base(self, relative, expected):
+        base = URIReference.from_string("scheme:foo/bar")
+        reference = URIReference.from_string(relative)
+
+        assert reference.resolve_with(base).unsplit() == expected
+
     def test_with_basic_and_relative_uris(self, basic_uri, relative_uri):
         R = URIReference.from_string(relative_uri)
         B = URIReference.from_string(basic_uri)
