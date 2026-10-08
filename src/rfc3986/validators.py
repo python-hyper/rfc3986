@@ -371,6 +371,17 @@ def path_is_valid(path: t.Optional[str], require: bool = False) -> bool:
     return is_valid(path, misc.PATH_MATCHER, require)
 
 
+def _path_is_valid_for_scheme(
+    path: t.Optional[str],
+    scheme: t.Optional[str],
+    require: bool = False,
+) -> bool:
+    """Apply the path-noscheme restriction to relative references."""
+    if not scheme and path and ":" in path.split("/", 1)[0]:
+        return False
+    return path_is_valid(path, require)
+
+
 def query_is_valid(query: t.Optional[str], require: bool = False) -> bool:
     """Determine if the query component is valid.
 
@@ -469,8 +480,12 @@ def ensure_components_are_valid(
             # https://bitbucket.org/ned/coveragepy/issues/198/continue-marked-as-not-covered
             continue  # nocov: Python 2.7, 3.3, 3.4
 
-        validator = _COMPONENT_VALIDATORS[component]
-        if not validator(getattr(uri, component)):
+        if component == "path":
+            valid = _path_is_valid_for_scheme(uri.path, uri.scheme)
+        else:
+            validator = _COMPONENT_VALIDATORS[component]
+            valid = validator(getattr(uri, component))
+        if not valid:
             invalid_components.add(component)
 
     if invalid_components:
