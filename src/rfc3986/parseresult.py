@@ -158,7 +158,7 @@ class ParseResult(
             authority += f":{port}"
         uri_ref = uri.URIReference(
             scheme=scheme,
-            authority=authority,
+            authority=authority if authority or host == "" else None,
             path=path,
             query=query,
             fragment=fragment,
@@ -344,7 +344,7 @@ class ParseResultBytes(
             authority += f":{int(port)}"
         uri_ref = uri.URIReference(
             scheme=scheme,
-            authority=authority,
+            authority=authority if authority or host == "" else None,
             path=path,
             query=query,
             fragment=fragment,
@@ -404,9 +404,9 @@ class ParseResultBytes(
         )
 
     @property
-    def authority(self) -> bytes:
+    def authority(self) -> t.Optional[bytes]:
         """Return the normalized authority."""
-        return self.reference.authority.encode(self.encoding)
+        return compat.to_bytes(self.reference.authority, self.encoding)
 
     def copy_with(
         self,

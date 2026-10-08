@@ -360,7 +360,7 @@ class URIMixin:
         result_list: list[str] = []
         if self.scheme:
             result_list.extend([self.scheme, ":"])
-        if self.authority:
+        if self.authority is not None:
             result_list.extend(["//", self.authority])
         if self.path:
             result_list.append(self.path)

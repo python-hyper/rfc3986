@@ -96,7 +96,7 @@ class URIReference(misc.URIReferenceBase, URIMixin):
         ref = super().__new__(
             cls,
             scheme or None,
-            authority or None,
+            authority,
             path or None,
             query,
             fragment,
@@ -136,11 +136,17 @@ class URIReference(misc.URIReferenceBase, URIMixin):
         """
         # See http://tools.ietf.org/html/rfc3986#section-6.2.2 for logic in
         # this method.
+        authority = self.authority
+        if authority:
+            authority = (
+                normalizers.normalize_authority(
+                    (self.userinfo, self.host, self.port)
+                )
+                or None
+            )
         return URIReference(
             normalizers.normalize_scheme(self.scheme or ""),
-            normalizers.normalize_authority(
-                (self.userinfo, self.host, self.port)
-            ),
+            authority,
             normalizers.normalize_path(self.path or ""),
             normalizers.normalize_query(self.query),
             normalizers.normalize_fragment(self.fragment),
