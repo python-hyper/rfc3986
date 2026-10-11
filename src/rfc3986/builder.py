@@ -325,7 +325,9 @@ class URIBuilder:
             URIBuilder(scheme=None, userinfo=None, host=None, port=None,
                     path=None, query='a=b+c&a=b+c', fragment=None)
         """
-        original_query_items = parse_qsl(self.query or "")
+        original_query_items = parse_qsl(
+            self.query or "", keep_blank_values=True
+        )
         if not isinstance(query_items, list):
             query_items = list(query_items.items())
 
