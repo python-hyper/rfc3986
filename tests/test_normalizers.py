@@ -1,11 +1,16 @@
 import pytest
 
+from rfc3986 import normalize_uri
 from rfc3986.normalizers import encode_component
 from rfc3986.normalizers import normalize_host
 from rfc3986.normalizers import normalize_percent_characters
 from rfc3986.normalizers import normalize_scheme
 from rfc3986.normalizers import remove_dot_segments
 from rfc3986.uri import URIReference
+
+UNRESERVED = (
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~"
+)
 
 
 def test_normalize_scheme():
@@ -15,7 +20,7 @@ def test_normalize_scheme():
 
 
 def test_normalize_percent_characters():
-    expected = "%3Athis_should_be_lowercase%DF%AB%4C"
+    expected = "%3Athis_should_be_lowercase%DF%ABL"
     assert expected == normalize_percent_characters(
         "%3athis_should_be_lowercase%DF%ab%4c"
     )
@@ -25,6 +30,31 @@ def test_normalize_percent_characters():
     assert expected == normalize_percent_characters(
         "%3Athis_should_be_lowercase%DF%aB%4C"
     )
+
+
+def test_normalize_percent_characters_decodes_unreserved():
+    for char in UNRESERVED:
+        assert normalize_percent_characters(f"%{ord(char):02X}") == char
+        assert normalize_percent_characters(f"%{ord(char):02x}") == char
+
+
+def test_normalize_percent_characters_keeps_other_octets():
+    for octet in range(256):
+        if chr(octet) in UNRESERVED:
+            continue
+        assert normalize_percent_characters(f"%{octet:02X}") == f"%{octet:02X}"
+
+
+def test_normalize_percent_characters_keeps_sub_delimiters():
+    sub_delimiters = "%21%24%26%27%28%29%2A%2B%2C%3B%3D"
+    assert sub_delimiters == normalize_percent_characters(sub_delimiters)
+
+
+def test_normalize_percent_characters_is_idempotent():
+    samples = ("%41%42%43", "%3A%2F%DF%AB%7e", "%7Efoo%21%2B", "a/b/%2E%2E")
+    for sample in samples:
+        once = normalize_percent_characters(sample)
+        assert once == normalize_percent_characters(once)
 
 
 paths = [
@@ -67,6 +97,15 @@ def test_normalized_equality(uris):
     assert uris[0] == uris[1]
 
 
+def test_normalized_equality_with_unreserved_percent_encoding():
+    assert URIReference(None, None, "/%7Efoo", None, None) == URIReference(
+        None, None, "/~foo", None, None
+    )
+    assert URIReference(None, None, "/%41%42%43", None, None) == URIReference(
+        None, None, "/ABC", None, None
+    )
+
+
 def test_hostname_normalization():
     assert URIReference(None, "EXAMPLE.COM", None, None, None) == URIReference(
         None, "example.com", None, None, None
@@ -78,6 +117,8 @@ def test_hostname_normalization():
     [
         ("user%2aName@EXAMPLE.COM", "user%2AName@example.com"),
         ("[::1%eth0]", "[::1%25eth0]"),
+        ("user%41%7e@EXAMPLE.COM", "userA~@example.com"),
+        ("user%21@EXAMPLE.COM", "user%21@example.com"),
     ],
 )
 def test_authority_normalization(authority, expected_authority):
@@ -86,8 +127,24 @@ def test_authority_normalization(authority, expected_authority):
 
 
 def test_fragment_normalization():
-    uri = URIReference(None, "example.com", None, None, "fiz%DF").normalize()
-    assert uri.fragment == "fiz%DF"
+    uri = URIReference(
+        None, "example.com", None, None, "fiz%DF%7e"
+    ).normalize()
+    assert uri.fragment == "fiz%DF~"
+
+
+def test_normalize_path_decodes_before_dot_segment_removal():
+    assert (
+        URIReference(None, None, "/a/%2E%2E/b", None, None).normalize().path
+        == "/b"
+    )
+
+
+def test_normalize_uri_api():
+    assert (
+        normalize_uri("http://example.com/%7Efoo/%41?q=%7E#%2D")
+        == "http://example.com/~foo/A?q=~#-"
+    )
 
 
 @pytest.mark.parametrize(
