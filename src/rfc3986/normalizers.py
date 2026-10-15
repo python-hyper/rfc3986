@@ -152,13 +152,12 @@ def remove_dot_segments(s: str) -> str:
         # element
         elif output:
             output.pop()
+            # Preserve the slash that replaces '/..' when the last segment
+            # is removed, even if the original path was rootless.
+            if not output:
+                output.append("")
 
-    # If the path starts with '/' and the output is empty or the first string
-    # is non-empty
-    if s.startswith("/") and (not output or output[0]):
-        output.insert(0, "")
-
-    # If the path starts with '/.' or '/..' ensure we add one more empty
+    # If the path ends with '/.' or '/..' ensure we add one more empty
     # string to add a trailing '/'
     if s.endswith(("/.", "/..")):
         output.append("")

@@ -41,6 +41,15 @@ paths = [
     ("//a/./b/../b/%63/%7Bfoo%7D", "//a/b/%63/%7Bfoo%7D"),
     ("mid/content=5/../6", "mid/6"),
     ("/a/b/c/./../../g", "/a/g"),
+    ("foo/../baz", "/baz"),
+    ("foo/..", "/"),
+    ("foo/../", "/"),
+    ("foo/bar/../../baz", "/baz"),
+    ("foo/../../baz", "/baz"),
+    ("foo/..//baz", "//baz"),
+    ("foo//../baz", "foo/baz"),
+    ("../", ""),
+    ("../../baz", "baz"),
 ]
 
 
