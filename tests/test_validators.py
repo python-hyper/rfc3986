@@ -204,6 +204,27 @@ def test_allowed_hosts_and_schemes(uri, failed_component):
 
 
 @pytest.mark.parametrize(
+    "validator",
+    [
+        validators.Validator().allow_hosts("github.com"),
+        validators.Validator().allow_ports("443"),
+        validators.Validator().forbid_use_of_password(),
+    ],
+)
+@pytest.mark.parametrize(
+    "uri",
+    [
+        rfc3986.uri_reference("https://user@user@evil.com/"),
+        rfc3986.uri_reference("https://user:pass@evil.com:80:80/"),
+    ],
+)
+def test_unparseable_authority_fails_subauthority_checks(validator, uri):
+    """Verify an invalid authority does not skip host/port/password checks."""
+    with pytest.raises(exceptions.InvalidComponentsError):
+        validator.validate(uri)
+
+
+@pytest.mark.parametrize(
     "uri",
     [
         rfc3986.uri_reference("https://github.com/sigmavirus24"),

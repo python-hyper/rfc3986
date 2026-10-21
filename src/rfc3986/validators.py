@@ -213,6 +213,16 @@ class Validator:
         :raises InvalidComponentsError:
             When a component was found to be invalid.
         """
+        if uri.authority is not None and (
+            self.allowed_hosts or self.allowed_ports or not self.allow_password
+        ):
+            # An unparseable authority makes userinfo, host, and port all
+            # None, which would otherwise skip the checks below.
+            try:
+                uri.authority_info()
+            except exceptions.InvalidAuthority:
+                raise exceptions.InvalidComponentsError(uri, "authority")
+
         if not self.allow_password:
             check_password(uri)
 
