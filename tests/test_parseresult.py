@@ -166,6 +166,18 @@ class TestParseResultBytes:
         idna_encoded = SNOWMAN_IDNA_HOST.encode("utf-8") + b"/path"
         assert uri.unsplit(use_idna=True) == idna_encoded
 
+    @pytest.mark.parametrize(
+        "reference", [b"/a", b"a", b"mailto:x", b"?q", b"#f"]
+    )
+    def test_unsplit_reference_without_authority(self, reference):
+        uri = pr.ParseResultBytes.from_string(reference)
+        assert uri.authority is None
+        assert uri.unsplit() == reference
+        assert (
+            pr.ParseResult.from_string(reference.decode()).unsplit()
+            == reference.decode()
+        )
+
     def test_eager_normalization_from_string(self):
         uri = pr.ParseResultBytes.from_string(
             b"http://" + SNOWMAN + b".com/path",
