@@ -88,6 +88,7 @@ def test_add_scheme(scheme):
         ("user", None, "user"),
         ("user@domain.com", "password", "user%40domain.com:password"),
         ("user", "pass:word", "user:pass%3Aword"),
+        ("domain/user", "pass/word", "domain%2Fuser:pass%2Fword"),
     ],
 )
 def test_add_credentials(username, password, userinfo):
@@ -100,6 +101,26 @@ def test_add_credentials_requires_username():
     """Verify one needs a username to add credentials."""
     with pytest.raises(ValueError):
         builder.URIBuilder().add_credentials(None, None)
+
+
+@pytest.mark.parametrize(
+    "username, password",
+    [("domain/user", "password"), ("user", "pass/word")],
+)
+def test_credentials_with_slashes_preserve_uri_components(username, password):
+    """Keep credential slashes from terminating the URI authority."""
+    reference = (
+        builder.URIBuilder()
+        .add_scheme("https")
+        .add_host("example.com")
+        .add_credentials(username, password)
+        .add_path("resource")
+        .finalize()
+    )
+    reparsed = uri_reference(reference.unsplit())
+    assert reparsed.host == "example.com"
+    assert reparsed.userinfo == reference.userinfo
+    assert reparsed.path == "/resource"
 
 
 @pytest.mark.parametrize(

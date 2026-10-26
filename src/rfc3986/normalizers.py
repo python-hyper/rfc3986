@@ -43,12 +43,12 @@ def normalize_authority(
 
 def normalize_username(username: str) -> str:
     """Normalize a username to make it safe to include in userinfo."""
-    return urlquote(username)
+    return urlquote(username, safe="")
 
 
 def normalize_password(password: str) -> str:
     """Normalize a password to make safe for userinfo."""
-    return urlquote(password)
+    return urlquote(password, safe="")
 
 
 def normalize_host(host: str) -> str:
