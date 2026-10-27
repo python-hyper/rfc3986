@@ -6,3 +6,7 @@ prune *.pyc
 recursive-include docs *.rst *.py
 recursive-include tests *.py
 prune docs/_build
+include tox.ini
+include dev-requirements.txt
+include .coveragerc
+include docs/source/requirements.txt
