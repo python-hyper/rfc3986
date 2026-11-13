@@ -126,6 +126,7 @@ class IRIReference(misc.URIReferenceBase, uri.URIMixin):
             Function that encodes each part of the host component
             If not given will raise an exception if the IRI
             contains a host component.
+        :raises InvalidAuthority: If a nonempty authority cannot be parsed.
         :rtype: uri.URIReference
         :returns: A URI reference
         """
@@ -150,6 +151,9 @@ class IRIReference(misc.URIReferenceBase, uri.URIMixin):
                             raise exceptions.InvalidAuthority(self.authority)
                     return name
 
+            # The convenience properties suppress InvalidAuthority, which
+            # would silently discard an unparseable authority here.
+            self.authority_info()
             authority = ""
             if self.host:
                 authority = ".".join(
