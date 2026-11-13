@@ -72,3 +72,67 @@ def test_encode_invalid_iri(iri):
     iri_ref = rfc3986.iri_reference(iri)
     with pytest.raises(InvalidAuthority):
         iri_ref.encode()
+
+
+@pytest.mark.parametrize(
+    "authority",
+    [
+        "example.com:bad",
+        "example.com:80:90",
+        "user:password@exa mple.com",
+        "[::g]",
+        "[::1",
+        "[::1]suffix",
+        "256.1.2.3",
+        "bad\x80.example",
+    ],
+)
+@pytest.mark.parametrize(
+    "custom_encoder", [pytest.param(False, marks=requires_idna), True]
+)
+def test_encode_rejects_unparseable_authority(authority, custom_encoder):
+    reference = rfc3986.iri_reference(
+        "https://" + authority + "/path?query#fragment"
+    )
+    calls = []
+
+    def encoder(label):
+        calls.append(label)
+        return label
+
+    with pytest.raises(InvalidAuthority):
+        if custom_encoder:
+            reference.encode(idna_encoder=encoder)
+        else:
+            reference.encode()
+    assert reference.authority == authority
+    assert calls == []
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        "https://user:password@example.com:080/path?query#fragment",
+        "https://[::1]:443/path",
+        "https://[fe80::1%25eth0]/path",
+        "https://user@:80/path",
+        "mailto:user@example.com",
+        "/relative/path?query#fragment",
+    ],
+)
+@pytest.mark.parametrize(
+    "custom_encoder", [pytest.param(False, marks=requires_idna), True]
+)
+def test_encode_preserves_parseable_authority(value, custom_encoder):
+    reference = rfc3986.iri_reference(value)
+    if custom_encoder:
+        encoded = reference.encode(idna_encoder=lambda label: label)
+    else:
+        encoded = reference.encode()
+    assert encoded.unsplit() == value
+
+
+@requires_idna
+def test_encode_empty_port_retains_existing_normalization():
+    reference = rfc3986.iri_reference("https://example.com:/path")
+    assert reference.encode().unsplit() == "https://example.com/path"
