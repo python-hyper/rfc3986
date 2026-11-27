@@ -69,6 +69,9 @@ class URIMixin:
             # valid bytes, it is an InvalidAuthority.
             raise exc.InvalidAuthority(self.authority.encode(self.encoding))
 
+        if matches.get("port") == "":
+            matches["port"] = None
+
         return matches
 
     def _match_subauthority(self) -> t.Optional[t.Match[str]]:
