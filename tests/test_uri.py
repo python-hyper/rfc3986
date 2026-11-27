@@ -404,3 +404,27 @@ def test_wide_domain_bypass_check():
     ref = URIReference.from_string(url)
     assert ref.scheme == "https"
     assert ref.host == "xdavidhu.me"
+
+
+@pytest.mark.parametrize(
+    ("raw", "expected_host", "expected_normalized"),
+    [
+        ("HTTP://example.com:/a", "example.com", "http://example.com/a"),
+        (
+            "HTTPS://user@EXAMPLE.COM:/a/b/../c",
+            "EXAMPLE.COM",
+            "https://user@example.com/a/c",
+        ),
+        ("http://[::1]:/path", "[::1]", "http://[::1]/path"),
+    ],
+)
+def test_empty_port_preserves_host_on_normalize(
+    raw, expected_host, expected_normalized
+):
+    """RFC 3986 section 3.2.3 & 6.2.3: empty port must preserve host."""
+    ref = URIReference.from_string(raw)
+    assert ref.host == expected_host
+    assert ref.port is None
+    assert ref.authority_info()["host"] == expected_host
+    assert ref.authority_info()["port"] is None
+    assert ref.normalize().unsplit() == expected_normalized

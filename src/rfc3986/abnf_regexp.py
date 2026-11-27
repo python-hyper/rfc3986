@@ -134,7 +134,7 @@ HOST_RE = HOST_PATTERN = "({}|{}|{})".format(
 USERINFO_RE = (
     "^([" + UNRESERVED_RE + SUB_DELIMITERS_RE + ":]|%s)+" % (PCT_ENCODED)
 )
-PORT_RE = "[0-9]{1,5}"
+PORT_RE = "[0-9]{0,5}"
 
 # ####################
 # Path Matcher Section
